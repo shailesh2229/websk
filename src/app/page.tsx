@@ -4,8 +4,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Code, Paintbrush, MonitorSmartphone, Cuboid } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -76,7 +76,7 @@ export default function Home() {
               <div>
                 <h2 className="text-3xl md:text-4xl font-light font-sans mb-4">Selected Work</h2>
                 <p className="text-muted-foreground font-light max-w-xl">
-                  A glimpse into some of the recent projects I've brought to life.
+                  A glimpse into some of the recent projects I&apos;ve brought to life.
                 </p>
               </div>
               <Link href="/work" className={buttonVariants({ variant: "ghost", className: "gap-2" })}>
@@ -114,9 +114,9 @@ export default function Home() {
         <section className="py-32 bg-zinc-950 relative overflow-hidden flex flex-col items-center justify-center text-center">
           <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]"></div>
           <div className="container mx-auto px-4 relative z-10 max-w-3xl">
-            <h2 className="text-4xl md:text-6xl font-light font-sans mb-6">Let's build something extraordinary.</h2>
+            <h2 className="text-4xl md:text-6xl font-light font-sans mb-6">Let&apos;s build something extraordinary.</h2>
             <p className="text-xl text-muted-foreground font-light mb-12">
-              Have a project in mind? I'm currently available for new opportunities.
+              Have a project in mind? I&apos;m currently available for new opportunities.
             </p>
             <Link href="/contact" className={buttonVariants({ size: "lg", className: "rounded-full px-8 py-6 text-lg" })}>
               Get In Touch

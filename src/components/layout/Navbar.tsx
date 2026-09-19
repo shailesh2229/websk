@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { profile } from "@/data/profile";
 
 export function Navbar() {
   const links = [

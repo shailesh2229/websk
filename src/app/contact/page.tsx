@@ -14,7 +14,7 @@ export default function Contact() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div>
-              <h1 className="text-5xl md:text-7xl font-light font-sans mb-8">Let's talk.</h1>
+              <h1 className="text-5xl md:text-7xl font-light font-sans mb-8">Let&apos;s talk.</h1>
               <p className="text-xl text-muted-foreground font-light mb-12 max-w-md">
                 Interested in working together or just want to say hi? Drop a message below or email me directly at <a href={`mailto:${profile.email}`} className="text-foreground hover:underline decoration-white/30 underline-offset-4 transition-all">{profile.email}</a>.
               </p>
