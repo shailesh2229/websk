@@ -5,15 +5,9 @@ import { Footer } from "@/components/layout/Footer";
 import { profile } from "@/data/profile";
 import { projects } from "@/data/projects";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Code, Paintbrush, MonitorSmartphone, Cuboid } from "lucide-react";
-
-const iconMap: Record<string, React.ReactNode> = {
-  "Web Design": <Paintbrush className="w-8 h-8 text-primary" />,
-  "Frontend Development": <Code className="w-8 h-8 text-primary" />,
-  "Full-stack Next.js Applications": <MonitorSmartphone className="w-8 h-8 text-primary" />,
-  "3D Web Experiences": <Cuboid className="w-8 h-8 text-primary" />,
-};
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import { ServicesSection } from "@/components/sections/ServicesSection";
 
 export default function Home() {
   return (
@@ -40,34 +34,7 @@ export default function Home() {
         </section>
 
         {/* Services Section */}
-        <section className="py-24 border-b border-[#22254a] bg-transparent">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-light font-sans mb-4">Core Capabilities</h2>
-                <p className="text-muted-foreground font-light max-w-xl">
-                  Leveraging modern technologies to build scalable, beautiful, and highly functional web applications.
-                </p>
-              </div>
-              <Link href="/services" className={buttonVariants({ variant: "ghost", className: "gap-2" })}>
-                All Services <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {profile.services.map((service, idx) => (
-                <Card key={idx} className="bg-white/[0.03] backdrop-blur border-[#22254a] hover:border-[#6D3BFF] transition-colors">
-                  <CardHeader>
-                    <div className="mb-4">
-                      {iconMap[service] || <Code className="w-8 h-8 text-primary" />}
-                    </div>
-                    <CardTitle className="font-light text-xl">{service}</CardTitle>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ServicesSection />
 
         {/* Selected Work Section */}
         <section className="py-24 border-b border-[#22254a] bg-transparent">
