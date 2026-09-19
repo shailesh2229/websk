@@ -16,13 +16,13 @@ export function WorkSection() {
         </div>
 
         {/* Work Items Grid */}
-        <div className="flex flex-col gap-12 md:gap-24 max-w-5xl mx-auto">
+        <div className="flex flex-col gap-12 md:gap-24 max-w-5xl mx-auto mb-32">
           {/* Project 1 */}
           <Link href="/work/shivkrupa" className="group block w-full">
             <div className="relative aspect-[4/3] md:aspect-[16/9] w-full overflow-hidden rounded-[32px] bg-[#111] border border-[#222] mb-6 md:mb-8 transition-colors duration-500 group-hover:border-[#6D3BFF]">
               <div 
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                style={{ backgroundImage: 'url(/work/shivkrupa-preview.jpg)' }}
+                style={{ backgroundImage: 'url(/proj1.png)' }}
               />
               {/* Overlay on hover */}
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -54,6 +54,65 @@ export function WorkSection() {
               </div>
             </div>
           </Link>
+        </div>
+
+        {/* Process */}
+        <div className="max-w-4xl mx-auto mb-32">
+          <span className="text-[11px] md:text-xs font-mono tracking-[0.3em] uppercase text-[#8a8a8a] mb-6 block text-center">
+            Process
+          </span>
+          <h2 className="text-[clamp(2.5rem,6vw,4.5rem)] font-bold font-sans tracking-tight mb-6 text-center uppercase">HOW WE WORK</h2>
+          <p className="text-center text-[#888] text-lg md:text-xl font-sans mb-16 max-w-2xl mx-auto">
+            Four clear steps from first conversation to launch — focused on clarity, speed, and results.
+          </p>
+          
+          <div className="space-y-12 mt-16">
+            {[
+              { num: "01", title: "DISCOVER", desc: "We dig into your business, audience, and goals before anything is designed." },
+              { num: "02", title: "DEFINE", desc: "Strategy, structure, and visual direction locked in with clear priorities." },
+              { num: "03", title: "BUILD", desc: "Design and development come together into one polished experience." },
+              { num: "04", title: "LAUNCH", desc: "Rigorous testing, fine-tuning, and a confident go-live." },
+            ].map((step, idx) => (
+              <div key={idx} className="flex gap-6 md:gap-12 items-start group">
+                <span className="text-2xl md:text-4xl font-mono text-muted-foreground/30 group-hover:text-white transition-colors tabular-nums mt-1">
+                  {step.num}
+                </span>
+                <div className="flex-1 border-b border-[#22254a] pb-12">
+                  <h3 className="text-2xl md:text-3xl font-bold font-sans tracking-tight mb-4">{step.title}</h3>
+                  <p className="text-muted-foreground font-sans text-lg leading-relaxed max-w-2xl">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Why Work With Us */}
+        <div className="max-w-5xl mx-auto pb-16">
+          <div className="flex flex-col items-center text-center mb-16">
+            <span className="text-[11px] md:text-xs font-mono tracking-[0.3em] uppercase text-[#8a8a8a] mb-6 block">
+              Why Us
+            </span>
+            <h2 className="text-[clamp(2.5rem,6vw,4.5rem)] font-bold font-sans tracking-tight mb-6">Why work with Websk?</h2>
+            <p className="text-[#888] text-lg md:text-xl font-sans max-w-2xl">
+              Design, development, and strategy in one place — so your website looks sharp, loads fast, and actually works for the business.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
+            {[
+              { num: "01", title: "Modern Design", desc: "Clean visuals and layouts that feel current, clear, and on-brand." },
+              { num: "02", title: "Clean Development", desc: "Structured, maintainable code built for speed and long-term growth." },
+              { num: "03", title: "Mobile First", desc: "Experiences designed to feel sharp and effortless on every screen." },
+              { num: "04", title: "Performance Focused", desc: "Lightweight builds that load fast and keep users moving." },
+              { num: "05", title: "SEO Ready", desc: "Technical foundations that help your site get found and rank better." },
+              { num: "06", title: "Business Focused", desc: "Every decision tied to clarity, trust, and real conversion goals." },
+            ].map((feature, idx) => (
+              <div key={idx} className="flex flex-col gap-3 bg-[#0a0a0a] p-8 rounded-2xl border border-[#1f1f1f]">
+                <span className="text-sm font-mono text-muted-foreground tabular-nums mb-2 block">{feature.num}</span>
+                <h3 className="text-xl font-bold font-sans tracking-tight text-white">{feature.title}</h3>
+                <p className="text-muted-foreground font-sans leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

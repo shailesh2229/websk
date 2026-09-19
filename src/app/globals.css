@@ -163,8 +163,9 @@ html[data-loader="playing"] {
 }
 
 html[data-loader="playing"] #site-content,
-html[data-loader="playing"] #navbar {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+html[data-loader="playing"] #navbar,
+html[data-loader="playing"] .scrollable-layer {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }

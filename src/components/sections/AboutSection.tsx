@@ -98,55 +98,6 @@ export function AboutSection() {
         </div>
       </div>
 
-      {/* Why Work With Us */}
-      <div className="container mx-auto px-4 max-w-5xl my-24 md:my-40">
-        <h2 className="text-3xl md:text-5xl font-bold font-sans tracking-tight mb-6 text-center">Why work with Websk?</h2>
-        <p className="text-center text-[#888] text-xl font-sans mb-16 max-w-2xl mx-auto">
-          Design, development, and strategy in one place — so your website looks sharp, loads fast, and actually works for the business.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
-          {[
-            { title: "Modern Design", desc: "Clean visuals and layouts that feel current, clear, and on-brand." },
-            { title: "Clean Development", desc: "Structured, maintainable code built for speed and long-term growth." },
-            { title: "Mobile First", desc: "Experiences designed to feel sharp and effortless on every screen." },
-            { title: "Performance Focused", desc: "Lightweight builds that load fast and keep users moving." },
-            { title: "SEO Ready", desc: "Technical foundations that help your site get found and rank better." },
-            { title: "Business Focused", desc: "Every decision tied to clarity, trust, and real conversion goals." },
-          ].map((feature, idx) => (
-            <div key={idx} className="flex flex-col gap-3 bg-[#0a0a0a] p-8 rounded-2xl border border-[#1f1f1f]">
-              <h3 className="text-xl font-bold font-sans tracking-tight text-white">{feature.title}</h3>
-              <p className="text-muted-foreground font-sans leading-relaxed">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Process */}
-      <div className="container mx-auto px-4 max-w-4xl mb-24 md:mb-40">
-        <span className="text-sm font-mono tracking-widest uppercase text-muted-foreground mb-8 block text-center">
-          How we work
-        </span>
-        <h2 className="text-3xl md:text-5xl font-bold font-sans tracking-tight mb-6 text-center">Four clear steps from first conversation to launch — focused on clarity, speed, and results.</h2>
-        
-        <div className="space-y-12 mt-16">
-          {[
-            { num: "01", title: "Discover", desc: "We dig into your business, audience, and goals before anything is designed." },
-            { num: "02", title: "Define", desc: "Strategy, structure, and visual direction locked in with clear priorities." },
-            { num: "03", title: "Build", desc: "Design and development come together into one polished experience." },
-            { num: "04", title: "Launch", desc: "Rigorous testing, fine-tuning, and a confident go-live." },
-          ].map((step, idx) => (
-            <div key={idx} className="flex gap-6 md:gap-12 items-start group">
-              <span className="text-2xl md:text-4xl font-mono text-muted-foreground/30 group-hover:text-white transition-colors tabular-nums mt-1">
-                {step.num}
-              </span>
-              <div className="flex-1 border-b border-[#22254a] pb-12">
-                <h3 className="text-2xl md:text-3xl font-bold font-sans tracking-tight mb-4">{step.title}</h3>
-                <p className="text-muted-foreground font-sans text-lg leading-relaxed max-w-2xl">{step.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* CTA */}
       <div className="container mx-auto px-4 max-w-4xl text-center bg-[#0a0a0a] p-12 md:p-24 rounded-[36px] border border-[#1f1f1f]">
