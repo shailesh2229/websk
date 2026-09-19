@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SiteBackground } from "./SiteBackground";
 
 let hasPlayed = false;
 
@@ -126,18 +125,18 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
           initial={{ y: 0 }}
           animate={{ y: phase === "done" ? "-100%" : 0 }}
           transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-[#02030c] text-white overflow-hidden font-serif"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent text-white overflow-hidden font-serif"
         >
-          {/* Background for loader so it matches exactly what's underneath */}
-          <SiteBackground shoot={true} />
-
           <div className="relative z-10 flex flex-col items-center w-[min(92vw,520px)] text-center">
             {/* Signature */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              className="sig w-[clamp(200px,34vw,340px)] h-auto block drop-shadow-[0_0_18px_rgba(140,110,255,0.35)]"
-              alt="Websk"
+              className="sig w-[clamp(200px,34vw,340px)] h-auto block drop-shadow-[0_0_18px_rgba(109,59,255,0.35)]"
+              alt=""
               src="/websk-signature.png"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
             />
 
             {/* Tagline */}

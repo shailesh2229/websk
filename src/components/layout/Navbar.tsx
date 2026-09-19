@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Navbar() {
   const [logoVisible, setLogoVisible] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // If we land on the page, the intro will dispatch introComplete when it finishes or skips
@@ -34,8 +36,8 @@ export function Navbar() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/5">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-[#22254a]">
+      <div className="container mx-auto px-4 h-[76px] flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <AnimatePresence>
             {logoVisible && (
@@ -43,25 +45,32 @@ export function Navbar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
-                src="/websk.png"
+                src="/websk-nav.png"
                 alt="Websk"
-                className="h-[30px] w-auto object-contain"
+                className="h-[36px] md:h-[44px] w-auto object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             )}
           </AnimatePresence>
         </Link>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex gap-8">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-[15px] font-serif font-light transition-colors ${
+                  isActive ? "text-white" : "text-[#9ea2c0] hover:text-white"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Mobile Nav Toggle */}

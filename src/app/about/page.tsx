@@ -16,7 +16,8 @@ export default function About() {
           bottomText="PROFILE.LOADED"
         />
 
-        <section className="py-24 bg-background">
+        {/* Hero Section */}
+        <section className="py-24 bg-transparent">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="prose prose-invert prose-lg max-w-none font-light leading-relaxed text-muted-foreground">
               <p className="text-2xl text-foreground mb-8">
@@ -34,7 +35,7 @@ export default function About() {
               <h3 className="text-2xl font-light font-sans mb-8">Skills & Technologies</h3>
               <div className="flex flex-wrap gap-4">
                 {profile.skills.map((skill, idx) => (
-                  <Card key={idx} className="bg-zinc-950 border-white/5">
+                  <Card key={idx} className="bg-white/[0.03] backdrop-blur border-[#22254a]">
                     <CardContent className="p-4 flex items-center justify-center">
                       <span className="font-mono text-sm tracking-wider">{skill}</span>
                     </CardContent>

@@ -23,7 +23,7 @@ export default function Home() {
         <GlobeHero />
 
         {/* Short About Section */}
-        <section className="py-24 bg-background border-b border-white/5">
+        <section className="py-24 border-b border-[#22254a] bg-transparent">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <h2 className="text-3xl md:text-5xl font-light mb-8 font-sans">
               Crafting digital experiences with precision and passion.
@@ -40,7 +40,7 @@ export default function Home() {
         </section>
 
         {/* Services Section */}
-        <section className="py-24 bg-zinc-950 border-b border-white/5">
+        <section className="py-24 border-b border-[#22254a] bg-transparent">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
               <div>
@@ -56,7 +56,7 @@ export default function Home() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {profile.services.map((service, idx) => (
-                <Card key={idx} className="bg-background/50 border-white/5 hover:border-white/20 transition-colors">
+                <Card key={idx} className="bg-white/[0.03] backdrop-blur border-[#22254a] hover:border-[#6D3BFF] transition-colors">
                   <CardHeader>
                     <div className="mb-4">
                       {iconMap[service] || <Code className="w-8 h-8 text-primary" />}
@@ -70,7 +70,7 @@ export default function Home() {
         </section>
 
         {/* Selected Work Section */}
-        <section className="py-24 bg-background border-b border-white/5">
+        <section className="py-24 border-b border-[#22254a] bg-transparent">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
               <div>
@@ -87,8 +87,8 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {projects.slice(0, 2).map((project, idx) => (
                 <Link href={project.link} key={idx} target="_blank" className="group block">
-                  <Card className="overflow-hidden border-white/5 bg-zinc-950/50 group-hover:border-white/20 transition-colors">
-                    <div className="aspect-video relative overflow-hidden bg-zinc-900">
+                  <Card className="overflow-hidden border-[#22254a] bg-white/[0.03] backdrop-blur group-hover:border-[#6D3BFF] transition-colors">
+                    <div className="aspect-video relative overflow-hidden bg-transparent">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
                         src={project.image} 
@@ -111,8 +111,8 @@ export default function Home() {
         </section>
 
         {/* Process & CTA Section */}
-        <section className="py-32 bg-zinc-950 relative overflow-hidden flex flex-col items-center justify-center text-center">
-          <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]"></div>
+        <section className="py-32 bg-transparent relative overflow-hidden flex flex-col items-center justify-center text-center">
+          <div className="absolute inset-0 z-0"></div>
           <div className="container mx-auto px-4 relative z-10 max-w-3xl">
             <h2 className="text-4xl md:text-6xl font-light font-sans mb-6">Let&apos;s build something extraordinary.</h2>
             <p className="text-xl text-muted-foreground font-light mb-12">

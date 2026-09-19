@@ -17,11 +17,11 @@ export default function Services() {
           bottomText="SERVICES.ONLINE"
         />
 
-        <section className="py-24 bg-background">
+        <section className="py-24 bg-transparent">
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {profile.services.map((service, idx) => (
-                <Card key={idx} className="bg-zinc-950 border-white/5 hover:border-white/20 transition-colors group cursor-pointer">
+                <Card key={idx} className="bg-white/[0.03] backdrop-blur border-[#22254a] hover:border-[#6D3BFF] transition-colors group cursor-pointer">
                   <CardHeader>
                     <CardTitle className="font-light text-2xl mb-4 group-hover:text-primary transition-colors">{service}</CardTitle>
                   </CardHeader>

@@ -34,7 +34,7 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="bg-zinc-950/50 border border-white/5 p-8 md:p-12">
+            <div className="bg-white/[0.03] backdrop-blur border border-[#22254a] p-8 md:p-12">
               <form className="space-y-8" action={`mailto:${profile.email}`} method="post" encType="text/plain">
                 <div className="space-y-3">
                   <Label htmlFor="name" className="text-xs font-mono tracking-widest uppercase text-muted-foreground">Name</Label>

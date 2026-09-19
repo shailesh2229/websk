@@ -7,10 +7,7 @@ import { profile } from "@/data/profile";
 
 export function GlobeHero() {
   return (
-    <section className="relative w-full h-screen bg-[#000000] overflow-hidden flex items-center justify-center">
-      {/* Background Grid for minimal effect */}
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-
+    <section className="relative w-full h-screen bg-transparent overflow-hidden flex items-center justify-center">
       {/* 3D Canvas */}
       <div className="absolute inset-0 z-10">
         <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
@@ -19,10 +16,10 @@ export function GlobeHero() {
           
           <Sphere args={[2, 32, 32]}>
             <meshStandardMaterial 
-              color="#ffffff" 
+              color="#a99bff" 
               wireframe={true} 
               transparent={true} 
-              opacity={0.3} 
+              opacity={0.25} 
             />
           </Sphere>
 
@@ -37,17 +34,27 @@ export function GlobeHero() {
       </div>
 
       {/* Content overlay */}
-      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none w-full px-4">
+      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none w-full px-4 h-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
           className="text-center"
         >
-          <h1 className="text-6xl md:text-9xl font-bold tracking-tighter text-white font-sans">
-            WEBSK
-          </h1>
-          <p className="mt-4 text-lg md:text-xl text-gray-400 font-mono tracking-widest uppercase">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="w-[clamp(240px,36vw,420px)] h-auto block mx-auto drop-shadow-[0_0_18px_rgba(109,59,255,0.35)]"
+            alt="Websk"
+            src="/websk-signature.png"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+          <div className="mt-8 text-[#9ea2c0] font-serif text-[clamp(16px,2vw,20px)] leading-relaxed tracking-wide">
+            <span className="block">Web experiences</span>
+            <span className="block">shaped by code, not templates.</span>
+          </div>
+          <p className="mt-8 text-[10px] text-[#6a6e90] font-mono tracking-[0.28em] uppercase">
             {profile.name}
           </p>
         </motion.div>
@@ -57,7 +64,7 @@ export function GlobeHero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-12 text-xs text-gray-500 font-mono tracking-widest uppercase flex items-center gap-2"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-[#6a6e90] font-mono tracking-[0.28em] uppercase flex items-center gap-2 w-max"
         >
           <span>[ Drag to rotate &bull; Scroll to zoom ]</span>
         </motion.div>

@@ -18,13 +18,13 @@ export default function Work() {
           bottomText="PROJECTS.ACTIVE"
         />
 
-        <section className="py-24 bg-background">
+        <section className="py-24 bg-transparent">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project, idx) => (
                 <Link href={project.link} key={idx} target="_blank" className="group block">
-                  <Card className="overflow-hidden border-white/5 bg-zinc-950/50 group-hover:border-white/20 transition-colors h-full flex flex-col">
-                    <div className="aspect-video relative overflow-hidden bg-zinc-900">
+                  <Card className="overflow-hidden border-[#22254a] bg-white/[0.03] backdrop-blur group-hover:border-[#6D3BFF] transition-colors h-full flex flex-col">
+                    <div className="aspect-video relative overflow-hidden bg-transparent">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
                         src={project.image} 
