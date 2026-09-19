@@ -1,31 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
 
 export function Navbar() {
-  const [logoVisible, setLogoVisible] = useState(false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    // If we land on the page, the intro will dispatch introComplete when it finishes or skips
-    const handleIntroComplete = () => setLogoVisible(true);
-    window.addEventListener("introComplete", handleIntroComplete);
-    
-    // Fallback: just in case it was already skipped and we missed the event (e.g. HMR)
-    const timer = setTimeout(() => {
-      setLogoVisible(true);
-    }, 6500);
-
-    return () => {
-      window.removeEventListener("introComplete", handleIntroComplete);
-      clearTimeout(timer);
-    };
-  }, []);
 
   const links = [
     { href: "/", label: "Home" },
@@ -36,24 +17,23 @@ export function Navbar() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-[#22254a]">
+    <header id="navbar" className="fixed top-0 left-0 right-0 z-50 bg-[linear-gradient(to_bottom,rgba(2,3,12,0.85),rgba(2,3,12,0))] border-b border-[#22254a]">
       <div className="container mx-auto px-4 h-[84px] flex items-center justify-between">
         <Link href="/" className="flex items-center">
-          <AnimatePresence>
-            {logoVisible && (
-              <motion.img
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8 }}
-                src="/websk-signature-nav.png"
-                alt="Websk"
-                className="h-[44px] md:h-[56px] w-auto object-contain drop-shadow-[0_0_10px_rgba(140,110,255,0.3)]"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            )}
-          </AnimatePresence>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/websk-signature-nav.png"
+            alt="Websk"
+            width="145"
+            height="56"
+            loading="eager"
+            decoding="sync"
+            fetchPriority="high"
+            className="h-[44px] md:h-[56px] w-auto object-contain drop-shadow-[0_0_10px_rgba(140,110,255,0.3)]"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
         </Link>
 
         <nav className="hidden md:flex gap-8">

@@ -132,14 +132,20 @@
   }
   html {
     @apply font-sans;
+    scrollbar-gutter: stable;
   }
 }
 
-#site-content {
-  transition: opacity 0.9s ease, visibility 0.9s ease;
+html[data-loader="playing"] {
+  overflow: hidden;
 }
 
-html[data-loader="playing"] #site-content {
+#site-content, #navbar {
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+html[data-loader="playing"] #site-content,
+html[data-loader="playing"] #navbar {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;

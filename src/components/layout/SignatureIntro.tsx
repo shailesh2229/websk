@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
 let hasPlayed = false;
 
@@ -19,11 +18,13 @@ const msgs: [number, string][] = [
 
 export function SignatureIntro({ onComplete }: SignatureIntroProps) {
   const [showPreloader, setShowPreloader] = useState(true);
-  const [phase, setPhase] = useState<"play" | "done" | "unmount">("play");
+  const [phase, setPhase] = useState<"play" | "fade" | "unmount">("play");
   const [loadingPct, setLoadingPct] = useState("00");
   const [statusText, setStatusText] = useState("Setting up the canvas");
   const [statusSwap, setStatusSwap] = useState(false);
   const fillRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const fadeFired = useRef(false);
 
   useEffect(() => {
     const forcePlay = window.location.search.includes("loader=1");
@@ -51,13 +52,12 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
       return;
     }
 
-    document.body.style.overflow = "hidden";
-
     const DUR = 4600;
     const DELAY = 900;
     let t0 = 0;
     let raf = 0;
     let curMsgIndex = 0;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     function ease(x: number) {
       return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
@@ -94,18 +94,9 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
       if (p < 1) {
         raf = requestAnimationFrame(tick);
       } else {
-        setTimeout(() => {
-          setPhase("done");
-          delete document.documentElement.dataset.loader;
-          setTimeout(() => {
-            setPhase("unmount");
-            setShowPreloader(false);
-            document.body.style.overflow = "";
-            hasPlayed = true;
-            window.dispatchEvent(new Event("introComplete"));
-            if (onComplete) onComplete();
-          }, 1000); // Wait for slide up
-        }, 500);
+        timeoutId = setTimeout(() => {
+          setPhase("fade");
+        }, 400); // 1) Loader reaches 100%, wait 400ms
       }
     }
 
@@ -113,86 +104,101 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
 
     return () => {
       cancelAnimationFrame(raf);
-      document.body.style.overflow = "";
+      clearTimeout(timeoutId);
     };
   }, [onComplete]);
+
+  // 3) On opacity transitionend
+  const handleTransitionEnd = (e: React.TransitionEvent) => {
+    if (phase !== "fade" || e.propertyName !== "opacity") return;
+    if (fadeFired.current) return;
+    fadeFired.current = true;
+    
+    setPhase("unmount");
+    setShowPreloader(false);
+    hasPlayed = true;
+    
+    requestAnimationFrame(() => {
+      delete document.documentElement.dataset.loader;
+    });
+
+    window.dispatchEvent(new Event("introComplete"));
+    if (onComplete) onComplete();
+  };
 
   if (phase === "unmount" || !showPreloader) {
     return null;
   }
 
   return (
-    <AnimatePresence>
-      {showPreloader && (
-        <motion.div
-          initial={{ y: 0 }}
-          animate={{ y: phase === "done" ? "-100%" : 0 }}
-          transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent text-white overflow-hidden font-serif"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent text-white overflow-hidden font-serif">
+      <div 
+        ref={contentRef}
+        onTransitionEnd={handleTransitionEnd}
+        className={`relative z-10 flex flex-col items-center w-[min(92vw,520px)] text-center transition-all duration-500 ${
+          phase === "fade" ? "opacity-0 -translate-y-2" : "opacity-100 translate-y-0"
+        }`}
+      >
+        {/* Signature */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="sig w-[clamp(200px,34vw,340px)] h-auto block drop-shadow-[0_0_18px_rgba(109,59,255,0.35)]"
+          alt=""
+          src="/websk-signature.png"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+
+        {/* Tagline */}
+        <div className="tag mt-[clamp(18px,3vh,30px)] min-h-[4.4em] text-[clamp(16px,2.1vw,21px)] leading-relaxed tracking-[0.01em]">
+          <span className="block opacity-0 translate-y-2 text-[#9ea2c0]">Web experiences</span>
+          <span className="block opacity-0 translate-y-2 text-[#9ea2c0]">shaped by code, not templates.</span>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="bar mt-[clamp(18px,3vh,30px)] w-[min(220px,50vw)] h-[1px] bg-[#22254a] relative overflow-hidden opacity-0">
+          <div
+            ref={fillRef}
+            className="absolute inset-0 origin-left scale-x-0 bg-[linear-gradient(90deg,transparent,#c9c6ff_70%,#fff)]"
+          />
+        </div>
+
+        {/* Meta */}
+        <div className="meta mt-[14px] font-mono text-[10px] tracking-[0.28em] uppercase text-[#6a6e90] opacity-0">
+          Loading {loadingPct}%
+        </div>
+
+        {/* Status */}
+        <div
+          className={`status mt-[18px] font-mono text-[9.5px] tracking-[0.3em] uppercase text-[#6a6e90] opacity-0 h-[1.2em] transition-opacity duration-200 ${
+            statusSwap ? "!opacity-25" : ""
+          }`}
         >
-          <div className="relative z-10 flex flex-col items-center w-[min(92vw,520px)] text-center">
-            {/* Signature */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className="sig w-[clamp(200px,34vw,340px)] h-auto block drop-shadow-[0_0_18px_rgba(109,59,255,0.35)]"
-              alt=""
-              src="/websk-signature.png"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
+          {statusText}
+        </div>
+      </div>
 
-            {/* Tagline */}
-            <div className="tag mt-[clamp(18px,3vh,30px)] min-h-[4.4em] text-[clamp(16px,2.1vw,21px)] leading-relaxed tracking-[0.01em]">
-              <span className="block opacity-0 translate-y-2 text-[#9ea2c0]">Web experiences</span>
-              <span className="block opacity-0 translate-y-2 text-[#9ea2c0]">shaped by code, not templates.</span>
-            </div>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .sig {
+          -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 42%, transparent 58%);
+          mask-image: linear-gradient(90deg, #000 0%, #000 42%, transparent 58%);
+          -webkit-mask-size: 260% 100%; mask-size: 260% 100%;
+          -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+          -webkit-mask-position: 100% 0; mask-position: 100% 0;
+          animation: write 1.9s cubic-bezier(.45,.05,.3,1) .15s forwards;
+        }
+        @keyframes write { to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
 
-            {/* Progress Bar */}
-            <div className="bar mt-[clamp(18px,3vh,30px)] w-[min(220px,50vw)] h-[1px] bg-[#22254a] relative overflow-hidden opacity-0">
-              <div
-                ref={fillRef}
-                className="absolute inset-0 origin-left scale-x-0 bg-[linear-gradient(90deg,transparent,#c9c6ff_70%,#fff)]"
-              />
-            </div>
+        .tag span:nth-child(1) { animation: up .9s ease 1.6s forwards; }
+        .tag span:nth-child(2) { animation: up .9s ease 2.3s forwards; }
+        @keyframes up { to { opacity: 1; transform: none; } }
 
-            {/* Meta */}
-            <div className="meta mt-[14px] font-mono text-[10px] tracking-[0.28em] uppercase text-[#6a6e90] opacity-0">
-              Loading {loadingPct}%
-            </div>
-
-            {/* Status */}
-            <div
-              className={`status mt-[18px] font-mono text-[9.5px] tracking-[0.3em] uppercase text-[#6a6e90] opacity-0 h-[1.2em] transition-opacity duration-200 ${
-                statusSwap ? "!opacity-25" : ""
-              }`}
-            >
-              {statusText}
-            </div>
-          </div>
-
-          <style dangerouslySetInnerHTML={{ __html: `
-            .sig {
-              -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 42%, transparent 58%);
-              mask-image: linear-gradient(90deg, #000 0%, #000 42%, transparent 58%);
-              -webkit-mask-size: 260% 100%; mask-size: 260% 100%;
-              -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
-              -webkit-mask-position: 100% 0; mask-position: 100% 0;
-              animation: write 1.9s cubic-bezier(.45,.05,.3,1) .15s forwards;
-            }
-            @keyframes write { to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
-
-            .tag span:nth-child(1) { animation: up .9s ease 1.6s forwards; }
-            .tag span:nth-child(2) { animation: up .9s ease 2.3s forwards; }
-            @keyframes up { to { opacity: 1; transform: none; } }
-
-            .bar { animation: fade .6s ease .9s forwards; }
-            .meta { animation: fade .6s ease 1s forwards; }
-            .status { animation: fade .6s ease 1s forwards; }
-            @keyframes fade { to { opacity: 1; } }
-          `}} />
-        </motion.div>
-      )}
-    </AnimatePresence>
+        .bar { animation: fade .6s ease .9s forwards; }
+        .meta { animation: fade .6s ease 1s forwards; }
+        .status { animation: fade .6s ease 1s forwards; }
+        @keyframes fade { to { opacity: 1; } }
+      `}} />
+    </div>
   );
 }
