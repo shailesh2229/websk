@@ -62,13 +62,8 @@ export function Preloader({ children }: { children: React.ReactNode }) {
   if (phase === "done") {
     return <>{children}</>;
   }
+  const trailCopies = isMobile ? 3 : 6;
 
-  const trailCopies = isMobile ? 3 : 5;
-  const trailOffset = isMobile ? 8 : 12;
-
-  // The CSS filter below approximates the purple color #6D3BFF from a white/black image.
-  // It's used on the ghost copies.
-  const purpleFilter = "invert(27%) sepia(87%) saturate(5834%) hue-rotate(253deg) brightness(101%) contrast(106%)";
 
   return (
     <>
@@ -93,21 +88,29 @@ export function Preloader({ children }: { children: React.ReactNode }) {
                 <div className="relative">
                   {/* Trail Copies */}
                   {Array.from({ length: trailCopies }).map((_, i) => (
-                     
-                    <motion.img
+                    <motion.div
                       key={i}
-                      src="/websk.png"
-                      alt=""
-                      className="absolute top-0 left-0 w-48 md:w-64 object-contain pointer-events-none"
-                      style={{ filter: purpleFilter }}
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        backgroundColor: "#6D3BFF",
+                        WebkitMaskImage: "url(/websk.png)",
+                        WebkitMaskSize: "contain",
+                        WebkitMaskRepeat: "no-repeat",
+                        WebkitMaskPosition: "center",
+                        maskImage: "url(/websk.png)",
+                        maskSize: "contain",
+                        maskRepeat: "no-repeat",
+                        maskPosition: "center",
+                        filter: "blur(0.5px)",
+                      }}
                       initial={{ x: 0, y: 0, opacity: 0 }}
                       animate={{
-                        x: [0, (i + 1) * trailOffset, 0],
-                        y: [0, (i + 1) * trailOffset, 0],
-                        opacity: [0, 0.5 - i * (0.45 / trailCopies), 0],
+                        x: [0, (i + 1) * 5, 0],
+                        y: [0, (i + 1) * 3, 0],
+                        opacity: [0, 0.5 - i * 0.08, 0],
                       }}
                       transition={{
-                        duration: 2.2,
+                        duration: 1.4,
                         times: [0, 0.5, 1],
                         ease: "easeInOut",
                       }}
