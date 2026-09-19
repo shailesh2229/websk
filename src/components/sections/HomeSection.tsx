@@ -1,14 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ServicesSection } from "@/components/sections/ServicesSection";
-import { WorkSection } from "@/components/sections/WorkSection";
 
 export function HomeSection() {
   return (
-    <>
-    <section className="relative w-full min-h-[100dvh] flex items-center justify-center pt-[84px]">
-      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-auto w-full px-4 h-full">
+    <section className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center pt-[84px] bg-transparent pb-24">
+      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-auto w-full px-4 h-full my-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -44,23 +41,5 @@ export function HomeSection() {
         </motion.div>
       </div>
     </section>
-    
-    <section className="py-24 border-b border-[#22254a] bg-transparent">
-      <div className="container mx-auto px-4 max-w-4xl text-center">
-        <h2 className="text-3xl md:text-5xl font-light mb-8 font-sans">
-          Crafting digital experiences with precision and passion.
-        </h2>
-        <div className="mt-12">
-          <a href="/about" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('zoomNavigate', { detail: { url: '/about' } })); }} className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">
-            More About Me
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <ServicesSection />
-    
-    <WorkSection />
-    </>
   );
 }

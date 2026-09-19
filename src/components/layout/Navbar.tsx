@@ -5,9 +5,16 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useZoom, PAGES } from "./ZoomContext";
+import { useState } from "react";
+import { useMotionValueEvent } from "framer-motion";
 
 export function Navbar() {
-  const { targetPage, setTargetPage } = useZoom();
+  const { setTargetPage, progress } = useZoom();
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useMotionValueEvent(progress, "change", (latest) => {
+    setActiveIndex(Math.round(latest));
+  });
 
   const links = [
     { href: "/", label: "Home" },
@@ -43,7 +50,7 @@ export function Navbar() {
 
         <nav className="hidden md:flex gap-8">
           {links.map((link, idx) => {
-            const isActive = targetPage === idx;
+            const isActive = activeIndex === idx;
             return (
               <a
                 key={link.href}

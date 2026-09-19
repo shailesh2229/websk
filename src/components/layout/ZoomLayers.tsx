@@ -1,12 +1,12 @@
 "use client";
 
-import { motion, useTransform } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, useTransform, useMotionValueEvent } from "framer-motion";
 import { useZoom } from "./ZoomContext";
 import { HomeSection } from "@/components/sections/HomeSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { WorkSection } from "@/components/sections/WorkSection";
-import { useEffect, useState } from "react";
 
 const pages = [
   { id: 0, component: HomeSection },
@@ -16,8 +16,9 @@ const pages = [
 ];
 
 function ZoomLayer({ index, Component }: { index: number; Component: any }) { // eslint-disable-line @typescript-eslint/no-explicit-any
-  const { progress } = useZoom();
+  const { progress, targetPage } = useZoom();
   const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const clamp = (v:number,a:number,b:number)=>Math.min(b,Math.max(a,v));
   const smooth = (a:number,b:number,x:number)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
@@ -29,23 +30,30 @@ function ZoomLayer({ index, Component }: { index: number; Component: any }) { //
   const visibility = useTransform(opacity, (o) => o < 0.05 ? "hidden" : "visible");
   const pointerEvents = useTransform(opacity, (o) => o < 0.05 ? "none" : "auto");
 
+  // Reset scroll when layer becomes active target
+  useEffect(() => {
+    if (targetPage === index && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [targetPage, index]);
+
   return (
     <motion.div
+      ref={scrollRef}
       style={{
         opacity,
         scale,
         visibility,
         pointerEvents,
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        position: "fixed",
+        inset: 0,
         zIndex: index + 10,
       }}
-      className="scrollable-layer overflow-y-auto overflow-x-hidden h-full w-full"
+      className="scrollable-layer overflow-y-auto overflow-x-hidden no-scrollbar"
     >
-      <Component />
+      <div className="w-full min-h-full block" style={{ paddingTop: 'calc(84px + 24px)', paddingBottom: '96px' }}>
+        <Component />
+      </div>
     </motion.div>
   );
 }
