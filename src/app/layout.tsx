@@ -15,8 +15,15 @@ const geistMono = Geist_Mono({
 import { Preloader } from "@/components/layout/Preloader";
 
 export const metadata: Metadata = {
-  title: "Shailesh Chaudhary | Portfolio",
+  title: "Websk",
   description: "Personal portfolio of Shailesh Chaudhary",
+  icons: {
+    icon: [
+      { url: "/favicon.png" },
+      { url: "/favicon-32.png", sizes: "32x32" }
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

@@ -3,29 +3,33 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+let hasPlayed = false;
+
 export function Preloader({ children }: { children: React.ReactNode }) {
   const [showPreloader, setShowPreloader] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [phase, setPhase] = useState<"trail" | "flash" | "exit" | "done">("trail");
 
   useEffect(() => {
-    // Check session storage
-    if (sessionStorage.getItem("preloader_shown")) {
+    // Support force play
+    const forcePlay = window.location.search.includes("loader=1");
+
+    // Check module level flag
+    if (hasPlayed && !forcePlay) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowPreloader(false);
        
       setPhase("done");
       return;
     }
-
     // Check reduced motion
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion && !forcePlay) {
        
       setShowPreloader(false);
        
       setPhase("done");
-      sessionStorage.setItem("preloader_shown", "true");
+      hasPlayed = true;
       return;
     }
 
@@ -48,7 +52,7 @@ export function Preloader({ children }: { children: React.ReactNode }) {
       setPhase("done");
       setShowPreloader(false);
       document.body.style.overflow = "";
-      sessionStorage.setItem("preloader_shown", "true");
+      hasPlayed = true;
     }, 3200);
 
     return () => {
@@ -118,7 +122,6 @@ export function Preloader({ children }: { children: React.ReactNode }) {
                   ))}
                   
                   {/* Main Logo */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <motion.img
                     src="/websk.png"
                     alt="WEBSK"
@@ -143,9 +146,8 @@ export function Preloader({ children }: { children: React.ReactNode }) {
             )}
 
             {phase === "flash" && (
-               
               <motion.img
-                src="/favicon.png"
+                src="/websk-icon-dark.png"
                 alt="W"
                 className="w-16 h-16 md:w-24 md:h-24 object-contain"
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -157,7 +159,7 @@ export function Preloader({ children }: { children: React.ReactNode }) {
             {phase === "exit" && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src="/favicon.png"
+                src="/websk-icon-dark.png"
                 alt="W"
                 className="w-16 h-16 md:w-24 md:h-24 object-contain"
               />
