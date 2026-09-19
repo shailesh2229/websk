@@ -19,38 +19,23 @@ function ZoomLayer({ index, Component }: { index: number; Component: any }) { //
   const { progress } = useZoom();
   const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Zooming IN to this page: progress goes from index-1 to index.
-  // Zooming PAST this page: progress goes from index to index+1.
+  const clamp = (v:number,a:number,b:number)=>Math.min(b,Math.max(a,v));
+  const smooth = (a:number,b:number,x:number)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+  const layerOpacity = (k:number, p:number) => 1 - smooth(0.12, 0.38, Math.abs(p - k));
+
+  const opacity = useTransform(progress, (p) => layerOpacity(index, p));
+  const scale = useTransform(opacity, (o) => reduce ? 1 : 0.94 + 0.06 * o);
   
-  const opacity = useTransform(
-    progress,
-    [index - 1, index, index + 1],
-    [0, 1, 0]
-  );
-
-  const scale = useTransform(
-    progress,
-    [index - 1, index, index + 1],
-    reduce ? [1, 1, 1] : [0.92, 1.0, 1.08]
-  );
-
-  const pointerEvents = useTransform(progress, (p) => {
-    // Only allow interactions if this page is fully active
-    return Math.abs(p - index) < 0.1 ? "auto" : "none";
-  });
-
-  const display = useTransform(progress, (p) => {
-    // Hide completely if far away to save rendering costs
-    return Math.abs(p - index) > 1.5 ? "none" : "block";
-  });
+  const visibility = useTransform(opacity, (o) => o < 0.05 ? "hidden" : "visible");
+  const pointerEvents = useTransform(opacity, (o) => o < 0.05 ? "none" : "auto");
 
   return (
     <motion.div
       style={{
         opacity,
         scale,
+        visibility,
         pointerEvents,
-        display,
         position: "absolute",
         top: 0,
         left: 0,
