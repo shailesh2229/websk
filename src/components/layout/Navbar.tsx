@@ -1,12 +1,12 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useZoom, PAGES } from "./ZoomContext";
 
 export function Navbar() {
-  const pathname = usePathname();
+  const { targetPage, setTargetPage } = useZoom();
 
   const links = [
     { href: "/", label: "Home" },
@@ -16,10 +16,15 @@ export function Navbar() {
     { href: "/contact", label: "Contact" },
   ];
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, index: number, href: string) => {
+    e.preventDefault();
+    setTargetPage(index);
+  };
+
   return (
     <header id="navbar" className="fixed top-0 left-0 right-0 z-50 bg-[linear-gradient(to_bottom,rgba(2,3,12,0.85),rgba(2,3,12,0))] border-b border-[#22254a]">
       <div className="container mx-auto px-4 h-[84px] flex items-center justify-between">
-        <Link href="/" className="flex items-center">
+        <a href="/" onClick={(e) => handleNavClick(e, 0, "/")} className="flex items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/websk-signature-nav.png"
@@ -34,21 +39,22 @@ export function Navbar() {
               e.currentTarget.style.display = 'none';
             }}
           />
-        </Link>
+        </a>
 
         <nav className="hidden md:flex gap-8">
-          {links.map((link) => {
-            const isActive = pathname === link.href;
+          {links.map((link, idx) => {
+            const isActive = targetPage === idx;
             return (
-              <Link
+              <a
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, idx, link.href)}
                 className={`text-[15px] font-serif font-light transition-colors ${
                   isActive ? "text-white" : "text-[#9ea2c0] hover:text-white"
                 }`}
               >
                 {link.label}
-              </Link>
+              </a>
             );
           })}
         </nav>

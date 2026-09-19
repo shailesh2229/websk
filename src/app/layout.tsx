@@ -21,6 +21,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 import { SignatureIntro } from "@/components/layout/SignatureIntro";
 import { SiteBackground } from "@/components/layout/SiteBackground";
+import { ZoomInitializer } from "@/components/layout/ZoomInitializer";
+import { ZoomController } from "@/components/layout/ZoomController";
+import { PersistentGlobe } from "@/components/layout/PersistentGlobe";
+import { ZoomLayers } from "@/components/layout/ZoomLayers";
+import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
   title: "Websk",
@@ -60,12 +65,21 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-transparent text-white min-h-screen flex flex-col font-serif relative">
-        <SiteBackground />
-        <SignatureIntro />
-        <div id="site-content" className="relative z-10 flex-1 flex flex-col">
-          {children}
-        </div>
+      <body className="bg-transparent text-white min-h-[100dvh] flex flex-col font-serif relative overflow-hidden">
+        <ZoomInitializer>
+          <SiteBackground />
+          <PersistentGlobe />
+          <SignatureIntro />
+          <ZoomController>
+            <div id="site-content" className="relative z-10 flex-1 flex flex-col h-[100dvh] overflow-hidden">
+              <Navbar />
+              <div className="sr-only" aria-hidden="true">
+                {children}
+              </div>
+              <ZoomLayers />
+            </div>
+          </ZoomController>
+        </ZoomInitializer>
       </body>
     </html>
   );
