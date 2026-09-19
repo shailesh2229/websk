@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Marcellus, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const marcellus = Marcellus({
+  weight: "400",
+  variable: "--font-marcellus",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
-import { Preloader } from "@/components/layout/Preloader";
+import { SignatureIntro } from "@/components/layout/SignatureIntro";
+import { SiteBackground } from "@/components/layout/SiteBackground";
 
 export const metadata: Metadata = {
   title: "Websk",
@@ -34,12 +36,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark antialiased`}
+      className={`${marcellus.variable} ${jetbrainsMono.variable} dark antialiased`}
     >
-      <body className="bg-background text-foreground min-h-screen flex flex-col font-sans">
-        <Preloader>
+      <body className="bg-transparent text-white min-h-screen flex flex-col font-serif relative">
+        <SiteBackground />
+        <SignatureIntro />
+        <div className="relative z-10 flex-1 flex flex-col">
           {children}
-        </Preloader>
+        </div>
       </body>
     </html>
   );
