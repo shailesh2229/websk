@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Marcellus, JetBrains_Mono } from "next/font/google";
+import { Marcellus, JetBrains_Mono, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
 const marcellus = Marcellus({
@@ -10,6 +10,12 @@ const marcellus = Marcellus({
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ["400", "700"],
+  variable: "--font-ibm-plex",
   subsets: ["latin"],
 });
 
@@ -36,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${marcellus.variable} ${jetbrainsMono.variable} dark antialiased`}
+      className={`${marcellus.variable} ${jetbrainsMono.variable} ${ibmPlexMono.variable} dark antialiased`}
       suppressHydrationWarning
     >
       <head>

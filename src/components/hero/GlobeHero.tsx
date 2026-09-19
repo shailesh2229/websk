@@ -3,7 +3,6 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Sphere } from "@react-three/drei";
 import { motion } from "framer-motion";
-import { profile } from "@/data/profile";
 
 export function GlobeHero() {
   return (
@@ -16,10 +15,10 @@ export function GlobeHero() {
           
           <Sphere args={[2, 32, 32]}>
             <meshStandardMaterial 
-              color="#a99bff" 
+              color="#ffffff" 
               wireframe={true} 
               transparent={true} 
-              opacity={0.25} 
+              opacity={0.3} 
             />
           </Sphere>
 
@@ -39,24 +38,24 @@ export function GlobeHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="text-center"
+          className="text-center w-full max-w-[375px] md:max-w-none"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className="w-[clamp(240px,36vw,420px)] h-auto block mx-auto drop-shadow-[0_0_18px_rgba(109,59,255,0.35)]"
-            alt="Websk"
-            src="/websk-signature.png"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-          <div className="mt-8 text-[#9ea2c0] font-serif text-[clamp(16px,2vw,20px)] leading-relaxed tracking-wide">
-            <span className="block">Web experiences</span>
-            <span className="block">shaped by code, not templates.</span>
+          <h1 className="text-6xl md:text-9xl font-bold tracking-tighter text-white font-sans">
+            WEBSK
+          </h1>
+
+          <div className="mt-8">
+            <h2 
+              className="font-[family-name:var(--font-ibm-plex)] font-bold text-[#f1f1f8] tracking-[-0.02em] leading-[1.08] text-[clamp(22px,3.6vw,52px)] text-balance mx-auto"
+            >
+              Your tech partner.<br />Shailesh Chaudhary.
+            </h2>
+            <p 
+              className="font-[family-name:var(--font-ibm-plex)] font-normal text-[#b9bad0] text-[clamp(13px,1.2vw,16px)] max-w-[620px] mx-auto mt-4"
+            >
+              Web experiences shaped by code, not templates.
+            </p>
           </div>
-          <p className="mt-8 text-[10px] text-[#6a6e90] font-mono tracking-[0.28em] uppercase">
-            {profile.name}
-          </p>
         </motion.div>
 
         {/* Hint */}
@@ -64,7 +63,7 @@ export function GlobeHero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-[#6a6e90] font-mono tracking-[0.28em] uppercase flex items-center gap-2 w-max"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] text-[#6a6e90] font-mono tracking-[0.28em] uppercase flex items-center gap-2 w-max"
         >
           <span>[ Drag to rotate &bull; Scroll to zoom ]</span>
         </motion.div>
