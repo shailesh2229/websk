@@ -37,7 +37,7 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-[#22254a]">
-      <div className="container mx-auto px-4 h-[76px] flex items-center justify-between">
+      <div className="container mx-auto px-4 h-[84px] flex items-center justify-between">
         <Link href="/" className="flex items-center">
           <AnimatePresence>
             {logoVisible && (
@@ -45,9 +45,9 @@ export function Navbar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8 }}
-                src="/websk-nav.png"
+                src="/websk-signature-nav.png"
                 alt="Websk"
-                className="h-[36px] md:h-[44px] w-auto object-contain"
+                className="h-[44px] md:h-[56px] w-auto object-contain drop-shadow-[0_0_10px_rgba(140,110,255,0.3)]"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}

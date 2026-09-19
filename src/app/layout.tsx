@@ -14,7 +14,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
-  weight: ["400", "700"],
+  weight: ["400", "500", "700"],
   variable: "--font-ibm-plex",
   subsets: ["latin"],
 });

@@ -51,9 +51,9 @@ export function GlobeHero() {
               Your tech partner.<br />Shailesh Chaudhary.
             </h2>
             <p 
-              className="font-[family-name:var(--font-ibm-plex)] font-normal text-[#b9bad0] text-[clamp(13px,1.2vw,16px)] max-w-[620px] mx-auto mt-4"
+              className="font-[family-name:var(--font-ibm-plex)] font-medium text-[#c9cade] text-[clamp(14px,1.15vw,18px)] leading-[1.7] max-w-[640px] mx-auto mt-[20px] text-balance"
             >
-              Web experiences shaped by code, not templates.
+              A five-phase method that transforms how your business runs on technology. An AI-first agency — and your end-to-end tech partner.
             </p>
           </div>
         </motion.div>
