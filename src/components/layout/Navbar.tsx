@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 
+import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useZoom, PAGES } from "./ZoomContext";
@@ -13,7 +14,6 @@ export function Navbar() {
     { href: "/about", label: "About" },
     { href: "/services", label: "Services" },
     { href: "/work", label: "Work" },
-    { href: "/contact", label: "Contact" },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, index: number, href: string) => {
@@ -57,6 +57,12 @@ export function Navbar() {
               </a>
             );
           })}
+          <Link
+            href="/contact"
+            className="text-[15px] font-serif font-light transition-colors text-[#9ea2c0] hover:text-white"
+          >
+            Contact
+          </Link>
         </nav>
 
         {/* Mobile Nav Toggle */}

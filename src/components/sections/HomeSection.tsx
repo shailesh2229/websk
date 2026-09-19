@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { WorkSection } from "@/components/sections/WorkSection";
-import { ContactSection } from "@/components/sections/ContactSection";
 
 export function HomeSection() {
   return (
@@ -62,8 +61,6 @@ export function HomeSection() {
     <ServicesSection />
     
     <WorkSection />
-    
-    <ContactSection />
     </>
   );
 }

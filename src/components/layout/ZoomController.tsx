@@ -14,7 +14,7 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
 
     // 2. Navigation logic
     const attemptNavigate = (delta: number) => {
-      if (delta > 0 && targetPage < 4) {
+      if (delta > 0 && targetPage < 3) {
         setTargetPage(targetPage + 1);
         return true;
       } else if (delta < 0 && targetPage > 0) {

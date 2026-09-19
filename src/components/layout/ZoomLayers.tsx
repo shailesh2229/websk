@@ -6,7 +6,6 @@ import { HomeSection } from "@/components/sections/HomeSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { WorkSection } from "@/components/sections/WorkSection";
-import { ContactSection } from "@/components/sections/ContactSection";
 import { useEffect, useState } from "react";
 
 const pages = [
@@ -14,7 +13,6 @@ const pages = [
   { id: 1, component: AboutSection },
   { id: 2, component: ServicesSection },
   { id: 3, component: WorkSection },
-  { id: 4, component: ContactSection },
 ];
 
 function ZoomLayer({ index, Component }: { index: number; Component: any }) { // eslint-disable-line @typescript-eslint/no-explicit-any

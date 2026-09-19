@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useSpring, MotionValue } from "framer-motion";
 
-export const PAGES = ["/", "/about", "/services", "/work", "/contact"];
+export const PAGES = ["/", "/about", "/services", "/work"];
 
 interface ZoomContextType {
   targetPage: number;
