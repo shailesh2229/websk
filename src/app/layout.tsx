@@ -37,6 +37,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${marcellus.variable} ${jetbrainsMono.variable} dark antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <script
