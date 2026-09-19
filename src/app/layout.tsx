@@ -38,10 +38,23 @@ export default function RootLayout({
       lang="en"
       className={`${marcellus.variable} ${jetbrainsMono.variable} dark antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.location.search.includes('loader=1')) {
+                  document.documentElement.dataset.loader = 'playing';
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </head>
       <body className="bg-transparent text-white min-h-screen flex flex-col font-serif relative">
         <SiteBackground />
         <SignatureIntro />
-        <div className="relative z-10 flex-1 flex flex-col">
+        <div id="site-content" className="relative z-10 flex-1 flex flex-col">
           {children}
         </div>
       </body>

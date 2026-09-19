@@ -32,6 +32,7 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
       setShowPreloader(false);
        
       setPhase("unmount");
+      delete document.documentElement.dataset.loader;
       window.dispatchEvent(new Event("introComplete"));
       if (onComplete) onComplete();
       return;
@@ -44,6 +45,7 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
        
       setPhase("unmount");
       hasPlayed = true;
+      delete document.documentElement.dataset.loader;
       window.dispatchEvent(new Event("introComplete"));
       if (onComplete) onComplete();
       return;
@@ -94,6 +96,7 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
       } else {
         setTimeout(() => {
           setPhase("done");
+          delete document.documentElement.dataset.loader;
           setTimeout(() => {
             setPhase("unmount");
             setShowPreloader(false);

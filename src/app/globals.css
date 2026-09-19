@@ -128,9 +128,19 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-transparent text-foreground;
   }
   html {
     @apply font-sans;
   }
+}
+
+#site-content {
+  transition: opacity 0.9s ease, visibility 0.9s ease;
+}
+
+html[data-loader="playing"] #site-content {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
