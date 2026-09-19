@@ -12,6 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { Preloader } from "@/components/layout/Preloader";
+
 export const metadata: Metadata = {
   title: "Shailesh Chaudhary | Portfolio",
   description: "Personal portfolio of Shailesh Chaudhary",
@@ -27,7 +29,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} dark antialiased`}
     >
-      <body className="bg-background text-foreground min-h-screen flex flex-col font-sans">{children}</body>
+      <body className="bg-background text-foreground min-h-screen flex flex-col font-sans">
+        <Preloader>
+          {children}
+        </Preloader>
+      </body>
     </html>
   );
 }
