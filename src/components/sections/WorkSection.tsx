@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import HoverFooter from "@/components/ui/hover-footer";
 
 export function WorkSection() {
   return (
@@ -211,6 +212,8 @@ export function WorkSection() {
           </div>
         </div>
       </div>
+
+      <HoverFooter />
     </section>
   );
 }
