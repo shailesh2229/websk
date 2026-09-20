@@ -51,12 +51,13 @@ export const TextHoverEffect = ({
       ref={svgRef}
       width="100%"
       height="100%"
-      viewBox="0 0 300 100"
+      viewBox="0 0 300 62"
+      preserveAspectRatio="xMidYMax meet"
       xmlns="http://www.w3.org/2000/svg"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onMouseMove={(e) => setCursor({ x: e.clientX, y: e.clientY })}
-      className={cn("select-none", className)}
+      className={cn("select-none block w-full", className)}
     >
       <defs>
         <linearGradient
@@ -105,8 +106,8 @@ export const TextHoverEffect = ({
         </mask>
       </defs>
       <text
-        x="50%"
-        y="85"
+        x="150"
+        y="61"
         textAnchor="middle"
         dominantBaseline="alphabetic"
         strokeWidth="0.3"
@@ -116,17 +117,17 @@ export const TextHoverEffect = ({
         {text}
       </text>
       <motion.text
-        x="50%"
-        y="85"
+        x="150"
+        y="61"
         textAnchor="middle"
         dominantBaseline="alphabetic"
         strokeWidth="0.3"
         className="fill-transparent stroke-[#3ca2fa] font-[helvetica] font-bold dark:stroke-[#3ca2fa99]"
         style={{ fontSize: "60px" }}
-        initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
+        initial={{ strokeDashoffset: 2000, strokeDasharray: 2000 }}
         whileInView={{
           strokeDashoffset: 0,
-          strokeDasharray: 1000,
+          strokeDasharray: 2000,
         }}
         viewport={{ once: false, amount: 0.1 }}
         transition={{
@@ -139,8 +140,8 @@ export const TextHoverEffect = ({
         {text}
       </motion.text>
       <text
-        x="50%"
-        y="85"
+        x="150"
+        y="61"
         textAnchor="middle"
         dominantBaseline="alphabetic"
         stroke="url(#textGradient)"
@@ -212,7 +213,7 @@ function HoverFooter() {
   return (
     <div className="dark bg-[#01030f] w-full relative pt-16 pb-8">
       <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden mx-4 md:mx-8 xl:mx-auto max-w-[1440px]" style={{ fontFamily: 'var(--font-nunito-sans)' }}>
-        <div className="max-w-7xl mx-auto p-8 md:p-14 lg:pb-[clamp(90px,9vw,140px)] z-40 relative pointer-events-none">
+        <div className="max-w-7xl mx-auto p-8 md:p-14 lg:pb-0 z-40 relative pointer-events-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
             {/* Brand section */}
             <div className="flex flex-col space-y-4 pointer-events-auto">
@@ -284,7 +285,7 @@ function HoverFooter() {
           <hr className="border-t border-gray-700 my-8 pointer-events-auto" />
 
           {/* Footer bottom */}
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0 pointer-events-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0 pointer-events-auto mb-8 lg:mb-0">
             {/* Social icons */}
             <div className="flex space-x-6 text-gray-400">
               <a href={profile.socials.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-[#3ca2fa] transition-colors">
@@ -303,11 +304,11 @@ function HoverFooter() {
               &copy; {new Date().getFullYear()} WEBSK. All rights reserved.
             </p>
           </div>
-        </div>
 
-        {/* Text hover effect */}
-        <div className="lg:block hidden absolute left-0 right-0 bottom-0 w-full z-0">
-          <TextHoverEffect text="WEBSK" className="z-50" />
+          {/* Text hover effect as in-flow block */}
+          <div className="hidden lg:block w-[75%] mx-auto mt-6 pointer-events-auto">
+            <TextHoverEffect text="WEBSK" />
+          </div>
         </div>
 
         <FooterBackgroundGradient />
