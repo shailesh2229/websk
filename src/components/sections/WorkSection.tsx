@@ -213,7 +213,6 @@ export function WorkSection() {
         </div>
       </div>
 
-      <HoverFooter />
     </section>
   );
 }

@@ -21,7 +21,7 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
       if (isCooldown.current) return;
       
       const nextTarget = direction === "next" 
-        ? Math.min(3, targetPage + 1)
+        ? Math.min(4, targetPage + 1)
         : Math.max(0, targetPage - 1);
         
       if (nextTarget !== targetPage) {

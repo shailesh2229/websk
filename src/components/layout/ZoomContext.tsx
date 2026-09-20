@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
 import { useMotionValue, animate, MotionValue } from "framer-motion";
 
-export const PAGES = ["/", "/about", "/services", "/work"];
+export const PAGES = ["/", "/about", "/services", "/work", "/contact"];
 
 interface ZoomContextType {
   targetPage: number;
@@ -33,7 +33,7 @@ export function ZoomProvider({ children, initialPage = 0 }: { children: ReactNod
   }, [progress]);
 
   const setTargetPage = (page: number) => {
-    const clamped = Math.min(3, Math.max(0, page));
+    const clamped = Math.min(4, Math.max(0, page));
     setTargetState(clamped);
     rawTarget.current = clamped;
     

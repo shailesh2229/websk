@@ -9,7 +9,7 @@ export function SpaceBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Parallax scaling for the 3 star layers based on zoom progress
-  const baseScale = useTransform(progress, [0, 3], [1, 1.28]);
+  const baseScale = useTransform(progress, [0, 4], [1, 1.35]);
   const rotation = useTransform(progress, (p) => p * 2); // subtle rotation
 
   useEffect(() => {

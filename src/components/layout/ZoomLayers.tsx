@@ -7,6 +7,7 @@ import { HomeSection } from "@/components/sections/HomeSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { WorkSection } from "@/components/sections/WorkSection";
+import { ContactSection } from "@/components/sections/ContactSection";
 import RotatingEarth from "@/components/ui/wireframe-dotted-globe";
 import { SpaceBackground } from "@/components/ui/space-background";
 
@@ -14,6 +15,7 @@ const pages = [
   { id: 1, component: AboutSection },
   { id: 2, component: ServicesSection },
   { id: 3, component: WorkSection },
+  { id: 4, component: ContactSection },
 ];
 
 function ZoomLayer({ Component, index, invGlobeScale }: { Component: React.ComponentType; index: number; invGlobeScale: MotionValue<number> }) { 
@@ -113,7 +115,7 @@ export function ZoomLayers() {
   // Calculate globe scale
   const globeScale = useTransform(progress, (p) => {
     const scale1 = (1.7 * vmax) / (0.72 * vmin);
-    const scale3 = (2.6 * vmax) / (0.72 * vmin);
+    const scale4 = (3.2 * vmax) / (0.72 * vmin);
     
     const t = Math.min(1, Math.max(0, p));
     const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -121,8 +123,8 @@ export function ZoomLayers() {
     if (p <= 1) {
       return 1 + (scale1 - 1) * ease;
     } else {
-      const progressOver1 = (p - 1) / 2;
-      return scale1 + (scale3 - scale1) * progressOver1;
+      const progressOver1 = (p - 1) / 3;
+      return scale1 + (scale4 - scale1) * progressOver1;
     }
   });
 
