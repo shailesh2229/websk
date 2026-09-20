@@ -106,22 +106,21 @@ export const TextHoverEffect = ({
       </defs>
       <text
         x="50%"
-        y="50%"
+        y="96"
         textAnchor="middle"
-        dominantBaseline="middle"
         strokeWidth="0.3"
-        className="fill-transparent stroke-neutral-200 font-[helvetica] text-7xl font-bold dark:stroke-neutral-800"
-        style={{ opacity: hovered ? 0.7 : 0 }}
+        className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
+        style={{ opacity: hovered ? 0.7 : 0, fontSize: "60px" }}
       >
         {text}
       </text>
       <motion.text
         x="50%"
-        y="50%"
+        y="96"
         textAnchor="middle"
-        dominantBaseline="middle"
         strokeWidth="0.3"
-        className="fill-transparent stroke-[#3ca2fa] font-[helvetica] text-7xl font-bold dark:stroke-[#3ca2fa99]"
+        className="fill-transparent stroke-[#3ca2fa] font-[helvetica] font-bold dark:stroke-[#3ca2fa99]"
+        style={{ fontSize: "60px" }}
         initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
         whileInView={{
           strokeDashoffset: 0,
@@ -137,13 +136,13 @@ export const TextHoverEffect = ({
       </motion.text>
       <text
         x="50%"
-        y="50%"
+        y="96"
         textAnchor="middle"
-        dominantBaseline="middle"
         stroke="url(#textGradient)"
         strokeWidth="0.3"
         mask="url(#textMask)"
-        className="fill-transparent font-[helvetica] text-7xl font-bold"
+        className="fill-transparent font-[helvetica] font-bold"
+        style={{ fontSize: "60px" }}
       >
         {text}
       </text>
@@ -206,8 +205,8 @@ function HoverFooter() {
   ];
 
   return (
-    <div className="dark">
-      <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden m-8 font-sans">
+    <div className="dark bg-[#01030f] w-full relative" style={{ paddingBlock: 'clamp(80px, 12vh, 200px)' }}>
+      <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden mx-4 md:mx-8 xl:mx-auto max-w-[1440px]" style={{ fontFamily: 'var(--font-nunito-sans)' }}>
         <div className="max-w-7xl mx-auto p-8 md:p-14 z-40 relative">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
             {/* Brand section */}
@@ -250,12 +249,12 @@ function HoverFooter() {
               <h4 className="text-white text-lg font-semibold mb-6">
                 Contact Us
               </h4>
-              <ul className="space-y-6">
+              <ul className="space-y-4">
                 <li className="flex items-center space-x-3">
                   <Mail size={18} className="text-[#3ca2fa] shrink-0" />
                   <a
                     href={`mailto:${profile.email}`}
-                    className="text-gray-300 hover:text-[#3ca2fa] transition-colors break-all"
+                    className="text-gray-300 hover:text-[#3ca2fa] transition-colors break-all text-base"
                   >
                     {profile.email}
                   </a>
@@ -265,13 +264,13 @@ function HoverFooter() {
                     <ArrowUpRight size={18} className="text-[#3ca2fa] shrink-0" />
                     <a
                       href="/contact"
-                      className="text-gray-300 hover:text-[#3ca2fa] transition-colors relative"
+                      className="text-gray-300 hover:text-[#3ca2fa] transition-colors relative text-base"
                     >
                       Get In Touch
                       <span className="absolute top-0 -right-4 w-2 h-2 rounded-full bg-[#3ca2fa] animate-pulse"></span>
                     </a>
                   </div>
-                  <p className="text-xs text-gray-500 pl-8">Currently available for new opportunities.</p>
+                  <p className="text-sm text-gray-500 pl-8">Currently available for new opportunities.</p>
                 </li>
               </ul>
             </div>
