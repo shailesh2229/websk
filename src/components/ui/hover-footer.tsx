@@ -106,7 +106,7 @@ export const TextHoverEffect = ({
       </defs>
       <text
         x="50%"
-        y="98"
+        y="85"
         textAnchor="middle"
         dominantBaseline="alphabetic"
         strokeWidth="0.3"
@@ -117,7 +117,7 @@ export const TextHoverEffect = ({
       </text>
       <motion.text
         x="50%"
-        y="98"
+        y="85"
         textAnchor="middle"
         dominantBaseline="alphabetic"
         strokeWidth="0.3"
@@ -132,13 +132,15 @@ export const TextHoverEffect = ({
         transition={{
           duration: duration || 4,
           ease: "easeInOut",
+          repeat: Infinity,
+          repeatType: "reverse",
         }}
       >
         {text}
       </motion.text>
       <text
         x="50%"
-        y="98"
+        y="85"
         textAnchor="middle"
         dominantBaseline="alphabetic"
         stroke="url(#textGradient)"
