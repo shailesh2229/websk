@@ -7,55 +7,70 @@ import { SpaceBackground } from "@/components/ui/space-background";
 
 const ZOOM_MIN = 0.85;
 const ZOOM_MAX = 1.5;
+const ZOOM_SENSITIVITY = 0.003; // per pixel of deltaY — tuned for normal trackpad
 
 export default function Home() {
   const [zoomLevel, setZoomLevel] = useState(1.0);
   const zoomRef = useRef(1.0);
+  const displayZoom = useRef(1.0);
+  const rafRef = useRef<number>(0);
+
+  // Smooth display zoom with lerp
+  useEffect(() => {
+    const loop = () => {
+      const prev = displayZoom.current;
+      const target = zoomRef.current;
+      displayZoom.current = prev + (target - prev) * 0.15;
+      if (Math.abs(displayZoom.current - target) > 0.0001) {
+        setZoomLevel(displayZoom.current);
+      }
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (e.ctrlKey) return; // let PageNavigator handle pinch
-      // Only intercept vertical wheel on the home page
-      // If zoom is maxed, let the event pass through for PageNavigator
+      // Only act when page is at the very top (globe section visible)
+      if (window.scrollY > 0) return;
+
       let dy = e.deltaY;
       if (e.deltaMode === 1) dy *= 16;
       else if (e.deltaMode === 2) dy *= window.innerHeight;
+
+      // Skip horizontal scrolls
       if (Math.abs(dy) < Math.abs(e.deltaX)) return;
 
-      const goingDown = dy > 0;
-      const goingUp = dy < 0;
-      const scrolledToBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      const goingDown = dy > 0; // zoom in
+      const goingUp = dy < 0;   // zoom out
 
-      if (goingDown && zoomRef.current >= ZOOM_MAX) {
-        // Max zoomed — release to PageNavigator (don't prevent default)
-        return;
-      }
-      if (goingUp && window.scrollY <= 0 && zoomRef.current <= ZOOM_MIN) {
-        // Min zoomed at top — nothing more to do
-        return;
-      }
-      // If the page is scrollable and not yet at top/bottom, let native scroll happen
-      if (scrolledToBottom && goingDown && zoomRef.current < ZOOM_MAX) {
-        // Intercept: zoom in instead of passing to PageNavigator yet
-      } else if (window.scrollY > 0) {
-        // Mid-page: let native scroll handle it
-        return;
-      } else if (window.scrollY <= 0 && goingUp && zoomRef.current > ZOOM_MIN) {
-        // At top: zoom out
-      } else if (!scrolledToBottom && !goingUp) {
+      const atMax = zoomRef.current >= ZOOM_MAX;
+      const atMin = zoomRef.current <= ZOOM_MIN;
+
+      if (goingUp && !atMin) {
+        // Zoom out — consume this event so PageNavigator doesn't also see it
+        e.preventDefault();
+        const newZoom = Math.max(ZOOM_MIN, zoomRef.current + dy * ZOOM_SENSITIVITY);
+        zoomRef.current = newZoom;
         return;
       }
 
-      e.preventDefault();
+      if (goingDown && !atMax) {
+        // Zoom in — consume
+        e.preventDefault();
+        const newZoom = Math.min(ZOOM_MAX, zoomRef.current + dy * ZOOM_SENSITIVITY);
+        zoomRef.current = newZoom;
+        return;
+      }
 
-      const delta = dy * 0.001; // sensitivity
-      const newZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoomRef.current + delta));
-      zoomRef.current = newZoom;
-      setZoomLevel(newZoom);
+      // atMax + goingDown, or atMin + goingUp: fall through to PageNavigator (don't preventDefault)
     };
 
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    return () => window.removeEventListener("wheel", handleWheel);
+    // capture:true — fires before PageNavigator (also capture) so globe zoom takes priority
+    // when scrollY === 0 and zoom is not at limit.
+    window.addEventListener("wheel", handleWheel, { capture: true, passive: false });
+    return () => window.removeEventListener("wheel", handleWheel, { capture: true });
   }, []);
 
   return (
@@ -79,10 +94,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Hero text — above globe, pointer-events-none so wheel reaches globe */}
-      <div
-        className="relative z-10 min-h-screen flex flex-col items-center justify-center pt-[84px] pb-24 pointer-events-none"
-      >
+      {/* Hero text — pointer-events-none so wheel passes through */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center pt-[84px] pb-24 pointer-events-none">
         <div className="flex flex-col items-center justify-center w-full px-4 my-auto pointer-events-none">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
