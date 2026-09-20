@@ -2,11 +2,11 @@ export const profile = {
   name: "Shailesh Chaudhary",
   tagline: "Building dynamic, functional, and visually stunning web experiences.",
   about: "I am a passionate web developer dedicated to creating minimalistic, beautiful, and highly responsive applications. With expertise in Next.js, React, and modern CSS frameworks, I bring designs to life and help businesses establish a strong digital presence.",
-  email: "hello@shailesh.dev", // Dummy email
+  email: "websk2026@gmail.com",
   socials: {
-    linkedin: "https://linkedin.com/in/shailesh",
-    github: "https://github.com/shailesh",
-    instagram: "https://instagram.com/shailesh",
+    linkedin: "https://www.linkedin.com/in/shailesh-chaudhary-0a215a378",
+    github: "https://github.com/shailesh2229",
+    instagram: "https://www.instagram.com/shailesh29___",
   },
   services: [
     "Web Design",
