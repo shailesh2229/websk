@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useTransform, useMotionValueEvent, MotionValue } from "framer-motion";
 import { useZoom } from "./ZoomContext";
 import { HomeSection } from "@/components/sections/HomeSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { WorkSection } from "@/components/sections/WorkSection";
 import RotatingEarth from "@/components/ui/wireframe-dotted-globe";
+import { SpaceBackground } from "@/components/ui/space-background";
 
 const pages = [
   { id: 1, component: AboutSection },
@@ -15,8 +16,7 @@ const pages = [
   { id: 3, component: WorkSection },
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ZoomLayer({ index, Component, invGlobeScale }: { index: number; Component: any; invGlobeScale: any }) { 
+function ZoomLayer({ Component, index, invGlobeScale }: { Component: React.ComponentType; index: number; invGlobeScale: MotionValue<number> }) { 
   const { progress, targetPage } = useZoom();
   const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -40,13 +40,20 @@ function ZoomLayer({ index, Component, invGlobeScale }: { index: number; Compone
     }
   });
 
-  const visibility = useTransform(opacity, (o) => o < 0.05 ? "hidden" : "visible");
-  const pointerEvents = useTransform(opacity, (o) => o < 0.05 ? "none" : "auto");
+  const visibility = useTransform(opacity, (o) => (o > 0 ? "visible" : "hidden"));
+  const pointerEvents = useTransform(progress, (p) => (Math.abs(p - index) < 0.1 ? "auto" : "none"));
+  
+  const willChange = useTransform(progress, (p) => {
+    return Math.abs(p - targetPage) > 0.01 ? "transform, opacity" : "auto";
+  });
 
-  // Reset scroll when layer becomes active target
+  // Reset scroll when navigating away
   useEffect(() => {
-    if (targetPage === index && scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
+    if (targetPage !== index && scrollRef.current) {
+      const el = scrollRef.current;
+      setTimeout(() => {
+        el.scrollTo({ top: 0, behavior: "instant" });
+      }, 500); // Wait for transition to end before resetting
     }
   }, [targetPage, index]);
 
@@ -64,6 +71,7 @@ function ZoomLayer({ index, Component, invGlobeScale }: { index: number; Compone
         visibility,
         pointerEvents,
         zIndex: index + 10,
+        willChange,
       }}
     >
       <motion.div
@@ -83,7 +91,6 @@ export function ZoomLayers() {
   const { progress } = useZoom();
   const [vmax, setVmax] = useState(1000);
   const [vmin, setVmin] = useState(1000);
-  const [isPaused, setIsPaused] = useState(false);
   const [isDimmed, setIsDimmed] = useState(false);
 
   useEffect(() => {
@@ -97,7 +104,6 @@ export function ZoomLayers() {
   }, []);
 
   useMotionValueEvent(progress, "change", (latest) => {
-    setIsPaused(latest >= 1);
     setIsDimmed(latest > 0.5);
     if (typeof document !== 'undefined') {
       document.documentElement.dataset.activePage = Math.round(latest).toString();
@@ -133,7 +139,8 @@ export function ZoomLayers() {
   const heroScale = useTransform(progress, [0, 0.25], [1, 0.9]);
 
   return (
-    <div className="fixed inset-0 overflow-hidden stage bg-[#030305]">
+    <div className="fixed inset-0 overflow-hidden stage bg-transparent">
+      <SpaceBackground />
       {/* Globe Circle Container */}
       <motion.div 
         className="globe absolute top-1/2 left-1/2 rounded-full overflow-hidden"
@@ -146,7 +153,6 @@ export function ZoomLayers() {
         }}
       >
         <RotatingEarth 
-          paused={isPaused} 
           dimmed={isDimmed} 
           interactive={true} 
           className="absolute inset-0" 

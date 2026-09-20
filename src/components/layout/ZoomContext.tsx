@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode, useRef } from "react";
-import { useMotionValue, useAnimationFrame, MotionValue } from "framer-motion";
+import { useMotionValue, animate, MotionValue } from "framer-motion";
 
 export const PAGES = ["/", "/about", "/services", "/work"];
 
@@ -19,35 +19,18 @@ export function ZoomProvider({ children, initialPage = 0 }: { children: ReactNod
   const rawTarget = useRef(initialPage);
   const progress = useMotionValue(initialPage);
   const isReducedMotion = useRef(false);
+  const activeAnimation = useRef<{ stop: () => void } | null>(null);
 
   useEffect(() => {
     isReducedMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // Expose for testing
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).__setProgress = (p: number) => {
+      if (activeAnimation.current) activeAnimation.current.stop();
       rawTarget.current = p;
       progress.set(p);
     };
   }, [progress]);
-
-  useAnimationFrame((t, delta) => {
-    if (isReducedMotion.current) {
-      // Instant snap if reduced motion
-      progress.set(rawTarget.current);
-      return;
-    }
-    const current = progress.get();
-    const target = rawTarget.current;
-    
-    // Smooth every frame
-    if (Math.abs(target - current) > 0.001) {
-      const dtSec = delta / 1000;
-      const next = current + (target - current) * (1 - Math.exp(-dtSec * 6));
-      progress.set(next);
-    } else if (current !== target) {
-      progress.set(target);
-    }
-  });
 
   const setTargetPage = (page: number) => {
     const clamped = Math.min(3, Math.max(0, page));
@@ -60,14 +43,28 @@ export function ZoomProvider({ children, initialPage = 0 }: { children: ReactNod
         window.history.pushState(null, "", path);
       }
     }
+
+    if (activeAnimation.current) {
+      activeAnimation.current.stop();
+    }
+
+    if (isReducedMotion.current) {
+      progress.set(clamped);
+      return;
+    }
+
+    activeAnimation.current = animate(progress, clamped, {
+      type: "tween",
+      duration: 1.0, // approx 900-1100ms
+      ease: [0.65, 0, 0.35, 1], // power3.inOut equivalent
+    });
   };
 
   useEffect(() => {
     const handlePopState = () => {
       const idx = PAGES.indexOf(window.location.pathname);
       if (idx !== -1) {
-        setTargetState(idx);
-        rawTarget.current = idx;
+        setTargetPage(idx);
       }
     };
     window.addEventListener("popstate", handlePopState);

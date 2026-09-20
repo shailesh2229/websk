@@ -111,10 +111,19 @@ export function ServicesSection() {
           stepTl.to(cards[i], {
             scale: 1 - (depth * 0.04), // 0.96, 0.92, etc
             y: -24 * depth,
-            filter: `brightness(${1 - depth * 0.2})`,
             ease: "power3.inOut",
             duration: 1,
           }, 0);
+          
+          // Animate the dimming overlay inside the card
+          const overlay = cards[i].querySelector('.dim-overlay');
+          if (overlay) {
+            stepTl.to(overlay, {
+              opacity: depth * 0.2, // 0.2, 0.4 etc
+              ease: "power3.inOut",
+              duration: 1,
+            }, 0);
+          }
         }
 
         // Add this card's entrance to the main timeline
@@ -200,17 +209,20 @@ export function ServicesSection() {
             return (
               <div 
                 key={idx} 
-                className="stack-item absolute max-w-[1100px] w-full flex flex-col justify-between border border-[#2a2a2a] rounded-[32px] p-[28px] md:p-[48px] will-change-transform shadow-2xl"
+                className="stack-item absolute max-w-[1100px] w-full flex flex-col justify-between border border-[#2a2a2a] rounded-[32px] p-[28px] md:p-[48px] shadow-2xl overflow-hidden"
                 style={{ backgroundColor: service.fill, height: "60vh", minHeight: "400px" }}
               >
-                <div className="flex justify-between items-start mb-auto">
+                {/* Dimming overlay for GSAP (replaces CSS filter) */}
+                <div className="dim-overlay absolute inset-0 bg-black pointer-events-none" style={{ opacity: 0, zIndex: 10 }} />
+                
+                <div className="flex justify-between items-start mb-auto relative z-20">
                   <span className="font-mono text-sm tracking-widest text-[#8a8a8a] tabular-nums pt-1">
                     {service.number}
                   </span>
                   <Icon className="w-9 h-9 text-white" strokeWidth={1.5} />
                 </div>
                 
-                <div className="flex flex-col gap-4 mt-auto">
+                <div className="flex flex-col gap-4 mt-auto relative z-20">
                   <h3 className="text-[24px] md:text-[36px] font-bold tracking-tight text-white font-sans">
                     {service.title}
                   </h3>

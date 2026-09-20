@@ -119,17 +119,28 @@ export default function RotatingEarth({
       lat: number
     }
 
-    const allDots: DotData[] = []
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allDots: [number, number, number][] = [] // 3D coordinates [x,y,z] before projection
     let landFeatures: any
+    let graticulePath: any = null
+    let landPath: any = null
 
-    const render = () => {
+    // Create a path generator that doesn't clear the context per feature
+    const renderPath = d3.geoPath().projection(projection).context(context)
+
+    const render = (time: number) => {
+      // Time-based rotation (approx 0.5 degrees per 16ms = 30 deg/sec)
+      // 10 degrees per second:
+      if (!isDragging) {
+        rotation[0] = (time * 0.01) % 360
+      }
+      projection.rotate(rotation as [number, number, number])
+      
       context.clearRect(0, 0, size, size)
       const currentScale = projection.scale()
       const scaleFactor = currentScale / radius
       const isDimmed = stateRef.current.dimmed
 
-      // Draw ocean (transparent)
+      // Ocean
       context.beginPath()
       context.arc(size / 2, size / 2, currentScale, 0, 2 * Math.PI)
       context.fillStyle = "transparent"
@@ -139,44 +150,44 @@ export default function RotatingEarth({
       context.stroke()
 
       if (landFeatures) {
-        // Graticule
-        const graticule = d3.geoGraticule()
+        // Graticule (batched)
+        if (!graticulePath) graticulePath = d3.geoGraticule()()
         context.beginPath()
-        path(graticule())
+        renderPath(graticulePath)
         context.strokeStyle = "#ffffff"
         context.lineWidth = 1 * scaleFactor
         context.globalAlpha = isDimmed ? 0.05 : 0.15
         context.stroke()
-        context.globalAlpha = 1
 
-        // Land outlines (faint)
+        // Land (batched)
+        if (!landPath) {
+          landPath = { type: "FeatureCollection", features: landFeatures.features }
+        }
         context.beginPath()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        landFeatures.features.forEach((feature: any) => {
-          path(feature)
-        })
+        renderPath(landPath)
         context.strokeStyle = "#ffffff"
         context.lineWidth = 0.5 * scaleFactor
         context.globalAlpha = isDimmed ? 0.1 : 0.3
         context.stroke()
         context.globalAlpha = 1
 
-        // Dots
+        // Dots (batched)
         context.fillStyle = isDimmed ? "rgba(153, 153, 153, 0.2)" : "rgba(153, 153, 153, 0.8)"
-        allDots.forEach((dot) => {
-          const projected = projection([dot.lng, dot.lat])
-          if (
-            projected &&
-            projected[0] >= 0 &&
-            projected[0] <= size &&
-            projected[1] >= 0 &&
-            projected[1] <= size
-          ) {
-            context.beginPath()
-            context.arc(projected[0], projected[1], 1.5 * scaleFactor, 0, 2 * Math.PI)
-            context.fill()
+        
+        // When dimmed, skip every second dot to lower density
+        const dotStep = isDimmed ? 2 : 1
+        const dotSize = 1.5 * scaleFactor
+        
+        context.beginPath()
+        for (let i = 0; i < allDots.length; i += dotStep) {
+          const projected = projection([allDots[i][0], allDots[i][1]])
+          if (projected) {
+            // Check visibility using 3D spherical math (if the dot is on the back, the projection might still return something or we can check distance from center, but d3 geoOrthographic handles clipping if we clipAngle(90))
+            // Actually, geoOrthographic with clipAngle(90) returns null for hidden points if we project them individually, but we know it's hidden if projected is null.
+            context.rect(projected[0] - dotSize/2, projected[1] - dotSize/2, dotSize, dotSize)
           }
-        })
+        }
+        context.fill()
       }
     }
 
@@ -188,15 +199,14 @@ export default function RotatingEarth({
 
         landFeatures = await response.json()
         
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // Generate dots
         landFeatures.features.forEach((feature: any) => {
           const dots = generateDotsInPolygon(feature, 16)
           dots.forEach(([lng, lat]) => {
-            allDots.push({ lng, lat })
+            allDots.push([lng, lat, 0])
           })
         })
 
-        render()
         setIsLoading(false)
       } catch {
         setError("Failed to load land map data")
@@ -206,20 +216,15 @@ export default function RotatingEarth({
 
     const rotation = [0, 0]
     let isDragging = false
-    const rotationSpeed = 0.5
+    let animationFrameId: number
 
-    const rotate = () => {
-      if (!stateRef.current.paused && !isDragging) {
-        rotation[0] += rotationSpeed
-        projection.rotate(rotation as [number, number, number])
-        render()
-      } else if (isDragging) {
-        // If dragging, we still want to render, but rotation is updated by mousemove
-        render()
-      }
+    const tick = (time: DOMHighResTimeStamp) => {
+      render(time)
+      animationFrameId = requestAnimationFrame(tick)
     }
-
-    const rotationTimer = d3.timer(rotate)
+    
+    // Start loop immediately
+    animationFrameId = requestAnimationFrame(tick)
 
     const handleMouseDown = (event: MouseEvent | TouchEvent) => {
       if (!stateRef.current.interactive) return
@@ -255,9 +260,6 @@ export default function RotatingEarth({
         rotation[0] = startRotation[0] + dx * sensitivity
         rotation[1] = startRotation[1] - dy * sensitivity
         rotation[1] = Math.max(-90, Math.min(90, rotation[1]))
-
-        projection.rotate(rotation as [number, number, number])
-        render()
       }
 
       const handleMouseUp = () => {
@@ -283,7 +285,7 @@ export default function RotatingEarth({
     loadWorldData()
 
     return () => {
-      rotationTimer.stop()
+      cancelAnimationFrame(animationFrameId)
       canvas.removeEventListener("mousedown", handleMouseDown)
       canvas.removeEventListener("touchstart", handleMouseDown)
     }

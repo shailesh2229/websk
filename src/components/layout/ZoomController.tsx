@@ -4,144 +4,165 @@ import { useEffect, useRef } from "react";
 import { useZoom } from "./ZoomContext";
 
 export function ZoomController({ children }: { children: React.ReactNode }) {
-  const { targetPage, setTargetPage, rawTarget } = useZoom();
-  const isCooldown = useRef(false);
-  const snapTimer = useRef<NodeJS.Timeout | null>(null);
+  const { targetPage, setTargetPage } = useZoom();
   
-  // Touch tracking
+  const isCooldown = useRef(false);
   const touchStartY = useRef(0);
   const touchStartX = useRef(0);
-  const touchAxis = useRef<"x" | "y" | null>(null);
-  const overscrollAccumulator = useRef(0);
+  
+  // State for strict page gating
+  const boundaryTimer = useRef<NodeJS.Timeout | null>(null);
+  const isArmed = useRef<"top" | "bottom" | null>(null);
+  const accumulatedOverscroll = useRef(0);
 
   useEffect(() => {
-    // 1. Core input handler
-    const applyDelta = (deltaY: number, e: Event) => {
-      // Check if loader is playing
+    const handleNavigationEvent = (direction: "next" | "prev") => {
       if (document.documentElement.dataset.loader === "playing") return;
       if (isCooldown.current) return;
+      
+      const nextTarget = direction === "next" 
+        ? Math.min(3, targetPage + 1)
+        : Math.max(0, targetPage - 1);
+        
+      if (nextTarget !== targetPage) {
+        setTargetPage(nextTarget);
+        isCooldown.current = true;
+        setTimeout(() => {
+          isCooldown.current = false;
+        }, 450); // Cooldown to swallow inertia after transition
+      }
+      
+      // Reset state
+      isArmed.current = null;
+      accumulatedOverscroll.current = 0;
+      if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+    };
 
-      // Scrollable layer check
+    const processDelta = (deltaY: number, e: Event, isTouch: boolean) => {
+      if (document.documentElement.dataset.loader === "playing") return;
+      if (isCooldown.current) {
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
       let scrollable: Element | null = e.target as Element;
       while (scrollable && scrollable !== document.body && !scrollable.classList.contains("scrollable-layer")) {
         scrollable = scrollable.parentElement;
       }
-      
+
       if (scrollable && scrollable.classList.contains("scrollable-layer")) {
-        const atTop = scrollable.scrollTop <= 0;
-        const atBottom = scrollable.scrollHeight - scrollable.scrollTop - scrollable.clientHeight <= 1;
+        const atTop = scrollable.scrollTop <= 2;
+        const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 2;
 
-        if (deltaY < 0 && !atTop) return; // Native scrolling up
-        if (deltaY > 0 && !atBottom) return; // Native scrolling down
+        const isPushingUp = deltaY < 0; // Scrolling up (to see previous page)
+        const isPushingDown = deltaY > 0; // Scrolling down (to see next page)
 
-        // If at boundaries, require accumulation before triggering zoom
-        if ((deltaY < 0 && atTop) || (deltaY > 0 && atBottom)) {
-          overscrollAccumulator.current += deltaY;
-          if (Math.abs(overscrollAccumulator.current) < 80) {
+        // Reset completely if moving away from boundaries
+        if ((!atTop && !atBottom) || (atTop && isPushingDown) || (atBottom && isPushingUp)) {
+          isArmed.current = null;
+          accumulatedOverscroll.current = 0;
+          if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+          return;
+        }
+
+        const boundaryHit = (atTop && isPushingUp) ? "top" : (atBottom && isPushingDown) ? "bottom" : null;
+
+        if (boundaryHit) {
+          // If we hit a boundary but aren't armed yet, prevent default to avoid rubber-banding and restart arming timer
+          if (isArmed.current !== boundaryHit) {
+            if (e.cancelable) e.preventDefault();
+            
+            if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+            boundaryTimer.current = setTimeout(() => {
+              isArmed.current = boundaryHit;
+              accumulatedOverscroll.current = 0;
+            }, 350);
             return;
+          }
+
+          // We are armed, start accumulating deliberate force
+          if (isArmed.current === boundaryHit) {
+            if (e.cancelable) e.preventDefault();
+            accumulatedOverscroll.current += deltaY;
+            
+            const threshold = isTouch ? 80 : 120;
+            
+            if (boundaryHit === "top" && accumulatedOverscroll.current <= -threshold) {
+              handleNavigationEvent("prev");
+            } else if (boundaryHit === "bottom" && accumulatedOverscroll.current >= threshold) {
+              handleNavigationEvent("next");
+            }
           }
         }
       }
-
-      // Reset accumulator if we break through
-      overscrollAccumulator.current = 0;
-      
-      // Prevent default browser actions (like back-swipe) once we hijack for zoom
-      if (e.cancelable) e.preventDefault();
-
-      // Apply raw delta to target
-      const move = deltaY * 0.0015;
-      rawTarget.current = Math.min(3, Math.max(0, rawTarget.current + move));
-
-      // Debounced Snapping (140ms)
-      if (snapTimer.current) clearTimeout(snapTimer.current);
-      snapTimer.current = setTimeout(() => {
-        const delta = rawTarget.current - targetPage;
-        let snapPage = targetPage;
-        
-        if (delta > 0.12) {
-          snapPage = Math.min(3, targetPage + 1);
-        } else if (delta < -0.12) {
-          snapPage = Math.max(0, targetPage - 1);
-        }
-        
-        // Cooldown to kill inertia (450ms)
-        isCooldown.current = true;
-        setTargetPage(snapPage);
-        
-        setTimeout(() => {
-          isCooldown.current = false;
-        }, 450);
-        
-      }, 140);
     };
 
-    // 2. Wheel Event
     const handleWheel = (e: WheelEvent) => {
-      // Trackpad pinch (wheel with ctrlKey)
-      if (e.ctrlKey) {
-        if (e.cancelable) e.preventDefault();
-        applyDelta(e.deltaY, e);
-        return;
-      }
-      
-      // Only care about vertical wheel
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        applyDelta(e.deltaY, e);
+        processDelta(e.deltaY, e, false);
       }
     };
 
-    // 3. Touch Events
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       touchStartX.current = e.touches[0].clientX;
       touchStartY.current = e.touches[0].clientY;
-      touchAxis.current = null;
-      overscrollAccumulator.current = 0;
+      // We don't reset arming on touchStart, the timer might be active
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
       
-      const cx = e.touches[0].clientX;
       const cy = e.touches[0].clientY;
-      const dx = cx - touchStartX.current;
       const dy = cy - touchStartY.current;
-
-      // Lock axis on first 8px
-      if (!touchAxis.current) {
-        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-          touchAxis.current = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-        }
-      }
-
-      // If vertical drag, map inverted dy to deltaY (pull down = scroll up = negative deltaY)
-      if (touchAxis.current === "y") {
-        applyDelta(-dy, e);
-        // Reset origin so it's a relative drag
-        touchStartY.current = cy;
-      }
+      
+      // Pulling down (dy > 0) means scrolling up (deltaY < 0)
+      processDelta(-dy, e, true);
+      touchStartY.current = cy;
     };
 
-    // 4. Keyboard Navigation
     const handleKeyDown = (e: KeyboardEvent) => {
       if (document.documentElement.dataset.loader === "playing") return;
       if (isCooldown.current) return;
       
-      if (e.key === "ArrowDown" || e.key === "PageDown") {
-        e.preventDefault();
-        isCooldown.current = true;
-        setTargetPage(Math.min(3, targetPage + 1));
-        setTimeout(() => isCooldown.current = false, 450);
-      } else if (e.key === "ArrowUp" || e.key === "PageUp") {
-        e.preventDefault();
-        isCooldown.current = true;
-        setTargetPage(Math.max(0, targetPage - 1));
-        setTimeout(() => isCooldown.current = false, 450);
+      const isDownKey = ["ArrowDown", "PageDown", " ", "End"].includes(e.key);
+      const isUpKey = ["ArrowUp", "PageUp", "Home"].includes(e.key);
+
+      if (!isDownKey && !isUpKey) return;
+
+      const activeLayer = document.querySelector(".scrollable-layer");
+      if (activeLayer) {
+        const atTop = activeLayer.scrollTop <= 2;
+        const atBottom = activeLayer.scrollTop + activeLayer.clientHeight >= activeLayer.scrollHeight - 2;
+
+        if (isDownKey && atBottom) {
+          if (isArmed.current === "bottom") {
+            e.preventDefault();
+            handleNavigationEvent("next");
+          } else {
+            if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+            boundaryTimer.current = setTimeout(() => {
+              isArmed.current = "bottom";
+            }, 350);
+          }
+        } else if (isUpKey && atTop) {
+          if (isArmed.current === "top") {
+            e.preventDefault();
+            handleNavigationEvent("prev");
+          } else {
+            if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+            boundaryTimer.current = setTimeout(() => {
+              isArmed.current = "top";
+            }, 350);
+          }
+        } else {
+          // Normal native keyboard scroll will happen
+          isArmed.current = null;
+          if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+        }
       }
     };
 
-    // Bind non-passive to allow e.preventDefault()
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
     window.addEventListener("touchmove", handleTouchMove, { passive: false });
@@ -152,9 +173,9 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("keydown", handleKeyDown);
-      if (snapTimer.current) clearTimeout(snapTimer.current);
+      if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
     };
-  }, [targetPage, setTargetPage, rawTarget]);
+  }, [targetPage, setTargetPage]);
 
   return <>{children}</>;
 }
