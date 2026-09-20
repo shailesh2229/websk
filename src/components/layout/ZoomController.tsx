@@ -8,12 +8,32 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
   
   const isCooldown = useRef(false);
   const touchStartY = useRef(0);
-  const touchStartX = useRef(0);
   
   // State for strict page gating
   const boundaryTimer = useRef<NodeJS.Timeout | null>(null);
   const isArmed = useRef<"top" | "bottom" | null>(null);
   const accumulatedOverscroll = useRef(0);
+
+  // ResizeObserver state
+  const scrollHeightCache = useRef<number>(0);
+
+  useEffect(() => {
+    // 1. Maintain a ResizeObserver on the active layer to ensure scrollHeight is perfectly accurate
+    const activeLayer = document.querySelector(`.scrollable-layer[data-page="${targetPage}"]`) as HTMLElement;
+    let ro: ResizeObserver | null = null;
+    
+    if (activeLayer && activeLayer.firstElementChild) {
+      scrollHeightCache.current = activeLayer.scrollHeight;
+      ro = new ResizeObserver(() => {
+        scrollHeightCache.current = activeLayer.scrollHeight;
+      });
+      ro.observe(activeLayer.firstElementChild);
+    }
+    
+    return () => {
+      if (ro) ro.disconnect();
+    };
+  }, [targetPage]);
 
   useEffect(() => {
     const handleNavigationEvent = (direction: "next" | "prev") => {
@@ -45,69 +65,85 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      let scrollable: Element | null = e.target as Element;
-      while (scrollable && scrollable !== document.body && !scrollable.classList.contains("scrollable-layer")) {
-        scrollable = scrollable.parentElement;
+      // Query the active layer directly, regardless of where the cursor is
+      const activeLayer = document.querySelector(`.scrollable-layer[data-page="${targetPage}"]`) as HTMLElement;
+      if (!activeLayer) return;
+
+      // Proxy manual scrolling if the event didn't happen inside the active layer
+      const target = e.target as HTMLElement;
+      const isInsideActiveLayer = activeLayer.contains(target);
+      
+      if (!isInsideActiveLayer) {
+        if (e.cancelable) e.preventDefault();
+        // Only proxy if it's not a touch event (touch relies on touchmove mapping)
+        if (!isTouch) {
+          activeLayer.scrollTop += deltaY;
+        }
       }
 
-      if (scrollable && scrollable.classList.contains("scrollable-layer")) {
-        const atTop = scrollable.scrollTop <= 2;
-        const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 2;
+      const clientHeight = activeLayer.clientHeight;
+      const scrollTop = activeLayer.scrollTop;
+      const scrollHeight = scrollHeightCache.current || activeLayer.scrollHeight;
 
-        const isPushingUp = deltaY < 0; // Scrolling up (to see previous page)
-        const isPushingDown = deltaY > 0; // Scrolling down (to see next page)
+      const atTop = scrollTop <= 2;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 2;
 
-        // Reset completely if moving away from boundaries
-        if ((!atTop && !atBottom) || (atTop && isPushingDown) || (atBottom && isPushingUp)) {
-          isArmed.current = null;
-          accumulatedOverscroll.current = 0;
+      const isPushingUp = deltaY < 0; // Scrolling up (to see previous page)
+      const isPushingDown = deltaY > 0; // Scrolling down (to see next page)
+
+      // Reset completely if moving away from boundaries
+      if ((!atTop && !atBottom) || (atTop && isPushingDown) || (atBottom && isPushingUp)) {
+        isArmed.current = null;
+        accumulatedOverscroll.current = 0;
+        if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+        return;
+      }
+
+      const boundaryHit = (atTop && isPushingUp) ? "top" : (atBottom && isPushingDown) ? "bottom" : null;
+
+      if (boundaryHit) {
+        // If we hit a boundary but aren't armed yet, prevent default to avoid rubber-banding and restart arming timer
+        if (isArmed.current !== boundaryHit) {
+          if (e.cancelable) e.preventDefault();
+          
           if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+          boundaryTimer.current = setTimeout(() => {
+            isArmed.current = boundaryHit;
+            accumulatedOverscroll.current = 0;
+          }, 350);
           return;
         }
 
-        const boundaryHit = (atTop && isPushingUp) ? "top" : (atBottom && isPushingDown) ? "bottom" : null;
-
-        if (boundaryHit) {
-          // If we hit a boundary but aren't armed yet, prevent default to avoid rubber-banding and restart arming timer
-          if (isArmed.current !== boundaryHit) {
-            if (e.cancelable) e.preventDefault();
-            
-            if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
-            boundaryTimer.current = setTimeout(() => {
-              isArmed.current = boundaryHit;
-              accumulatedOverscroll.current = 0;
-            }, 350);
-            return;
-          }
-
-          // We are armed, start accumulating deliberate force
-          if (isArmed.current === boundaryHit) {
-            if (e.cancelable) e.preventDefault();
-            accumulatedOverscroll.current += deltaY;
-            
-            const threshold = isTouch ? 80 : 120;
-            
-            if (boundaryHit === "top" && accumulatedOverscroll.current <= -threshold) {
-              handleNavigationEvent("prev");
-            } else if (boundaryHit === "bottom" && accumulatedOverscroll.current >= threshold) {
-              handleNavigationEvent("next");
-            }
+        // We are armed, start accumulating deliberate force
+        if (isArmed.current === boundaryHit) {
+          if (e.cancelable) e.preventDefault();
+          accumulatedOverscroll.current += deltaY;
+          
+          const threshold = isTouch ? 80 : 120;
+          
+          if (boundaryHit === "top" && accumulatedOverscroll.current <= -threshold) {
+            handleNavigationEvent("prev");
+          } else if (boundaryHit === "bottom" && accumulatedOverscroll.current >= threshold) {
+            handleNavigationEvent("next");
           }
         }
       }
     };
 
     const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        processDelta(e.deltaY, e, false);
+      // Use deltaMode to normalize deltaY (pixels vs lines vs pages)
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 16; // lines
+      else if (e.deltaMode === 2) dy *= window.innerHeight; // pages
+      
+      if (Math.abs(dy) > Math.abs(e.deltaX)) {
+        processDelta(dy, e, false);
       }
     };
 
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length !== 1) return;
-      touchStartX.current = e.touches[0].clientX;
       touchStartY.current = e.touches[0].clientY;
-      // We don't reset arming on touchStart, the timer might be active
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -116,6 +152,15 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
       const cy = e.touches[0].clientY;
       const dy = cy - touchStartY.current;
       
+      const activeLayer = document.querySelector(`.scrollable-layer[data-page="${targetPage}"]`) as HTMLElement;
+      if (activeLayer) {
+        const isInsideActiveLayer = activeLayer.contains(e.target as HTMLElement);
+        if (!isInsideActiveLayer) {
+          if (e.cancelable) e.preventDefault();
+          activeLayer.scrollTop -= dy;
+        }
+      }
+
       // Pulling down (dy > 0) means scrolling up (deltaY < 0)
       processDelta(-dy, e, true);
       touchStartY.current = cy;
@@ -130,10 +175,14 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
 
       if (!isDownKey && !isUpKey) return;
 
-      const activeLayer = document.querySelector(".scrollable-layer");
+      const activeLayer = document.querySelector(`.scrollable-layer[data-page="${targetPage}"]`) as HTMLElement;
       if (activeLayer) {
-        const atTop = activeLayer.scrollTop <= 2;
-        const atBottom = activeLayer.scrollTop + activeLayer.clientHeight >= activeLayer.scrollHeight - 2;
+        const clientHeight = activeLayer.clientHeight;
+        const scrollTop = activeLayer.scrollTop;
+        const scrollHeight = scrollHeightCache.current || activeLayer.scrollHeight;
+
+        const atTop = scrollTop <= 2;
+        const atBottom = scrollTop + clientHeight >= scrollHeight - 2;
 
         if (isDownKey && atBottom) {
           if (isArmed.current === "bottom") {
@@ -159,6 +208,9 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
           // Normal native keyboard scroll will happen
           isArmed.current = null;
           if (boundaryTimer.current) clearTimeout(boundaryTimer.current);
+          
+          // If we are focused outside the layer (e.g. somehow), we should proxy the keyboard event,
+          // but our useEffect in ZoomLayers ensures focus is maintained, so it's fine.
         }
       }
     };

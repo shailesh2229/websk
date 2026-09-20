@@ -49,13 +49,16 @@ function ZoomLayer({ Component, index, invGlobeScale }: { Component: React.Compo
     return Math.abs(p - targetPage) > 0.01 ? "transform, opacity" : "auto";
   });
 
-  // Reset scroll when navigating away
+  // Reset scroll when navigating away or focus when active
   useEffect(() => {
     if (targetPage !== index && scrollRef.current) {
       const el = scrollRef.current;
       setTimeout(() => {
         el.scrollTo({ top: 0, behavior: "instant" });
       }, 500); // Wait for transition to end before resetting
+    } else if (targetPage === index && scrollRef.current) {
+      // Focus the active layer so keyboard events work immediately
+      scrollRef.current.focus({ preventScroll: true });
     }
   }, [targetPage, index]);
 
@@ -78,8 +81,10 @@ function ZoomLayer({ Component, index, invGlobeScale }: { Component: React.Compo
     >
       <motion.div
         ref={scrollRef}
+        data-page={index}
+        tabIndex={-1}
         style={{ opacity, scale: localScale, width: "100%", height: "100%" }}
-        className="scrollable-layer overflow-y-auto overflow-x-hidden no-scrollbar"
+        className="scrollable-layer overflow-y-auto overflow-x-hidden no-scrollbar outline-none focus:outline-none"
       >
         <div className="w-full min-h-full block" style={{ paddingTop: 'calc(84px + 24px)', paddingBottom: index === 3 ? '0px' : '96px' }}>
           <Component />
