@@ -78,6 +78,13 @@ export function ZoomController({ children }: { children: React.ReactNode }) {
 
     // 2. Wheel Event
     const handleWheel = (e: WheelEvent) => {
+      // Trackpad pinch (wheel with ctrlKey)
+      if (e.ctrlKey) {
+        if (e.cancelable) e.preventDefault();
+        applyDelta(e.deltaY, e);
+        return;
+      }
+      
       // Only care about vertical wheel
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         applyDelta(e.deltaY, e);

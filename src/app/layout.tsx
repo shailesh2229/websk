@@ -22,7 +22,6 @@ const ibmPlexMono = IBM_Plex_Mono({
 import { SignatureIntro } from "@/components/layout/SignatureIntro";
 import { ZoomInitializer } from "@/components/layout/ZoomInitializer";
 import { ZoomController } from "@/components/layout/ZoomController";
-import { PersistentGlobe } from "@/components/layout/PersistentGlobe";
 import { ZoomLayers } from "@/components/layout/ZoomLayers";
 import { Navbar } from "@/components/layout/Navbar";
 
@@ -66,7 +65,6 @@ export default function RootLayout({
       </head>
       <body className="bg-black text-white min-h-[100dvh] flex flex-col font-serif relative overflow-hidden overscroll-none touch-none">
         <ZoomInitializer>
-          <PersistentGlobe />
           <SignatureIntro />
           <ZoomController>
             <div id="site-content" className="relative z-10 flex-1 flex flex-col h-[100dvh] overflow-hidden">

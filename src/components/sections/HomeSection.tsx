@@ -5,12 +5,12 @@ import { motion } from "framer-motion";
 export function HomeSection() {
   return (
     <section className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center pt-[84px] bg-transparent pb-24">
-      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-auto w-full px-4 h-full my-auto">
+      <div className="relative z-20 flex flex-col items-center justify-center pointer-events-none w-full px-4 h-full my-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="text-center w-full max-w-[375px] md:max-w-none"
+          className="text-center w-full max-w-[375px] md:max-w-none pointer-events-auto"
         >
           <h1 className="text-6xl md:text-9xl font-bold tracking-tighter text-white font-sans">
             WEBSK
