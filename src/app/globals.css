@@ -154,6 +154,10 @@
   }
 }
 
+:root {
+  --nav-h: 84px;
+}
+
 html[data-loader="playing"] {
   overflow: hidden;
 }
@@ -163,10 +167,8 @@ html[data-loader="playing"] {
 }
 
 html[data-loader="playing"] #site-content,
-html[data-loader="playing"] #navbar,
-html[data-loader="playing"] .scrollable-layer {
+html[data-loader="playing"] #navbar {
   opacity: 0 !important;
-  visibility: hidden !important;
   pointer-events: none !important;
 }
 
@@ -188,10 +190,6 @@ html[data-loader="playing"] .scrollable-layer {
 .animate-marquee-reverse {
   animation: marquee-reverse 30s linear infinite;
   will-change: transform;
-}
-
-html:not([data-active-page="3"]) .marquee-track {
-  animation-play-state: paused !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -25,10 +25,8 @@ const nunitoSans = Nunito_Sans({
 });
 
 import { SignatureIntro } from "@/components/layout/SignatureIntro";
-import { ZoomInitializer } from "@/components/layout/ZoomInitializer";
-import { ZoomController } from "@/components/layout/ZoomController";
-import { ZoomLayers } from "@/components/layout/ZoomLayers";
 import { Navbar } from "@/components/layout/Navbar";
+import { PageNavigator } from "@/components/PageNavigator";
 
 export const metadata: Metadata = {
   title: "Websk",
@@ -68,20 +66,15 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-black text-white min-h-[100dvh] flex flex-col font-serif relative overflow-hidden overscroll-none touch-none">
-        <ZoomInitializer>
-          <SignatureIntro />
-          <ZoomController>
-            <div id="site-content" className="relative z-10 flex-1 flex flex-col h-[100dvh] overflow-hidden">
-              <Navbar />
-              <div className="sr-only" aria-hidden="true">
-                {children}
-              </div>
-              <ZoomLayers />
-            </div>
-          </ZoomController>
-        </ZoomInitializer>
+      <body className="bg-black text-white min-h-[100dvh] flex flex-col font-serif relative">
+        <SignatureIntro />
+        <Navbar />
+        <main id="site-content" className="relative z-10 flex-1 flex flex-col">
+          {children}
+        </main>
+        <PageNavigator />
       </body>
     </html>
   );
 }
+

@@ -2,36 +2,40 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useZoom, PAGES } from "./ZoomContext";
-import { useState } from "react";
-import { useMotionValueEvent } from "framer-motion";
+import { navDirection } from "@/lib/nav-direction";
+
+const PAGES = ["/", "/about", "/services", "/work", "/contact"];
 
 export function Navbar() {
-  const { setTargetPage, progress } = useZoom();
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useMotionValueEvent(progress, "change", (latest) => {
-    setActiveIndex(Math.round(latest));
-  });
+  const pathname = usePathname();
+  const router = useRouter();
 
   const links = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/services", label: "Services" },
     { href: "/work", label: "Work" },
+    { href: "/contact", label: "Contact" },
   ];
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, index: number, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    setTargetPage(index);
+    if (href === pathname) return;
+    const currentIdx = PAGES.indexOf(pathname);
+    const targetIdx = PAGES.indexOf(href);
+    if (currentIdx !== -1 && targetIdx !== -1) {
+      navDirection.set(targetIdx > currentIdx ? "next" : "prev");
+    }
+    router.push(href, { scroll: false });
   };
 
   return (
     <header id="navbar" className="fixed top-0 left-0 right-0 z-50 bg-[linear-gradient(to_bottom,rgba(2,3,12,0.85),rgba(2,3,12,0))] border-b border-[#22254a]">
       <div className="container mx-auto px-4 h-[84px] flex items-center justify-between">
-        <a href="/" onClick={(e) => handleNavClick(e, 0, "/")} className="flex items-center">
+        <a href="/" onClick={(e) => handleNavClick(e, "/")} className="flex items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/websk-signature-nav.png"
@@ -49,13 +53,13 @@ export function Navbar() {
         </a>
 
         <nav className="hidden md:flex gap-8">
-          {links.map((link, idx) => {
-            const isActive = activeIndex === idx;
+          {links.map((link) => {
+            const isActive = pathname === link.href;
             return (
               <a
                 key={link.href}
                 href={link.href}
-                onClick={(e) => handleNavClick(e, idx, link.href)}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={`text-[15px] font-serif font-light transition-colors ${
                   isActive ? "text-white" : "text-[#9ea2c0] hover:text-white"
                 }`}
@@ -64,12 +68,6 @@ export function Navbar() {
               </a>
             );
           })}
-          <Link
-            href="/contact"
-            className="text-[15px] font-serif font-light transition-colors text-[#9ea2c0] hover:text-white"
-          >
-            Contact
-          </Link>
         </nav>
 
         {/* Mobile Nav Toggle */}
@@ -82,3 +80,4 @@ export function Navbar() {
     </header>
   );
 }
+

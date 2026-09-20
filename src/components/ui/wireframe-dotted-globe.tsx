@@ -8,23 +8,25 @@ interface RotatingEarthProps {
   paused?: boolean
   dimmed?: boolean
   interactive?: boolean
+  zoomLevel?: number // 1.0 = default, clamped [0.85, 1.5]
 }
 
 export default function RotatingEarth({ 
   className = "",
   paused = false,
   dimmed = false,
-  interactive = true
+  interactive = true,
+  zoomLevel = 1.0,
 }: RotatingEarthProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   // We keep these in refs so the D3 render loop always sees the latest props without rebinding
-  const stateRef = useRef({ paused, dimmed, interactive })
+  const stateRef = useRef({ paused, dimmed, interactive, zoomLevel })
   useEffect(() => {
-    stateRef.current = { paused, dimmed, interactive }
-  }, [paused, dimmed, interactive])
+    stateRef.current = { paused, dimmed, interactive, zoomLevel }
+  }, [paused, dimmed, interactive, zoomLevel])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -133,6 +135,8 @@ export default function RotatingEarth({
       if (!isDragging) {
         rotation[0] = (time * 0.01) % 360
       }
+      // Apply zoom level from prop
+      projection.scale(radius * stateRef.current.zoomLevel)
       projection.rotate(rotation as [number, number, number])
       
       context.clearRect(0, 0, size, size)

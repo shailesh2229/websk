@@ -5,7 +5,6 @@ import { LayoutTemplate, Code2, Palette, RefreshCw, ArrowUpRight } from "lucide-
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { useZoom } from "../layout/ZoomContext";
 
 // Register ScrollTrigger
 if (typeof window !== "undefined") {
@@ -55,15 +54,13 @@ export function ServicesSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const { targetPage } = useZoom(); // Re-refresh ScrollTrigger when zooming to this page
 
   useEffect(() => {
     if (reduceMotion) return;
 
     const ctx = gsap.context(() => {
-      // Find the scrollable container that is actually scrolling this section
-      // Since it's inside ZoomLayers, the scroller is the closest `.scrollable-layer`
-      const scroller = containerRef.current?.closest(".scrollable-layer") || window;
+      // In real multi-page routing mode, the scroller is the window
+      const scroller = window;
       
       const cards = gsap.utils.toArray<HTMLElement>('.stack-item');
       
@@ -142,15 +139,6 @@ export function ServicesSection() {
 
     return () => ctx.revert();
   }, [reduceMotion, isMobile]);
-
-  // When zooming changes, ScrollTrigger bounds might shift.
-  useEffect(() => {
-    if (targetPage === 2) {
-      setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 500); // refresh after the zoom lands
-    }
-  }, [targetPage]);
 
   if (reduceMotion) {
     return (

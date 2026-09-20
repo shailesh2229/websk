@@ -4,7 +4,7 @@ import { Sparkles, PenTool, Gauge, Search, ArrowUpRight } from "lucide-react";
 
 export function AboutSection() {
   return (
-    <section className="bg-transparent pb-32">
+    <section className="bg-transparent pb-32 pt-[108px]">
       {/* Intro Section - Bento Grid */}
       <div className="container mx-auto px-4 sm:px-8 max-w-[1400px]">
         {/* Row 1 */}

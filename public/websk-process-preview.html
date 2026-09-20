@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Websk — How we work (slide preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Marcellus&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#02030c; --ink:#f1f1f8; --lead:#c9cade; --muted:#9ea2c0; --dim:#6a6e90; --line:#2a2d55; --accent:#6D3BFF; --accent2:#a99bff;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --serif:"Marcellus", Georgia, "Times New Roman", serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#02030c; --ink:#f1f1f8; } }
+:root[data-theme="dark"]{ --bg:#02030c; --ink:#f1f1f8; }
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);overflow-x:clip}
+
+/* space background */
+#stars{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.nebula{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+   radial-gradient(38% 34% at 18% 24%, rgba(109,59,255,.16), transparent 70%),
+   radial-gradient(34% 30% at 82% 68%, rgba(59,43,224,.14), transparent 70%),
+   radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.55) 100%)}
+
+.block{position:relative;z-index:2;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+.block h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,7vw,88px);letter-spacing:-.01em}
+.block p{margin-top:18px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.block.short{min-height:70vh}
+
+/* pinned slide section */
+#how{position:relative;z-index:2;height:500vh}
+.sticky{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden}
+.tint{position:absolute;inset:0;background:
+  radial-gradient(60% 55% at 28% 45%, var(--tint,rgba(109,59,255,.12)), transparent 70%),
+  radial-gradient(50% 45% at 85% 80%, var(--tint2,rgba(59,43,224,.10)), transparent 70%)}
+.slide{position:absolute;inset:0;display:flex;align-items:center;padding:84px 8vw 130px;will-change:transform,opacity}
+.slide.intro{justify-content:center;text-align:center}
+.copy{position:relative;z-index:2;max-width:760px}
+.eyebrow{font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim);margin-bottom:22px}
+.title{font-weight:700;letter-spacing:-.035em;line-height:.95;font-size:clamp(44px,9vw,132px);color:var(--ink)}
+.title i{font-style:normal;color:var(--accent);text-shadow:0 0 28px rgba(109,59,255,.65)}
+.intro .title{font-size:clamp(40px,8vw,112px)}
+.lead{margin-top:26px;font-size:clamp(14px,1.35vw,19px);line-height:1.7;color:var(--lead);max-width:560px}
+.intro .lead{margin-left:auto;margin-right:auto}
+.bul{list-style:none;margin-top:22px;display:grid;gap:11px;max-width:560px}
+.bul li{font-size:clamp(12px,1.05vw,15px);line-height:1.6;color:var(--muted);padding-left:26px;position:relative}
+.bul li::before{content:"—";position:absolute;left:0;color:var(--accent2)}
+.flow{margin-top:34px;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.flow b{font-weight:500;color:var(--accent2)}
+.ghost{position:absolute;right:5vw;top:50%;transform:translateY(-50%);font-weight:700;font-size:clamp(170px,32vw,500px);line-height:1;letter-spacing:-.06em;color:rgba(255,255,255,.045);user-select:none;pointer-events:none;z-index:1}
+.cue{position:absolute;left:0;right:0;bottom:calc(6vh + env(safe-area-inset-bottom,0px));text-align:center;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+.cue span{display:inline-block;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(6px)}}
+
+/* stepper */
+.stepper{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(5.5vh + env(safe-area-inset-bottom,0px));z-index:5;display:flex;align-items:flex-start;opacity:0}
+.node{display:flex;flex-direction:column;align-items:center;gap:8px;width:64px}
+.node .ltr{font-weight:700;font-size:15px;color:var(--dim);transition:color .3s, text-shadow .3s}
+.node .lbl{font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);opacity:.6;transition:color .3s,opacity .3s}
+.node.done .ltr{color:var(--ink)} .node.done .lbl{opacity:.8}
+.node.active .ltr{color:var(--accent2);text-shadow:0 0 16px rgba(109,59,255,.9)} .node.active .lbl{color:var(--accent2);opacity:1}
+.link{width:clamp(28px,7vw,64px);height:1px;background:var(--line);margin-top:10px;position:relative}
+.link i{position:absolute;inset:0;background:var(--accent2);transform-origin:left;transform:scaleX(0)}
+.count{position:absolute;right:clamp(16px,3vw,44px);top:50%;transform:translateY(-50%);z-index:5;font-size:10px;letter-spacing:.24em;color:var(--dim);writing-mode:vertical-rl;opacity:0}
+
+@media (max-width:640px){
+  .slide{padding:84px 24px 140px}
+  .ghost{right:-6vw;font-size:70vw}
+  .count{display:none}
+  .node{width:54px}
+}
+@media (prefers-reduced-motion: reduce){ .cue span{animation:none} }
+</style>
+</head>
+<body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="nebula" aria-hidden="true"></div>
+
+<div class="block"><h2>Selected Work</h2><p>End of the Work page — keep scrolling</p></div>
+
+<section id="how" aria-label="How we work">
+  <div class="sticky" id="sticky">
+    <div class="tint" id="tint"></div>
+
+    <div class="slide intro" data-i="0">
+      <div class="copy">
+        <div class="eyebrow">[ Process ]</div>
+        <h3 class="title">How we work<i>.</i></h3>
+        <p class="lead">Four clear steps from first conversation to launch — focused on clarity, speed, and results.</p>
+        <div class="flow">Discover · Define · Build · <b>Launch</b></div>
+      </div>
+      <div class="cue"><span>Scroll to begin ↓</span></div>
+    </div>
+
+    <div class="slide" data-i="1">
+      <div class="ghost" data-ghost>01</div>
+      <div class="copy">
+        <h3 class="title">Discover<i>.</i></h3>
+        <p class="lead">We dig into your business, audience, and goals before anything is designed.</p>
+        <ul class="bul"><li>We learn how your business really works</li><li>What you need, not what a template gives</li><li>A clear brief before any design starts</li></ul>
+      </div>
+    </div>
+
+    <div class="slide" data-i="2">
+      <div class="ghost" data-ghost>02</div>
+      <div class="copy">
+        <h3 class="title">Define<i>.</i></h3>
+        <p class="lead">Strategy, structure, and visual direction locked in with clear priorities.</p>
+        <ul class="bul"><li>Site map, pages and content plan</li><li>Visual direction and style agreed</li><li>Scope, timeline and priorities in writing</li></ul>
+      </div>
+    </div>
+
+    <div class="slide" data-i="3">
+      <div class="ghost" data-ghost>03</div>
+      <div class="copy">
+        <h3 class="title">Build<i>.</i></h3>
+        <p class="lead">Design and development come together into one polished experience.</p>
+        <ul class="bul"><li>Custom design and clean code, one team</li><li>Fast, responsive, SEO-ready pages</li><li>Regular previews so nothing surprises you</li></ul>
+      </div>
+    </div>
+
+    <div class="slide" data-i="4">
+      <div class="ghost" data-ghost>04</div>
+      <div class="copy">
+        <h3 class="title">Launch<i>.</i></h3>
+        <p class="lead">Rigorous testing, fine-tuning, and a confident go-live.</p>
+        <ul class="bul"><li>Tested on every device and browser</li><li>Speed and small details fine-tuned</li><li>Live with support after launch</li></ul>
+      </div>
+    </div>
+
+    <div class="count" id="count">01 / 04</div>
+
+    <div class="stepper" id="stepper" aria-hidden="true">
+      <div class="node"><span class="ltr">D</span><span class="lbl">Discover</span></div><div class="link"><i></i></div>
+      <div class="node"><span class="ltr">D</span><span class="lbl">Define</span></div><div class="link"><i></i></div>
+      <div class="node"><span class="ltr">B</span><span class="lbl">Build</span></div><div class="link"><i></i></div>
+      <div class="node"><span class="ltr">L</span><span class="lbl">Launch</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="block short"><h2>Ready to build something great?</h2><p>Next: CTA and footer</p></div>
+
+<script>
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var N=5, sec=document.getElementById('how'), stepper=document.getElementById('stepper'),
+      count=document.getElementById('count'), tint=document.getElementById('tint');
+  var slides=[].slice.call(sec.querySelectorAll('.slide')), nodes=[].slice.call(stepper.querySelectorAll('.node')),
+      links=[].slice.call(stepper.querySelectorAll('.link i'));
+  var tints=[[109,59,255,.12],[59,43,224,.16],[139,92,246,.15],[80,60,255,.15],[109,59,255,.18]];
+  var tints2=[[59,43,224,.10],[109,59,255,.12],[59,43,224,.14],[139,92,246,.12],[59,43,224,.16]];
+  var target=0, cur=0, snapping=false, snapTimer=0;
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+  function mix(arr,p){var i=clamp(Math.floor(p),0,arr.length-2),t=p-i,a=arr[i],b=arr[i+1];
+    return 'rgba('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+Math.round(a[2]+(b[2]-a[2])*t)+','+(a[3]+(b[3]-a[3])*t).toFixed(3)+')';}
+  function readScroll(){
+    var r=sec.getBoundingClientRect(), total=sec.offsetHeight-window.innerHeight;
+    target=clamp(-r.top/total,0,1)*(N-1);
+  }
+  function render(p){
+    var vw=window.innerWidth;
+    slides.forEach(function(s,i){
+      var d=i-p, a=Math.min(Math.abs(d),1);
+      var x=d*vw*0.62, sc=1-a*0.07, op=Math.pow(1-a,1.3);
+      s.style.transform='translate3d('+x.toFixed(1)+'px,0,0) scale('+sc.toFixed(3)+')';
+      s.style.opacity=op.toFixed(3);
+      s.style.filter=a>0.02?'blur('+(a*5).toFixed(1)+'px)':'none';
+      s.style.visibility=a>=1?'hidden':'visible';
+      var g=s.querySelector('[data-ghost]');
+      if(g){ g.style.transform='translate3d('+(d*vw*0.22).toFixed(1)+'px,-50%,0)'; }
+    });
+    tint.style.setProperty('--tint',mix(tints,p)); tint.style.setProperty('--tint2',mix(tints2,p));
+    stepper.style.opacity=clamp((p-0.35)/0.5,0,1).toFixed(2);
+    count.style.opacity=clamp((p-0.35)/0.5,0,1).toFixed(2);
+    var a=Math.round(p);
+    nodes.forEach(function(n,k){var step=k+1; n.classList.toggle('active',a===step); n.classList.toggle('done',a>step);});
+    links.forEach(function(l,k){l.style.transform='scaleX('+clamp(p-(k+1),0,1).toFixed(3)+')';});
+    count.textContent=(a>0?('0'+a):'00')+' / 04';
+  }
+  function loop(){
+    cur = reduce ? target : cur+(target-cur)*0.12;
+    if(Math.abs(target-cur)<0.0005) cur=target;
+    render(cur); requestAnimationFrame(loop);
+  }
+  function softSnap(){
+    var r=sec.getBoundingClientRect(), total=sec.offsetHeight-window.innerHeight, y=-r.top;
+    if(snapping||y<=2||y>=total-2) return;
+    var idx=Math.round(clamp(y/total,0,1)*(N-1)), top=window.scrollY+r.top+(idx/(N-1))*total;
+    if(Math.abs(window.scrollY-top)>4){ snapping=true; window.scrollTo({top:top,behavior:reduce?'auto':'smooth'}); setTimeout(function(){snapping=false;},700); }
+  }
+  window.addEventListener('scroll',function(){ readScroll(); clearTimeout(snapTimer); snapTimer=setTimeout(softSnap,220); },{passive:true});
+  window.addEventListener('resize',function(){ readScroll(); });
+  readScroll(); cur=target; requestAnimationFrame(loop);
+
+  /* light starfield */
+  var c=document.getElementById('stars'), ctx=c.getContext('2d'), stars=[], W=0, H=0, dpr=1;
+  function build(){ var n=Math.max(90,Math.min(Math.round(W*H/6000),300)); stars=[];
+    for(var i=0;i<n;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()>.9?1.1+Math.random()*.8:.35+Math.random()*.7,t:Math.random()*6.28,s:.5+Math.random()*1.5,z:.4+Math.random()*.6}); }
+  function size(){ dpr=Math.min(window.devicePixelRatio||1,2); W=c.clientWidth; H=c.clientHeight; c.width=W*dpr; c.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); build(); }
+  function draw(t){ ctx.clearRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){ var s=stars[i]; if(!reduce){ s.x-=.03*s.z; if(s.x<-2)s.x=W+2; }
+      var a=(.3+.7*(.5+.5*Math.sin(t*.001*s.s+s.t)))*(.4+.6*s.z); ctx.fillStyle='rgba(225,228,255,'+a.toFixed(3)+')'; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.283); ctx.fill(); }
+    if(!reduce) requestAnimationFrame(draw); }
+  window.addEventListener('resize',size); size(); requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>

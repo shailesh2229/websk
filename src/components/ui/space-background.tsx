@@ -1,17 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useZoom } from "../layout/ZoomContext";
-import { useTransform, motion } from "framer-motion";
 
 export function SpaceBackground() {
-  const { progress } = useZoom();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
-  // Parallax scaling for the 3 star layers based on zoom progress
-  const baseScale = useTransform(progress, [0, 4], [1, 1.35]);
-  const rotation = useTransform(progress, (p) => p * 2); // subtle rotation
-
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -144,19 +137,13 @@ export function SpaceBackground() {
       />
       
       {/* Star layers combined in one canvas for performance */}
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{
-          scale: baseScale,
-          rotate: rotation,
-        }}
-      >
+      <div className="absolute inset-0 flex items-center justify-center">
         <canvas
           ref={canvasRef}
           className="max-w-none max-h-none"
           style={{ width: "150vw", height: "150vh" }}
         />
-      </motion.div>
+      </div>
     </div>
   );
 }

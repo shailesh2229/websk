@@ -17,7 +17,8 @@ const Instagram = ({ size }: { size: number }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
 );
 import { profile } from "@/data/profile";
-import { useZoom } from "@/components/layout/ZoomContext";
+import { useRouter } from "next/navigation";
+import { navDirection } from "@/lib/nav-direction";
 
 export const TextHoverEffect = ({
   text,
@@ -169,23 +170,21 @@ export const FooterBackgroundGradient = () => {
 };
 
 function HoverFooter() {
-  const { setTargetPage } = useZoom();
+  const router = useRouter();
 
-  // Handle routing internally via Zoom context for mapped pages
+  // Handle routing via router.push with direction
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     e.preventDefault();
-    const map: Record<string, number> = {
-      "/": 0,
-      "/about": 1,
-      "/services": 2,
-      "/work": 3
+    const MAP: Record<string, number> = {
+      "/": 0, "/about": 1, "/services": 2, "/work": 3, "/contact": 4
     };
-    if (path in map) {
-      setTargetPage(map[path]);
-    } else {
-      // For contact or unknown, use standard navigation
-      window.location.href = path;
+    const PAGES = ["/", "/about", "/services", "/work", "/contact"];
+    const currentIdx = PAGES.indexOf(window.location.pathname);
+    const targetIdx = MAP[path] ?? -1;
+    if (targetIdx !== -1 && currentIdx !== -1) {
+      navDirection.set(targetIdx > currentIdx ? "next" : "prev");
     }
+    router.push(path, { scroll: false });
   };
 
   const footerLinks = [
