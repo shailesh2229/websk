@@ -115,6 +115,102 @@ export function WorkSection() {
           </div>
         </div>
       </div>
+
+      {/* Technology */}
+      <div className="w-full bg-[#030303] relative border-t border-white/5 py-24 md:py-32">
+        {/* Grid background */}
+        <div className="absolute inset-0 z-0" style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px)
+          `,
+          backgroundSize: '66px 66px'
+        }} />
+        
+        <div className="container mx-auto px-4 max-w-[1400px] relative z-10 flex flex-col lg:flex-row gap-16 lg:gap-32">
+          {/* Left Column */}
+          <div className="flex-1 max-w-2xl">
+            <span className="text-[11px] md:text-xs font-mono tracking-[0.3em] uppercase text-[#8a8a8a] mb-6 block">
+              TECHNOLOGY
+            </span>
+            <h2 className="text-[clamp(2.5rem,5vw,4.5rem)] leading-[1.05] font-bold font-sans tracking-tight text-white uppercase mb-8">
+              TOOLS WE<br />WORK WITH
+            </h2>
+            <p className="text-[#888] text-[20px] md:text-[28px] font-sans leading-[1.4] mb-12">
+              Modern technologies for fast, scalable, and maintainable digital products.
+            </p>
+            <hr className="w-[130px] border-white/20 mb-8" />
+            <p className="text-[#666] text-sm md:text-base font-sans max-w-sm">
+              From first wireframe to production deploy — the stack stays lean and built for long-term growth.
+            </p>
+          </div>
+
+          {/* Right Column */}
+          <div className="flex-1 flex flex-col gap-12 lg:pt-12">
+            {/* Group 1 */}
+            <div>
+              <div className="flex items-center justify-between border-b border-[#222] pb-3 mb-6">
+                <span className="text-[11px] font-mono tracking-[0.3em] text-[#666] uppercase">01&nbsp;&nbsp;FRONTEND</span>
+              </div>
+              <div className="flex flex-wrap gap-x-6 gap-y-4 items-baseline font-sans font-bold uppercase tracking-tight">
+                <span className="text-[2rem] md:text-[3rem] text-white">NEXT.JS</span>
+                <span className="text-[2rem] md:text-[3rem] text-white">REACT</span>
+                <span className="text-xl md:text-2xl text-[#888]">JAVASCRIPT</span>
+                <span className="text-xl md:text-2xl text-[#888]">TAILWIND CSS</span>
+                <div className="w-full h-0" />
+                <span className="text-lg md:text-xl text-[#555]">HTML</span>
+                <span className="text-lg md:text-xl text-[#555]">CSS</span>
+              </div>
+            </div>
+            
+            {/* Group 2 */}
+            <div>
+              <div className="flex items-center justify-between border-b border-[#222] pb-3 mb-6">
+                <span className="text-[11px] font-mono tracking-[0.3em] text-[#666] uppercase">02&nbsp;&nbsp;PLATFORM</span>
+              </div>
+              <div className="flex flex-wrap gap-x-6 gap-y-4 items-baseline font-sans font-bold uppercase tracking-tight">
+                <span className="text-[2rem] md:text-[3rem] text-white">WORDPRESS</span>
+                <span className="text-xl md:text-2xl text-[#888]">WOOCOMMERCE</span>
+              </div>
+            </div>
+
+            {/* Group 3 */}
+            <div>
+              <div className="flex items-center justify-between border-b border-[#222] pb-3 mb-6">
+                <span className="text-[11px] font-mono tracking-[0.3em] text-[#666] uppercase">03&nbsp;&nbsp;WORKFLOW</span>
+              </div>
+              <div className="flex flex-wrap gap-x-6 gap-y-4 items-baseline font-sans font-bold uppercase tracking-tight">
+                <span className="text-2xl md:text-[2rem] text-[#aaa]">FIGMA</span>
+                <span className="text-2xl md:text-[2rem] text-[#aaa]">GIT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Running Lines */}
+      <div className="w-full bg-[#000] border-t border-[#222]">
+        <div className="w-full overflow-hidden flex border-b border-[#222] py-5">
+          <div className="flex shrink-0 whitespace-nowrap animate-marquee text-[#888] marquee-track">
+            {[...["HTML", "CSS", "GIT", "FIGMA", "NEXT.JS", "REACT", "WORDPRESS", "JAVASCRIPT", "TAILWIND", "WOOCOMMERCE"], ...["HTML", "CSS", "GIT", "FIGMA", "NEXT.JS", "REACT", "WORDPRESS", "JAVASCRIPT", "TAILWIND", "WOOCOMMERCE"]].map((item, idx) => (
+              <div key={idx} className="flex items-center px-6">
+                <span className="text-[11px] md:text-xs font-mono tracking-[0.25em] uppercase">{item}</span>
+                <span className="w-1 h-1 rounded-full bg-white/20 ml-12" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="w-full overflow-hidden flex border-b border-[#222] py-5">
+          <div className="flex shrink-0 whitespace-nowrap animate-marquee-reverse text-[#444] marquee-track">
+            {[...["REACT", "NEXT.JS", "FIGMA", "GIT", "CSS", "HTML", "WOOCOMMERCE", "TAILWIND", "JAVASCRIPT", "WORDPRESS"], ...["REACT", "NEXT.JS", "FIGMA", "GIT", "CSS", "HTML", "WOOCOMMERCE", "TAILWIND", "JAVASCRIPT", "WORDPRESS"]].map((item, idx) => (
+              <div key={idx} className="flex items-center px-6">
+                <span className="text-[11px] md:text-xs font-mono tracking-[0.25em] uppercase">{item}</span>
+                <span className="w-1 h-1 rounded-full bg-white/20 ml-12" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

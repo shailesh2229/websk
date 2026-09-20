@@ -169,3 +169,33 @@ html[data-loader="playing"] .scrollable-layer {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 30s linear infinite;
+  will-change: transform;
+}
+
+html:not([data-active-page="3"]) .marquee-track {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee, .animate-marquee-reverse {
+    animation: none !important;
+  }
+}

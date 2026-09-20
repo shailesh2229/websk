@@ -99,6 +99,9 @@ export function ZoomLayers() {
   useMotionValueEvent(progress, "change", (latest) => {
     setIsPaused(latest >= 1);
     setIsDimmed(latest > 0.5);
+    if (typeof document !== 'undefined') {
+      document.documentElement.dataset.activePage = Math.round(latest).toString();
+    }
   });
 
   // Calculate globe scale
