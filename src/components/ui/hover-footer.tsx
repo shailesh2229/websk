@@ -106,8 +106,9 @@ export const TextHoverEffect = ({
       </defs>
       <text
         x="50%"
-        y="96"
+        y="98"
         textAnchor="middle"
+        dominantBaseline="alphabetic"
         strokeWidth="0.3"
         className="fill-transparent stroke-neutral-200 font-[helvetica] font-bold dark:stroke-neutral-800"
         style={{ opacity: hovered ? 0.7 : 0, fontSize: "60px" }}
@@ -116,8 +117,9 @@ export const TextHoverEffect = ({
       </text>
       <motion.text
         x="50%"
-        y="96"
+        y="98"
         textAnchor="middle"
+        dominantBaseline="alphabetic"
         strokeWidth="0.3"
         className="fill-transparent stroke-[#3ca2fa] font-[helvetica] font-bold dark:stroke-[#3ca2fa99]"
         style={{ fontSize: "60px" }}
@@ -136,8 +138,9 @@ export const TextHoverEffect = ({
       </motion.text>
       <text
         x="50%"
-        y="96"
+        y="98"
         textAnchor="middle"
+        dominantBaseline="alphabetic"
         stroke="url(#textGradient)"
         strokeWidth="0.3"
         mask="url(#textMask)"
@@ -205,12 +208,12 @@ function HoverFooter() {
   ];
 
   return (
-    <div className="dark bg-[#01030f] w-full relative" style={{ paddingBlock: 'clamp(80px, 12vh, 200px)' }}>
+    <div className="dark bg-[#01030f] w-full relative pt-16 pb-8">
       <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden mx-4 md:mx-8 xl:mx-auto max-w-[1440px]" style={{ fontFamily: 'var(--font-nunito-sans)' }}>
-        <div className="max-w-7xl mx-auto p-8 md:p-14 z-40 relative">
+        <div className="max-w-7xl mx-auto p-8 md:p-14 lg:pb-[clamp(90px,9vw,140px)] z-40 relative pointer-events-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
             {/* Brand section */}
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-4 pointer-events-auto">
               <div className="flex items-center space-x-2">
                 <span className="text-[#3ca2fa] text-3xl font-extrabold">
                   &hearts;
@@ -224,7 +227,7 @@ function HoverFooter() {
 
             {/* Footer link sections */}
             {footerLinks.map((section) => (
-              <div key={section.title}>
+              <div key={section.title} className="pointer-events-auto">
                 <h4 className="text-white text-lg font-semibold mb-6">
                   {section.title}
                 </h4>
@@ -245,7 +248,7 @@ function HoverFooter() {
             ))}
 
             {/* Contact section */}
-            <div>
+            <div className="pointer-events-auto">
               <h4 className="text-white text-lg font-semibold mb-6">
                 Contact Us
               </h4>
@@ -276,10 +279,10 @@ function HoverFooter() {
             </div>
           </div>
 
-          <hr className="border-t border-gray-700 my-8" />
+          <hr className="border-t border-gray-700 my-8 pointer-events-auto" />
 
           {/* Footer bottom */}
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0">
+          <div className="flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0 pointer-events-auto">
             {/* Social icons */}
             <div className="flex space-x-6 text-gray-400">
               <a href={profile.socials.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-[#3ca2fa] transition-colors">
@@ -301,7 +304,7 @@ function HoverFooter() {
         </div>
 
         {/* Text hover effect */}
-        <div className="lg:flex hidden h-[30rem] -mt-52 -mb-36">
+        <div className="lg:block hidden absolute left-0 right-0 bottom-0 w-full z-0">
           <TextHoverEffect text="WEBSK" className="z-50" />
         </div>
 

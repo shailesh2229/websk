@@ -4,7 +4,7 @@ import HoverFooter from "@/components/ui/hover-footer";
 
 export function WorkSection() {
   return (
-    <section className="bg-transparent py-24 md:py-32 w-full">
+    <section className="bg-transparent pt-24 md:pt-32 pb-0 w-full">
       <div className="container mx-auto px-4 max-w-[1400px]">
         {/* Header */}
         <div className="mb-16 md:mb-24 flex flex-col items-center text-center">

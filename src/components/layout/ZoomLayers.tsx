@@ -71,7 +71,7 @@ function ZoomLayer({ index, Component, invGlobeScale }: { index: number; Compone
         style={{ opacity, scale: localScale, width: "100%", height: "100%" }}
         className="scrollable-layer overflow-y-auto overflow-x-hidden no-scrollbar"
       >
-        <div className="w-full min-h-full block" style={{ paddingTop: 'calc(84px + 24px)', paddingBottom: '96px' }}>
+        <div className="w-full min-h-full block" style={{ paddingTop: 'calc(84px + 24px)', paddingBottom: index === 3 ? '0px' : '96px' }}>
           <Component />
         </div>
       </motion.div>
