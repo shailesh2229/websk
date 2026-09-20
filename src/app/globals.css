@@ -163,7 +163,7 @@ html[data-loader="playing"] {
 }
 
 #site-content, #navbar {
-  transition: opacity 0.8s ease, visibility 0.8s ease;
+  transition: opacity 0.8s ease;
 }
 
 html[data-loader="playing"] #site-content,

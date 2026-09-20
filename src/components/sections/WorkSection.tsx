@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import HoverFooter from "@/components/ui/hover-footer";
+import { ProcessSlides } from "@/components/ProcessSlides";
 
 export function WorkSection() {
   return (
@@ -57,35 +58,8 @@ export function WorkSection() {
           </Link>
         </div>
 
-        {/* Process */}
-        <div className="max-w-4xl mx-auto mb-32">
-          <span className="text-[11px] md:text-xs font-mono tracking-[0.3em] uppercase text-[#8a8a8a] mb-6 block text-center">
-            Process
-          </span>
-          <h2 className="text-[clamp(2.5rem,6vw,4.5rem)] font-bold font-sans tracking-tight mb-6 text-center uppercase">HOW WE WORK</h2>
-          <p className="text-center text-[#888] text-lg md:text-xl font-sans mb-16 max-w-2xl mx-auto">
-            Four clear steps from first conversation to launch — focused on clarity, speed, and results.
-          </p>
-          
-          <div className="space-y-12 mt-16">
-            {[
-              { num: "01", title: "DISCOVER", desc: "We dig into your business, audience, and goals before anything is designed." },
-              { num: "02", title: "DEFINE", desc: "Strategy, structure, and visual direction locked in with clear priorities." },
-              { num: "03", title: "BUILD", desc: "Design and development come together into one polished experience." },
-              { num: "04", title: "LAUNCH", desc: "Rigorous testing, fine-tuning, and a confident go-live." },
-            ].map((step, idx) => (
-              <div key={idx} className="flex gap-6 md:gap-12 items-start group">
-                <span className="text-2xl md:text-4xl font-mono text-muted-foreground/30 group-hover:text-white transition-colors tabular-nums mt-1">
-                  {step.num}
-                </span>
-                <div className="flex-1 border-b border-[#22254a] pb-12">
-                  <h3 className="text-2xl md:text-3xl font-bold font-sans tracking-tight mb-4">{step.title}</h3>
-                  <p className="text-muted-foreground font-sans text-lg leading-relaxed max-w-2xl">{step.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* How We Work – scroll-driven slide section */}
+      <ProcessSlides />
 
         {/* Why Work With Us */}
         <div className="max-w-5xl mx-auto pb-16">

@@ -51,7 +51,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div ref={ref} id="page-content" style={{ willChange: "opacity, transform" }}>
+    <div ref={ref} id="page-content" style={{ willChange: "opacity, transform", overflowX: "clip" }}>
       {children}
     </div>
   );

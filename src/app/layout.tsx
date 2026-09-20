@@ -66,10 +66,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-black text-white min-h-[100dvh] flex flex-col font-serif relative">
+      <body className="bg-black text-white min-h-[100dvh] flex flex-col font-serif relative" style={{ overflowX: "clip" }}>
         <SignatureIntro />
         <Navbar />
-        <main id="site-content" className="relative z-10 flex-1 flex flex-col">
+        <main id="site-content" className="relative z-10 flex-1 flex flex-col" style={{ overflowX: "clip" }}>
           {children}
         </main>
         <PageNavigator />
