@@ -151,6 +151,7 @@
   html {
     @apply font-sans;
     scrollbar-gutter: stable;
+    scroll-behavior: auto;
   }
 }
 
@@ -162,14 +163,50 @@ html[data-loader="playing"] {
   overflow: hidden;
 }
 
-#site-content, #navbar {
+#site-content, #navbar, #page-shell {
   transition: opacity 0.8s ease;
 }
 
 html[data-loader="playing"] #site-content,
-html[data-loader="playing"] #navbar {
+html[data-loader="playing"] #navbar,
+html[data-loader="playing"] #page-shell {
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+/* ── Page transition shell ─────────────────────────────────────────────── */
+#page-shell {
+  transform-origin: 50% 50%;
+  will-change: transform, opacity, filter;
+}
+
+/* Leaving: zoom-in + fade (next page) */
+html[data-nav="out"] #page-shell {
+  transition: transform 650ms cubic-bezier(.7,0,.84,0),
+              opacity  600ms ease-in,
+              filter   650ms ease-in;
+  transform: scale(1.7); opacity: 0; filter: blur(10px);
+}
+/* Leaving: reverse (prev page) */
+html[data-nav="out"][data-dir="up"] #page-shell { transform: scale(.85); }
+
+/* Entering: start state (invisible, offset) */
+html[data-nav="in-start"] #page-shell {
+  transition: none;
+  opacity: 0; filter: blur(8px); transform: scale(.92);
+}
+html[data-nav="in-start"][data-dir="up"] #page-shell { transform: scale(1.15); }
+
+/* Entering: animate to natural state */
+html[data-nav="in"] #page-shell {
+  transition: transform 900ms cubic-bezier(.16,1,.3,1),
+              opacity  700ms ease-out,
+              filter   700ms ease-out;
+  transform: none; opacity: 1; filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-nav] #page-shell { transition: none !important; transform: none !important; filter: none !important; opacity: 1 !important; }
 }
 
 @keyframes marquee {
