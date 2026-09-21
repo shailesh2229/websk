@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Websk — fly into the globe (preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#02030c; --ink:#f1f1f8; --lead:#c9cade; --muted:#9ea2c0; --dim:#6a6e90; --accent:#6D3BFF; --accent2:#a99bff;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --disp:"Playfair Display", Georgia, "Times New Roman", serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#02030c; --ink:#f1f1f8; } }
+:root[data-theme="dark"]{ --bg:#02030c; --ink:#f1f1f8; }
+html,body{height:100%}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(120% 90% at 50% 120%, #0a0b2a 0%, #03040f 55%, #010208 100%);color:var(--ink);font-family:var(--mono);overflow:hidden;overscroll-behavior:none;touch-action:none}
+.neb{position:fixed;inset:0;pointer-events:none;background:
+  radial-gradient(38% 34% at 18% 24%, rgba(109,59,255,.16), transparent 70%),
+  radial-gradient(34% 30% at 82% 68%, rgba(59,43,224,.14), transparent 70%),
+  radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.55) 100%)}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;transition:opacity .8s ease}
+
+.hero{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,900px);text-align:center;pointer-events:none;will-change:transform,opacity,filter}
+.hero h1{font-family:var(--disp);font-weight:900;font-size:clamp(64px,11.5vw,168px);letter-spacing:-.03em;line-height:.9;color:#fff}
+.hero h2{margin-top:clamp(18px,3vh,34px);font-weight:700;font-size:clamp(22px,3.4vw,50px);letter-spacing:-.02em;line-height:1.1;color:var(--ink)}
+.hero p{margin:clamp(14px,2.4vh,24px) auto 0;max-width:560px;font-size:clamp(12px,1.05vw,15px);line-height:1.7;color:var(--lead)}
+
+.about{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:8vw;opacity:0;transform:scale(1.08);pointer-events:none;transition:opacity .9s ease, transform 1.1s cubic-bezier(.2,.7,.2,1);
+  background:radial-gradient(60% 55% at 30% 45%, rgba(109,59,255,.14), transparent 70%), rgba(2,3,12,.55)}
+.about.show{opacity:1;transform:scale(1)}
+.about .in{max-width:980px}
+.about .tag{display:inline-block;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);border:1px solid #2a2d55;border-radius:999px;padding:9px 16px;margin-bottom:28px}
+.about h3{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.6vw,84px);line-height:1.05;letter-spacing:-.02em}
+
+.hint{position:fixed;left:0;right:0;bottom:calc(6vh + env(safe-area-inset-bottom,0px));text-align:center;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);pointer-events:none;transition:opacity .4s}
+.hint span{display:inline-block;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(5px)}}
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(4vh + env(safe-area-inset-bottom,0px));width:min(220px,50vw);height:1px;background:#22254a;overflow:hidden}
+.bar i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,transparent,var(--accent2) 70%,#fff)}
+@media (prefers-reduced-motion: reduce){ .hint span{animation:none} }
+</style>
+</head>
+<body>
+<div class="neb" aria-hidden="true"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<div class="hero" id="hero">
+  <h1>WEBSK</h1>
+  <h2>Your tech partner.<br>Shailesh.</h2>
+  <p>Custom websites, designed and coded from scratch. Fast, modern, and built for your business.</p>
+</div>
+
+<div class="about" id="about">
+  <div class="in">
+    <div class="tag">About Websk</div>
+    <h3>We don't just build websites. We build digital identities that help brands stand out, convert, and grow online.</h3>
+  </div>
+</div>
+
+<div class="hint" id="hint"><span>Scroll or pinch to enter the globe</span></div>
+<div class="bar" aria-hidden="true"><i id="bar"></i></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canvas=document.getElementById('gl'), hero=document.getElementById('hero'), about=document.getElementById('about'),
+      hint=document.getElementById('hint'), bar=document.getElementById('bar');
+  if(!window.THREE){ hint.textContent='3D could not load'; return; }
+
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(58,1,0.02,200);
+  function resize(){ var w=window.innerWidth,h=window.innerHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+  window.addEventListener('resize',resize); resize();
+
+  function rp(n,rmin,rmax){ var a=new Float32Array(n*3);
+    for(var i=0;i<n;i++){ var u=Math.random()*2-1, th=Math.random()*6.2832, s=Math.sqrt(1-u*u), r=rmin+Math.random()*(rmax-rmin);
+      a[i*3]=r*s*Math.cos(th); a[i*3+1]=r*u; a[i*3+2]=r*s*Math.sin(th); } return a; }
+  function pts(arr,size,color,op){ var g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(arr,3));
+    var m=new THREE.PointsMaterial({color:color,size:size,transparent:true,opacity:op,sizeAttenuation:true,depthWrite:false}); return new THREE.Points(g,m); }
+
+  var tilt=new THREE.Group(), spin=new THREE.Group();
+  tilt.rotation.x=0.42; tilt.rotation.z=0.14; tilt.add(spin); scene.add(tilt);
+
+  var ico=new THREE.IcosahedronGeometry(1,5);
+  var wireMat=new THREE.LineBasicMaterial({color:0xa99bff,transparent:true,opacity:0.22,depthWrite:false});
+  spin.add(new THREE.LineSegments(new THREE.WireframeGeometry(ico),wireMat));
+  var dots=pts(rp(1400,1.0,1.0),0.014,0xffffff,0.75); spin.add(dots);
+  var inner=pts(rp(900,0.12,0.97),0.011,0xcfc8ff,0.55); spin.add(inner);
+  scene.add(pts(rp(1800,8,40),0.09,0xe1e4ff,0.8));
+
+  var state='home', depth=0, disp=0, lastInput=0, pull=0, lastPull=0, velY=0, dragging=false, lx=0, ly=0;
+  function now(){ return performance.now(); }
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function addDepth(dv){ if(state!=='home') return; depth=clamp(depth+dv,0,1); lastInput=now(); }
+
+  function toAbout(){ state='toAbout'; about.classList.add('show'); canvas.style.opacity=0; hint.firstChild.textContent='Scroll up to go back';
+    setTimeout(function(){ state='about'; pull=0; },900); }
+  function goHome(){ state='toHome'; pull=0; depth=1; disp=1; about.classList.remove('show'); canvas.style.opacity=1; hint.firstChild.textContent='Scroll or pinch to enter the globe'; }
+
+  window.addEventListener('wheel',function(e){
+    e.preventDefault();
+    if(state==='home'){ addDepth(e.ctrlKey ? -e.deltaY/220 : e.deltaY/1500); }
+    else if(state==='about'){
+      var t=now(); if(t-lastPull>300) pull=0; lastPull=t;
+      if(e.deltaY<0){ pull+=-e.deltaY; if(pull>=320) goHome(); } else { pull=0; }
+    }
+  },{passive:false});
+
+  /* Safari trackpad pinch */
+  var prevScale=1;
+  window.addEventListener('gesturestart',function(e){ e.preventDefault(); prevScale=1; });
+  window.addEventListener('gesturechange',function(e){ e.preventDefault(); if(state==='home'){ addDepth((e.scale-prevScale)*1.1); } prevScale=e.scale; });
+
+  /* touch: swipe up = deeper, swipe down at the "about" page = back */
+  var ty=0;
+  window.addEventListener('touchstart',function(e){ ty=e.touches[0].clientY; },{passive:true});
+  window.addEventListener('touchmove',function(e){
+    var y=e.touches[0].clientY, dy=ty-y; ty=y;
+    if(state==='home'){ addDepth(dy/520); }
+    else if(state==='about'){ if(dy<0){ pull+=-dy*2.2; lastPull=now(); if(pull>=320) goHome(); } else { pull=0; } }
+  },{passive:true});
+
+  /* drag to rotate (mouse) */
+  window.addEventListener('pointerdown',function(e){ if(e.pointerType==='mouse'&&state==='home'){ dragging=true; lx=e.clientX; ly=e.clientY; } });
+  window.addEventListener('pointerup',function(){ dragging=false; });
+  window.addEventListener('pointermove',function(e){
+    if(!dragging) return; var dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY;
+    spin.rotation.y+=dx*0.006; velY=dx*0.006*60; tilt.rotation.x=clamp(tilt.rotation.x+dy*0.004,-0.3,1.1);
+  });
+
+  var last=0;
+  function frame(t){
+    requestAnimationFrame(frame);
+    if(document.hidden) return;
+    var dt=Math.min(((t-last)/1000)||0.016,0.05); last=t;
+
+    if(state==='home'){
+      if(!reduce && now()-lastInput>650){
+        if(depth>=0.45) depth=Math.min(1,depth+dt*0.8); else if(depth>0) depth=Math.max(0,depth-dt*0.9);
+      }
+      if(depth>=0.998) toAbout();
+    } else if(state==='toHome'){
+      depth=Math.max(0,depth-dt/1.7);
+      if(depth<=0.001){ state='home'; lastInput=now(); }
+    }
+
+    disp+=(depth-disp)*(reduce?1:Math.min(1,dt*7));
+    var e=disp;
+
+    camera.position.z=3.3-3.7*e;
+    camera.fov=58+48*e; camera.updateProjectionMatrix();
+    camera.rotation.z=e*0.28;
+    wireMat.opacity=0.2+0.55*e;
+
+    var auto=reduce?0:(0.16+e*1.1);
+    spin.rotation.y+=(auto+(dragging?0:velY))*dt;
+    velY*=Math.pow(0.03,dt);
+
+    renderer.render(scene,camera);
+
+    hero.style.opacity=clamp(1-e*1.9,0,1).toFixed(3);
+    hero.style.transform='translate(-50%,-50%) scale('+(1+e*1.5).toFixed(3)+')';
+    hero.style.filter=e>0.02?'blur('+(e*9).toFixed(1)+'px)':'none';
+    hint.style.opacity=(state==='home'?clamp(1-e*3,0,1):(state==='about'?1:0)).toFixed(2);
+    bar.style.transform='scaleX('+(state==='about'?clamp(pull/320,0,1):e).toFixed(3)+')';
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
