@@ -1,12 +1,10 @@
 "use client";
 
-import { SpaceBackground } from "@/components/ui/space-background";
 import { GlobeHero } from "@/components/GlobeHero";
 
 export default function Home() {
   return (
     <>
-      <SpaceBackground />
       {/* GlobeHero: fixed full-viewport, handles its own scroll/pinch/touch */}
       <GlobeHero />
       {/* A min-height div so the page has scroll height for PageNavigator's atBottom check */}

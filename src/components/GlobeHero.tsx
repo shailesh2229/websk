@@ -82,7 +82,7 @@ export function GlobeHero({ onNavigateToAbout }: { onNavigateToAbout?: () => voi
     if (onNavigateToAbout) onNavigateToAbout();
     setTimeout(() => {
       router.push("/about", { scroll: false });
-    }, 400);
+    }, 300);
   }, [router, onNavigateToAbout]);
 
   useEffect(() => {
@@ -295,7 +295,7 @@ export function GlobeHero({ onNavigateToAbout }: { onNavigateToAbout?: () => voi
         ref={canvasRef}
         style={{
           position: "absolute", inset: 0, width: "100%", height: "100%", display: "block",
-          transition: "opacity 0.8s ease",
+          transition: "opacity 0.35s ease",
           opacity: canvasOpacity,
         }}
         aria-hidden="true"

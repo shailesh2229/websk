@@ -27,6 +27,7 @@ const nunitoSans = Nunito_Sans({
 import { SignatureIntro } from "@/components/layout/SignatureIntro";
 import { Navbar } from "@/components/layout/Navbar";
 import { PageNavigator } from "@/components/PageNavigator";
+import { SpaceBackground } from "@/components/ui/space-background";
 
 export const metadata: Metadata = {
   title: "Websk",
@@ -67,6 +68,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-black text-white min-h-[100dvh] flex flex-col font-serif relative" style={{ overflowX: "clip" }}>
+        <SpaceBackground />
         <SignatureIntro />
         <Navbar />
         <PageNavigator />
