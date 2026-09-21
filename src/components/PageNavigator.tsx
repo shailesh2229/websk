@@ -1,347 +1,215 @@
 "use client";
 
-/**
- * PageNavigator — global scroll-edge page navigation.
- *
- * Root cause of the cursor-position bug (documented):
- *
- *   OLD: The old navigator used bubble-phase (no capture:true).
- *   The Home page globe zoom handler used { capture:true, passive:false }
- *   and called e.preventDefault() in the capture phase. Since the navigator
- *   only listened in the bubble phase, events that the globe captured and
- *   called preventDefault() on never reached PageNavigator via atBottom().
- *   Because window.scrollY never changed (preventDefault blocked native scroll)
- *   the atBottom() check returned false. The only place it worked was when
- *   the cursor was over pointer-events:none elements (hero text) — there the
- *   globe's capture listener saw no pointer-events surface, didn't preventDefault,
- *   and scrollY changed normally. Hence the cursor-position dependency.
- *
- *   CURRENT FIX:
- *   - PageNavigator uses { capture:true, passive:true } — fires before all child
- *     listeners, never calls preventDefault, so it never blocks scrolling.
- *   - GlobeHero also uses { capture:true, passive:false } but ONLY on Home;
- *     when it calls preventDefault, PageNavigator's capture listener has already
- *     fired and read the deltaY — order within the same phase is registration order,
- *     so PageNavigator fires first (it was registered first in layout.tsx).
- *   - On Home, PageNavigator must NOT try to navigate with wheel — GlobeHero
- *     owns all wheel input on Home. PageNavigator only navigates on non-Home pages.
- */
-
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { navDirection } from "@/lib/nav-direction";
 import { homeEntry } from "@/lib/home-entry";
 
-// ─── Constants ───────────────────────────────────────────────────────────────
 const PAGES = ["/", "/about", "/services", "/work", "/contact"];
 const PAGE_LABELS = ["Home", "About", "Services", "Work", "Contact"];
 
-/** |deltaY| sum needed to trigger a page change */
-const THRESHOLD = 400;
-/** Reset accumulator after this many ms without wheel events */
-const RESET_IDLE_MS = 250;
-/** After navigation, ignore events for this long */
-const COOLDOWN_MS = 1000;
-/** Swipe px on mobile to trigger nav */
-const TOUCH_THRESHOLD = 90;
-/** Page must be at rest at this edge for this many ms before events count as intentional */
-const EDGE_REST_MS = 150;
-/** Gap from last wheel event that indicates a NEW gesture (inertia ended) */
-const NEW_GESTURE_GAP_MS = 120;
+const GESTURE_GAP = 200;      // ms: gap larger than this = new gesture
+const QUIET_AFTER_NAV = 250;  // ms: unlock only when wheel silent for this long after nav
+const EDGE_REST = 150;        // ms: must have rested at edge before a gesture counts
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-function getNextPath(pathname: string, dir: "next" | "prev"): string | null {
-  const idx = PAGES.indexOf(pathname);
-  if (idx === -1) return null;
-  const next = dir === "next" ? idx + 1 : idx - 1;
-  if (next < 0 || next >= PAGES.length) return null;
-  return PAGES[next];
-}
-function getTargetLabel(pathname: string, dir: "next" | "prev"): string {
-  const idx = PAGES.indexOf(pathname);
-  if (idx === -1) return "";
-  const next = dir === "next" ? idx + 1 : idx - 1;
-  if (next < 0 || next >= PAGES.length) return "";
-  return PAGE_LABELS[next];
-}
-function isInputFocused(): boolean {
-  const el = document.activeElement;
-  if (!el) return false;
-  const tag = el.tagName.toLowerCase();
-  return tag === "input" || tag === "textarea" || tag === "select" ||
-    (el as HTMLElement).isContentEditable;
-}
-function isLoaderPlaying(): boolean {
-  return document.documentElement.dataset.loader === "playing";
-}
-/** Use scrollingElement for rubber-band safety on iOS Safari */
-function getScrollEl(): Element {
-  return document.scrollingElement || document.documentElement;
-}
-function atBottom(): boolean {
-  const el = getScrollEl();
-  return el.scrollTop + window.innerHeight >= el.scrollHeight - 4;
-}
-function atTop(): boolean {
-  return getScrollEl().scrollTop <= 4;
+function pendingDirFromStorage(): "up" | "down" | null {
+  try {
+    const d = sessionStorage.getItem("nav-dir") as "up" | "down" | null;
+    sessionStorage.removeItem("nav-dir");
+    return d;
+  } catch { return null; }
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
 export function PageNavigator() {
-  const router = useRouter();
   const pathname = usePathname();
-  const pathnameRef = useRef(pathname);
-  useEffect(() => { pathnameRef.current = pathname; }, [pathname]);
+  const router = useRouter();
+  const [hud, setHud] = useState<Record<string, unknown> | null>(null);
+  const [debug, setDebug] = useState(false);
 
-  const cooldown = useRef(false);
-  const accumulated = useRef(0);
-  const accumDir = useRef<"next" | "prev" | null>(null);
-  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastWheelTime = useRef(0);
-  // Initialize edgeArrivalTime to a very old time so the first check always passes
-  const edgeArrivalTime = useRef<Record<"top" | "bottom", number>>({
-    top: Date.now() - 10000,    // treat page as "rested at top" from the start
-    bottom: Date.now() - 10000, // treat page as "rested at bottom" from the start
-  });
-  const lastScrollTop = useRef<number | null>(null);
-
-  // Touch
-  const touchStartY = useRef(0);
-  const touchStartAtTop = useRef(false);
-  const touchStartAtBottom = useRef(false);
-
-  // Progress bar (visual only)
+  // ── progress bar ────────────────────────────────────────────────────────────
   const [barVisible, setBarVisible] = useState(false);
-  const [barPct, setBarPct] = useState(0);
-  const [barDir, setBarDir] = useState<"next" | "prev">("next");
-  const [targetLabel, setTargetLabel] = useState("");
+  const [barLabel, setBarLabel] = useState("");
 
-  // Debug HUD
-  const [debugInfo, setDebugInfo] = useState<{
-    page: string; atTop: boolean; atBottom: boolean;
-    acc: number; lastDy: number; targetTag: string; targetClass: string;
-  } | null>(null);
-  // showDebug is stable — read once from URL at mount
-  const showDebugRef = useRef(false);
+  const s = useRef({
+    lastWheel: 0,
+    gestureId: 0,
+    locked: false,
+    edgeSince: { top: 0, bottom: 0 },
+    gestureStartedAtEdge: { top: false, bottom: false },
+    pendingDir: null as null | "up" | "down",
+  });
+
   useEffect(() => {
-    showDebugRef.current = window.location.search.includes("debug=nav");
-  }, []);
-  const showDebug = typeof window !== "undefined" && window.location.search.includes("debug=nav");
-
-  // ─── Navigate ──────────────────────────────────────────────────────────────
-  const navigate = useCallback((dir: "next" | "prev") => {
-    if (cooldown.current) return;
-    const next = getNextPath(pathnameRef.current, dir);
-    if (!next) return;
-
-    cooldown.current = true;
-    accumulated.current = 0;
-    accumDir.current = null;
-    setBarVisible(false);
-    setBarPct(0);
-    if (idleTimer.current) clearTimeout(idleTimer.current);
-
-    // If navigating back to Home from About, set the fromAbout flag
-    if (dir === "prev" && pathnameRef.current === "/about") {
-      homeEntry.setFromAbout(true);
-    }
-
-    const pageEl = document.getElementById("page-content");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    navDirection.set(dir);
-
-    const doNav = () => {
-      router.push(next, { scroll: false });
-      // Landing on a previous page: scroll to bottom so user arrives at the bottom
-      if (dir === "prev" && next !== "/") {
-        setTimeout(() => {
-          window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" });
-        }, 80);
-      }
-      setTimeout(() => { cooldown.current = false; }, COOLDOWN_MS);
-    };
-
-    if (pageEl && !reducedMotion) {
-      const toScale = dir === "next" ? 1.08 : 0.94;
-      pageEl.style.transition =
-        "opacity 350ms cubic-bezier(0.65,0,0.35,1), transform 350ms cubic-bezier(0.65,0,0.35,1)";
-      pageEl.style.opacity = "0";
-      pageEl.style.transform = `scale(${toScale})`;
-      setTimeout(doNav, 360);
-    } else {
-      doNav();
-    }
-  }, [router]);
-
-  // ─── Reset accumulator ──────────────────────────────────────────────────────
-  const resetAcc = useCallback(() => {
-    accumulated.current = 0;
-    accumDir.current = null;
-    setBarVisible(false);
-    setBarPct(0);
+    setDebug(new URLSearchParams(location.search).get("debug") === "nav");
   }, []);
 
-  // ─── Main effect ────────────────────────────────────────────────────────────
+  const scroller = () =>
+    (document.scrollingElement || document.documentElement) as HTMLElement;
+  const atTop = () => scroller().scrollTop <= 1;
+  const atBottom = () =>
+    scroller().scrollTop + window.innerHeight >= scroller().scrollHeight - 2;
+
+  // After route changes: set scroll position, then unlock when wheel goes quiet
   useEffect(() => {
-    // Stamp edge-arrival time on scroll so we know when the page reached an edge
-    const trackEdge = () => {
-      const el = getScrollEl();
-      const st = el.scrollTop;
-      const prev = lastScrollTop.current;
-      const changed = prev === null || Math.abs(st - prev) > 0.5;
-      lastScrollTop.current = st;
+    const st = s.current;
+    const dir = pendingDirFromStorage();
+    st.locked = true;
+    st.pendingDir = dir;
+    setBarVisible(false);
 
-      if (!changed) return;
-      const now = Date.now();
-      if (atTop()) edgeArrivalTime.current.top = now;
-      if (atBottom()) edgeArrivalTime.current.bottom = now;
-    };
-
-    // Stamp immediately for pages that load at top
-    if (atTop()) edgeArrivalTime.current.top = Date.now() - EDGE_REST_MS;
-    if (atBottom()) edgeArrivalTime.current.bottom = Date.now() - EDGE_REST_MS;
-
-    window.addEventListener("scroll", trackEdge, { passive: true });
-
-    // ── Wheel handler ─────────────────────────────────────────────────────────
-    const handleWheel = (e: WheelEvent) => {
-      if (isLoaderPlaying() || isInputFocused() || cooldown.current) return;
-
-      // Home page: GlobeHero owns ALL wheel input. PageNavigator does not navigate from Home.
-      if (pathnameRef.current === "/") return;
-
-      let dy = e.deltaY;
-      if (e.deltaMode === 1) dy *= 16;
-      else if (e.deltaMode === 2) dy *= window.innerHeight;
-
-      // Skip horizontal-dominant scrolls
-      if (Math.abs(dy) < Math.abs(e.deltaX)) return;
-
-      // Pinch (ctrlKey): treat as strong scroll for nav purposes
-      if (e.ctrlKey) {
-        const dir: "next" | "prev" = e.deltaY > 0 ? "next" : "prev";
-        const edge = dir === "next" ? atBottom() : atTop();
-        if (edge && getNextPath(pathnameRef.current, dir)) {
-          navigate(dir);
+    // Wait for content to render, then set scroll position
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (dir === "up") {
+          // Arrived from a "next" navigation — stay at top
+          window.scrollTo(0, 0);
+        } else if (dir === "down") {
+          // Arrived going back — scroll to bottom
+          window.scrollTo(0, scroller().scrollHeight);
         }
+      });
+    });
+
+    // Unlock: only when wheel has been quiet for QUIET_AFTER_NAV ms
+    const t = setInterval(() => {
+      if (performance.now() - st.lastWheel > QUIET_AFTER_NAV) {
+        st.locked = false;
+        const now = performance.now();
+        st.edgeSince = { top: now, bottom: now };
+        st.gestureStartedAtEdge = { top: false, bottom: false };
+        clearInterval(t);
+      }
+    }, 50);
+
+    return () => {
+      cancelAnimationFrame(id);
+      clearInterval(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  useEffect(() => {
+    const st = s.current;
+
+    const onScroll = () => {
+      const now = performance.now();
+      if (!atTop()) st.edgeSince.top = now;
+      if (!atBottom()) st.edgeSince.bottom = now;
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return; // let GlobeHero / browser handle pinch
+      const now = performance.now();
+      const fresh = now - st.lastWheel > GESTURE_GAP;
+      st.lastWheel = now;
+
+      // Locked after nav: swallow event to prevent inertia bleed
+      if (st.locked) {
+        e.preventDefault();
         return;
       }
 
-      const goingDown = dy > 0;
-      const goingUp = dy < 0;
-      const isAtBottom = atBottom();
-      const isAtTop = atTop();
+      if (fresh) {
+        st.gestureId++;
+        // Record whether the fresh gesture started while resting at an edge
+        st.gestureStartedAtEdge.top =
+          atTop() && now - st.edgeSince.top >= EDGE_REST;
+        st.gestureStartedAtEdge.bottom =
+          atBottom() && now - st.edgeSince.bottom >= EDGE_REST;
+      }
 
-      // Debug HUD
-      if (showDebugRef.current) {
-        setDebugInfo({
-          page: pathnameRef.current,
-          atTop: isAtTop,
-          atBottom: isAtBottom,
-          acc: accumulated.current,
-          lastDy: dy,
-          targetTag: (e.target as HTMLElement)?.tagName ?? "?",
-          targetClass: (e.target as HTMLElement)?.className?.toString().slice(0, 40) ?? "",
+      const i = PAGES.indexOf(pathname);
+      const down = e.deltaY > 0;
+      const isTop = atTop();
+      const isBottom = atBottom();
+
+      if (debug) {
+        setHud({
+          page: pathname,
+          scrollTop: Math.round(scroller().scrollTop),
+          scrollHeight: scroller().scrollHeight,
+          atTop: isTop,
+          atBottom: isBottom,
+          startedTop: st.gestureStartedAtEdge.top,
+          startedBottom: st.gestureStartedAtEdge.bottom,
+          deltaY: Math.round(e.deltaY),
+          fresh,
+          locked: st.locked,
+          target: (e.target as HTMLElement)?.tagName,
         });
       }
 
-      // Not at an edge in the relevant direction → reset and let native scroll work
-      if (goingDown && !isAtBottom) { resetAcc(); return; }
-      if (goingUp && !isAtTop) { resetAcc(); return; }
-      if (dy === 0) return;
+      const navigate = (dir: "up" | "down", target: string) => {
+        e.preventDefault();
+        st.locked = true;
+        setBarVisible(false);
 
-      const dir: "next" | "prev" = goingDown ? "next" : "prev";
+        // Set direction store for template.tsx enter animation and homeEntry fly-out
+        if (dir === "up") {
+          navDirection.set("prev");
+          if (pathname === "/about") {
+            homeEntry.setFromAbout(true);
+          }
+        } else {
+          navDirection.set("next");
+        }
 
-      // No page in that direction
-      if (!getNextPath(pathnameRef.current, dir)) return;
+        // Store direction so the arriving page knows where to scroll
+        try { sessionStorage.setItem("nav-dir", dir); } catch { /* ignore */ }
 
-      // ── Inertia filter ────────────────────────────────────────────────────
-      const now = Date.now();
-      const timeSinceLast = now - lastWheelTime.current;
-      lastWheelTime.current = now;
+        // Exit animation on current page
+        const pageEl = document.getElementById("page-content");
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (pageEl && !reducedMotion) {
+          const toScale = dir === "down" ? 1.08 : 0.94;
+          pageEl.style.transition =
+            "opacity 320ms cubic-bezier(0.65,0,0.35,1), transform 320ms cubic-bezier(0.65,0,0.35,1)";
+          pageEl.style.opacity = "0";
+          pageEl.style.transform = `scale(${toScale})`;
+          setTimeout(() => router.push(target, { scroll: false }), 330);
+        } else {
+          router.push(target, { scroll: false });
+        }
+      };
 
-      const edgeKey = dir === "next" ? "bottom" : "top";
-      const restingMs = now - edgeArrivalTime.current[edgeKey];
-      const isNewGesture = timeSinceLast >= NEW_GESTURE_GAP_MS;
-      const isIntentional = restingMs >= EDGE_REST_MS || isNewGesture;
-
-      if (!isIntentional) return; // momentum inertia — ignore silently
-
-      // Direction flip → reset
-      if (accumDir.current !== null && accumDir.current !== dir) {
-        resetAcc();
+      // Navigate down: scrolled to bottom, gesture started at bottom, there is a next page
+      if (down && isBottom && st.gestureStartedAtEdge.bottom && i < PAGES.length - 1) {
+        navigate("down", PAGES[i + 1]);
         return;
       }
-      accumDir.current = dir;
 
-      // Accumulate
-      accumulated.current += Math.abs(dy);
+      // Navigate up: scrolled to top, gesture started at top, there is a prev page
+      if (!down && isTop && st.gestureStartedAtEdge.top && i > 0) {
+        navigate("up", PAGES[i - 1]);
+        return;
+      }
 
-      // Idle reset timer
-      if (idleTimer.current) clearTimeout(idleTimer.current);
-      idleTimer.current = setTimeout(resetAcc, RESET_IDLE_MS);
-
-      // Progress bar
-      const pct = Math.min(1, accumulated.current / THRESHOLD);
-      setBarDir(dir);
-      setTargetLabel(getTargetLabel(pathnameRef.current, dir));
-      setBarVisible(true);
-      setBarPct(pct);
-
-      // Navigate!
-      if (accumulated.current >= THRESHOLD) {
-        navigate(dir);
+      // Show progress hint if approaching edge
+      const nextLabel = i < PAGES.length - 1 ? PAGE_LABELS[i + 1] : null;
+      const prevLabel = i > 0 ? PAGE_LABELS[i - 1] : null;
+      if (down && isBottom && nextLabel) {
+        setBarLabel(`KEEP SCROLLING: ${nextLabel} ↓`);
+        setBarVisible(true);
+      } else if (!down && isTop && prevLabel) {
+        setBarLabel(`↑ KEEP SCROLLING UP: ${prevLabel}`);
+        setBarVisible(true);
+      } else {
+        setBarVisible(false);
       }
     };
 
-    // ── Touch ─────────────────────────────────────────────────────────────────
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      touchStartY.current = e.touches[0].clientY;
-      touchStartAtBottom.current = atBottom();
-      touchStartAtTop.current = atTop();
-    };
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (isLoaderPlaying() || isInputFocused() || cooldown.current) return;
-      if (pathnameRef.current === "/") return; // Home handles its own touch
-      const endY = e.changedTouches[0]?.clientY ?? touchStartY.current;
-      const dy = touchStartY.current - endY;
-      if (dy > TOUCH_THRESHOLD && touchStartAtBottom.current) navigate("next");
-      else if (dy < -TOUCH_THRESHOLD && touchStartAtTop.current) navigate("prev");
-    };
-
-    // Safari gesturechange
-    const handleGestureChange = (e: Event) => {
-      if (isLoaderPlaying() || isInputFocused() || cooldown.current) return;
-      if (pathnameRef.current === "/") return;
-      const ge = e as unknown as { scale: number };
-      if (ge.scale > 1.15 && atBottom()) navigate("next");
-      else if (ge.scale < 0.85 && atTop()) navigate("prev");
-    };
-
-    // capture:true — fires before any child. passive:true — never prevents scroll.
-    window.addEventListener("wheel", handleWheel, { capture: true, passive: true });
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
-    window.addEventListener("gesturechange", handleGestureChange);
+    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", trackEdge);
-      window.removeEventListener("wheel", handleWheel, { capture: true });
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-      window.removeEventListener("gesturechange", handleGestureChange);
-      if (idleTimer.current) clearTimeout(idleTimer.current);
+      window.removeEventListener("wheel", onWheel, { capture: true } as EventListenerOptions);
+      window.removeEventListener("scroll", onScroll);
     };
-  }, [navigate, resetAcc]);
-
-  // ─── Bar label ───────────────────────────────────────────────────────────────
-  const barLabel = barDir === "next"
-    ? `KEEP SCROLLING: ${targetLabel} ↓`
-    : `↑ KEEP SCROLLING UP: ${targetLabel}`;
+  }, [pathname, router, debug]);
 
   return (
     <>
+      {/* Progress hint bar */}
       {barVisible && (
         <div
           aria-hidden="true"
@@ -352,33 +220,28 @@ export function PageNavigator() {
             fontFamily: "var(--font-ibm-plex, monospace)",
           }}
         >
-          <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: "#6a6e90", whiteSpace: "nowrap" }}>
+          <span style={{
+            fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase",
+            color: "#6a6e90", whiteSpace: "nowrap",
+          }}>
             {barLabel}
           </span>
           <div style={{ width: 120, height: 3, borderRadius: 999, background: "rgba(109,59,255,0.2)", overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${barPct * 100}%`, background: "#6D3BFF", borderRadius: 999, transition: "width 80ms linear" }} />
+            <div style={{ height: "100%", width: "60%", background: "#6D3BFF", borderRadius: 999 }} />
           </div>
         </div>
       )}
 
-      {showDebug && debugInfo && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "fixed", bottom: 16, left: 16, zIndex: 99999,
-            background: "rgba(0,0,0,0.88)", border: "1px solid #6D3BFF",
-            borderRadius: 8, padding: "10px 14px",
-            fontFamily: "monospace", fontSize: 11, color: "#a99bff", lineHeight: 1.7,
-            pointerEvents: "none", maxWidth: 380,
-          }}
-        >
-          <div><b>page:</b> {debugInfo.page}</div>
-          <div><b>atTop:</b> {String(debugInfo.atTop)} &nbsp; <b>atBottom:</b> {String(debugInfo.atBottom)}</div>
-          <div><b>acc:</b> {debugInfo.acc.toFixed(1)} / {THRESHOLD}</div>
-          <div><b>lastΔY:</b> {debugInfo.lastDy.toFixed(1)}</div>
-          <div><b>target:</b> &lt;{debugInfo.targetTag.toLowerCase()}&gt; {debugInfo.targetClass}</div>
-          <div style={{ color: "#6a6e90", fontSize: 10 }}>capture:true — cursor pos irrelevant ✓</div>
-        </div>
+      {/* Debug HUD (?debug=nav) */}
+      {debug && hud && (
+        <pre style={{
+          position: "fixed", bottom: 8, left: 8, zIndex: 9999,
+          background: "rgba(0,0,0,0.88)", color: "#0f0", padding: 10,
+          fontSize: 11, borderRadius: 6, border: "1px solid #6D3BFF",
+          fontFamily: "monospace", lineHeight: 1.6, pointerEvents: "none",
+        }}>
+          {JSON.stringify(hud, null, 2)}
+        </pre>
       )}
     </>
   );
