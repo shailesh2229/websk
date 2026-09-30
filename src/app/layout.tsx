@@ -70,7 +70,7 @@ export default function RootLayout({
         <SpaceBackground />
         <SignatureIntro />
         <Navbar />
-        <div id="page-shell" className="relative z-10 flex-1 flex flex-col" style={{ overflowX: "clip" }}>
+        <div id="page-shell" className="relative z-10" style={{ overflowX: "clip" }}>
           {children}
         </div>
       </body>

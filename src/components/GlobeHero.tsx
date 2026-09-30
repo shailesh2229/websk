@@ -182,7 +182,7 @@ export function GlobeHero() {
   }, [reduce]);
 
   return (
-    <div ref={wrapperRef} className="relative block" style={{ height: "200vh" }}>
+    <div ref={wrapperRef} className="relative block shrink-0" style={{ height: "200vh" }}>
       <div className="sticky top-0 h-screen overflow-hidden" style={{ zIndex: 0 }}>
         <canvas
           ref={canvasRef}
