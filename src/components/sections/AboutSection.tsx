@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
 import { Sparkles, PenTool, Gauge, Search, ArrowUpRight } from "lucide-react";
 
 export function AboutSection() {
@@ -7,17 +6,79 @@ export function AboutSection() {
     <section className="bg-transparent pb-32 pt-[108px]">
       {/* Intro Section - Bento Grid */}
       <div className="container mx-auto px-4 sm:px-8 max-w-[1400px]">
-        {/* Row 1 */}
-        <div className="flex flex-col md:flex-row mb-16 md:mb-24 gap-8">
-          <div className="w-full md:w-[45%]">
-            <div className="inline-flex items-center px-4 py-2 rounded-full border border-white/20 text-[11px] font-mono tracking-[0.2em] uppercase">
-              ABOUT WEBSK
+        {/* Row 1 — Personal Profile Intro */}
+        <div className="flex flex-col md:flex-row mb-16 md:mb-24 gap-8 md:gap-12 items-stretch">
+
+          {/* Left: Portrait photo card */}
+          <div className="w-full md:w-[38%] relative">
+            <div className="bg-[#0a0a0a] border border-[#1f1f1f] rounded-[36px] overflow-hidden w-full aspect-[3/4] md:aspect-auto md:h-full min-h-[340px] relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/sk.jpg"
+                alt="Shailesh Chaudhary"
+                className="w-full h-full object-cover object-top"
+              />
+              {/* Purple gradient overlay at bottom for pill readability */}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-[36px]" />
+            </div>
+
+            {/* Status pill — overlaps the bottom of the photo card */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 md:left-6 md:translate-x-0 whitespace-nowrap inline-flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-mono uppercase tracking-widest text-white">
+              <span className="w-2 h-2 rounded-full bg-green-400 shrink-0 animate-pulse" />
+              Open to opportunities
             </div>
           </div>
-          <div className="w-full md:w-[55%]">
+
+          {/* Right: Bio content */}
+          <div className="w-full md:w-[62%] flex flex-col justify-center gap-6">
+
+            {/* Mono label pill */}
+            <div className="inline-flex items-center px-4 py-2 rounded-full border border-white/20 text-[11px] font-mono tracking-[0.2em] uppercase w-fit">
+              // SYSTEM PROFILE
+            </div>
+
+            {/* Heading */}
             <h1 className="text-white font-sans font-bold leading-[1.1] tracking-[-0.03em] text-[clamp(2.2rem,4.6vw,4rem)]">
-              We don&apos;t just build websites. We build digital identities that help brands stand out, convert, and grow online.
+              Hi, I&apos;m Shailesh.
             </h1>
+
+            {/* Body */}
+            <p className="text-[#a1a1a1] font-sans text-[clamp(15px,1.15vw,18px)] leading-[1.75] max-w-[560px]">
+              A second-year Computer Science student who builds like he&apos;s already four years in.
+              I use AI as a force multiplier — not a shortcut — to design, build, and ship
+              production-grade full-stack products, learning by doing rather than waiting for a
+              syllabus to catch up.
+            </p>
+
+            {/* Skill chips */}
+            <div className="flex flex-wrap gap-2">
+              {["Full-Stack", "AI-Accelerated Dev", "Fast Shipping"].map((tag) => (
+                <span
+                  key={tag}
+                  className="px-3 py-1.5 rounded-full border border-white/10 text-[11px] font-mono tracking-widest text-[#a1a1a1] uppercase"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {/* CTA buttons */}
+            <div className="flex flex-wrap gap-4 mt-2">
+              <Link
+                href="/#work"
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-full border-[4px] border-white text-white font-bold text-xs tracking-widest uppercase hover:bg-white hover:text-black transition-colors"
+              >
+                View My Work
+                <ArrowUpRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/#contact"
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-full border border-white/20 text-white font-bold text-xs tracking-widest uppercase hover:bg-white/10 transition-colors"
+              >
+                Contact Me
+              </Link>
+            </div>
+
           </div>
         </div>
 
