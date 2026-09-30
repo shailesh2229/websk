@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 
 export function ContactSection() {
   return (
-    <section className="min-h-full flex flex-col pt-[calc(var(--nav-h,84px)+48px)]">
+    <section className="flex flex-col pt-24 pb-0">
       {/* CTA from old About */}
       <div className="container mx-auto px-4 max-w-4xl text-center bg-[#0a0a0a] p-12 md:p-24 rounded-[36px] border border-[#1f1f1f] my-auto">
         <h2 className="text-4xl md:text-6xl font-bold font-sans tracking-tight mb-6">Ready to build something great?</h2>
@@ -19,7 +19,7 @@ export function ContactSection() {
           >
             Start a Project
           </a>
-          <Link href="/work" className={buttonVariants({ variant: "outline", size: "lg", className: "rounded-full px-8 py-6 text-lg font-bold border-white/20 hover:bg-white/10" })}>
+          <Link href="/#work" className={buttonVariants({ variant: "outline", size: "lg", className: "rounded-full px-8 py-6 text-lg font-bold border-white/20 hover:bg-white/10" })}>
             View Our Work
           </Link>
         </div>

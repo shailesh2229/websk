@@ -217,7 +217,7 @@ export function ServicesSection() {
                   <p className="text-[16px] md:text-[20px] leading-[1.6] text-[#8a8a8a] max-w-lg font-sans mb-6">
                     {service.description}
                   </p>
-                  <Link href="/services" className="inline-flex">
+                  <Link href="/#services" className="inline-flex">
                     <ArrowUpRight className="w-6 h-6 text-white hover:translate-x-1 hover:-translate-y-1 transition-transform" strokeWidth={1.5} />
                   </Link>
                 </div>

@@ -26,7 +26,6 @@ const nunitoSans = Nunito_Sans({
 
 import { SignatureIntro } from "@/components/layout/SignatureIntro";
 import { Navbar } from "@/components/layout/Navbar";
-import { PageNavigator } from "@/components/PageNavigator";
 import { SpaceBackground } from "@/components/ui/space-background";
 
 export const metadata: Metadata = {
@@ -71,7 +70,6 @@ export default function RootLayout({
         <SpaceBackground />
         <SignatureIntro />
         <Navbar />
-        <PageNavigator />
         <div id="page-shell" className="relative z-10 flex-1 flex flex-col" style={{ overflowX: "clip" }}>
           {children}
         </div>

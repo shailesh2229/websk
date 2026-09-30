@@ -49,7 +49,7 @@ export function AboutSection() {
                   <span className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">SEO<br/>Ready</span>
                 </div>
               </div>
-              <Link href="/contact" className="inline-flex items-center gap-2 px-6 py-4 rounded-full border-[4px] border-white text-white font-bold text-xs tracking-widest uppercase hover:bg-white hover:text-black transition-colors w-fit">
+              <Link href="/#contact" className="inline-flex items-center gap-2 px-6 py-4 rounded-full border-[4px] border-white text-white font-bold text-xs tracking-widest uppercase hover:bg-white hover:text-black transition-colors w-fit">
                 CONTACT US
                 <ArrowUpRight className="w-4 h-4" />
               </Link>

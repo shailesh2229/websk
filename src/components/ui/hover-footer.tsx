@@ -18,7 +18,6 @@ const Instagram = ({ size }: { size: number }) => (
 );
 import { profile } from "@/data/profile";
 import { useRouter } from "next/navigation";
-import { navDirection } from "@/lib/nav-direction";
 
 export const TextHoverEffect = ({
   text,
@@ -172,19 +171,18 @@ export const FooterBackgroundGradient = () => {
 function HoverFooter() {
   const router = useRouter();
 
-  // Handle routing via router.push with direction
+  // Handle footer link navigation — anchors all live on the home page now.
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     e.preventDefault();
-    const MAP: Record<string, number> = {
-      "/": 0, "/about": 1, "/services": 2, "/work": 3, "/contact": 4
+    // Map old route paths to their home-page anchor equivalents.
+    const ANCHOR_MAP: Record<string, string> = {
+      "/": "/",
+      "/about": "/#about",
+      "/services": "/#services",
+      "/work": "/#work",
+      "/contact": "/#contact",
     };
-    const PAGES = ["/", "/about", "/services", "/work", "/contact"];
-    const currentIdx = PAGES.indexOf(window.location.pathname);
-    const targetIdx = MAP[path] ?? -1;
-    if (targetIdx !== -1 && currentIdx !== -1) {
-      navDirection.set(targetIdx > currentIdx ? "next" : "prev");
-    }
-    router.push(path, { scroll: false });
+    router.push(ANCHOR_MAP[path] ?? path);
   };
 
   const footerLinks = [
@@ -208,6 +206,17 @@ function HoverFooter() {
       ],
     },
   ];
+
+  // Map old route paths to their home-page anchor equivalents for the footer links.
+  const resolveHref = (href: string): string => {
+    const map: Record<string, string> = {
+      "/about": "/#about",
+      "/services": "/#services",
+      "/work": "/#work",
+      "/contact": "/#contact",
+    };
+    return map[href] ?? href;
+  };
 
   return (
     <div className="dark bg-[#01030f] w-full relative pt-16 pb-8">
@@ -237,7 +246,7 @@ function HoverFooter() {
                   {section.links.map((link) => (
                     <li key={link.label} className="relative">
                       <a
-                        href={link.href}
+                        href={resolveHref(link.href)}
                         onClick={(e) => handleNavigation(e, link.href)}
                         className="text-gray-300 hover:text-[#3ca2fa] transition-colors"
                       >
@@ -268,7 +277,7 @@ function HoverFooter() {
                   <div className="flex items-center space-x-3 mb-2">
                     <ArrowUpRight size={18} className="text-[#3ca2fa] shrink-0" />
                     <a
-                      href="/contact"
+                      href="/#contact"
                       className="text-gray-300 hover:text-[#3ca2fa] transition-colors relative text-base"
                     >
                       Get In Touch

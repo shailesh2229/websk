@@ -1,35 +1,39 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { navDirection } from "@/lib/nav-direction";
 
-const PAGES = ["/", "/about", "/services", "/work", "/contact"];
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/#about", label: "About" },
+  { href: "/#services", label: "Services" },
+  { href: "/#work", label: "Work" },
+  { href: "/#contact", label: "Contact" },
+];
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-
-  const links = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/services", label: "Services" },
-    { href: "/work", label: "Work" },
-    { href: "/contact", label: "Contact" },
-  ];
+  const currentHash = typeof window !== "undefined" ? window.location.hash : "";
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    if (href === pathname) return;
-    const currentIdx = PAGES.indexOf(pathname);
-    const targetIdx = PAGES.indexOf(href);
-    if (currentIdx !== -1 && targetIdx !== -1) {
-      navDirection.set(targetIdx > currentIdx ? "next" : "prev");
+    const id = href === "/" ? null : href.replace("/", "").replace("#", "");
+
+    if (pathname !== "/") {
+      router.push(id ? `/#${id}` : "/");
+      return;
     }
-    router.push(href, { scroll: false });
+
+    if (!id) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -54,7 +58,7 @@ export function Navbar() {
 
         <nav className="hidden md:flex gap-8">
           {links.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname === link.href || (link.href !== "/" && pathname === "/" && currentHash === `#${link.href.replace("/#", "")}`);
             return (
               <a
                 key={link.href}
