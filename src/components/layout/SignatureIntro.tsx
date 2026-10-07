@@ -5,14 +5,14 @@ import { useState, useRef, useEffect } from "react";
 let hasPlayed = false;
 
 export function SignatureIntro() {
-  const [showPreloader, setShowPreloader] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
   const [phase, setPhase] = useState<"play" | "fade" | "unmount">("play");
   const fadeFired = useRef(false);
 
   useEffect(() => {
-    const forcePlay = window.location.search.includes("loader=1");
+    const forcePlay = window.location.search.includes("intro=1");
     if (hasPlayed && !forcePlay) {
-      setShowPreloader(false);
+      setShowIntro(false);
       setPhase("unmount");
       window.dispatchEvent(new Event("shutterOpen"));
       return;
@@ -20,7 +20,7 @@ export function SignatureIntro() {
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce && !forcePlay) {
-      setShowPreloader(false);
+      setShowIntro(false);
       setPhase("unmount");
       hasPlayed = true;
       window.dispatchEvent(new Event("shutterOpen"));
@@ -44,11 +44,11 @@ export function SignatureIntro() {
     fadeFired.current = true;
     
     setPhase("unmount");
-    setShowPreloader(false);
+    setShowIntro(false);
     hasPlayed = true;
   };
 
-  if (phase === "unmount" || !showPreloader) {
+  if (phase === "unmount" || !showIntro) {
     return null;
   }
 
