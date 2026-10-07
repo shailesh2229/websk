@@ -46,6 +46,7 @@ export function GlobeHero() {
   const [heroOpacity, setHeroOpacity] = useState(1);
   const [heroScale, setHeroScale] = useState(1);
   const [heroBlur, setHeroBlur] = useState(0);
+  const isStableRef = useRef(false);
   const reduce = typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -54,6 +55,7 @@ export function GlobeHero() {
     if (!wrapper) return;
 
     const updateDepth = () => {
+      if (!isStableRef.current) return;
       const total = Math.max(1, wrapper.offsetHeight - window.innerHeight);
       const scrollInWrapper = clamp(window.scrollY - (wrapper.offsetTop || 0), 0, total);
       stateRef.current.depth = clamp(scrollInWrapper / total, 0, 1);
@@ -150,14 +152,14 @@ export function GlobeHero() {
     rafRef.current = requestAnimationFrame(frame);
 
     const onPointerDown = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return;
+      if (e.pointerType !== "mouse" || !isStableRef.current) return;
       state.dragging = true;
       state.lx = e.clientX;
       state.ly = e.clientY;
     };
     const onPointerUp = () => { state.dragging = false; };
     const onPointerMove = (e: PointerEvent) => {
-      if (!state.dragging) return;
+      if (!state.dragging || !isStableRef.current) return;
       const dx = e.clientX - state.lx;
       const dy = e.clientY - state.ly;
       state.lx = e.clientX;
@@ -181,9 +183,54 @@ export function GlobeHero() {
     };
   }, [reduce]);
 
+  // Shutter state
+  const [shutterState, setShutterState] = useState<"hidden" | "revealing" | "stable">("hidden");
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (shutterState === "stable") {
+        document.body.style.overflow = "";
+      } else {
+        document.body.style.overflow = "hidden";
+      }
+    }
+  }, [shutterState]);
+
+  useEffect(() => {
+    if (reduce) {
+      setShutterState("stable");
+      isStableRef.current = true;
+      return;
+    }
+
+    const onShutterOpen = () => {
+      setShutterState("revealing");
+      
+      // Wait for the shutter to fully open (700ms) + 1-2s stabilization period
+      setTimeout(() => {
+        setShutterState("stable");
+        isStableRef.current = true;
+      }, 700 + 1000); // 1.7s total stabilization
+    };
+
+    window.addEventListener("shutterOpen", onShutterOpen);
+
+    return () => window.removeEventListener("shutterOpen", onShutterOpen);
+  }, [reduce]);
+
   return (
     <div ref={wrapperRef} className="relative block shrink-0" style={{ height: "200vh" }}>
-      <div className="sticky top-0 h-screen overflow-hidden" style={{ zIndex: 0 }}>
+      <div 
+        className="sticky top-0 h-screen overflow-hidden" 
+        style={{ 
+          zIndex: 0,
+          clipPath: shutterState === "hidden" ? "inset(100% 0 0 0)" : "inset(0 0 0 0)",
+          WebkitClipPath: shutterState === "hidden" ? "inset(100% 0 0 0)" : "inset(0 0 0 0)",
+          transition: "clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1), -webkit-clip-path 0.7s cubic-bezier(0.76, 0, 0.24, 1)",
+          transform: "translateZ(0)",
+          pointerEvents: shutterState === "stable" ? "auto" : "none"
+        }}
+      >
         <canvas
           ref={canvasRef}
           style={{

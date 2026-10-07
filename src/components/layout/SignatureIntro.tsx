@@ -4,126 +4,48 @@ import { useState, useRef, useEffect } from "react";
 
 let hasPlayed = false;
 
-interface SignatureIntroProps {
-  onComplete?: () => void;
-}
-
-const msgs: [number, string][] = [
-  [0, "Setting up the canvas"],
-  [28, "Writing clean code"],
-  [55, "Tuning performance"],
-  [80, "Polishing the details"],
-  [96, "Ready"],
-];
-
-export function SignatureIntro({ onComplete }: SignatureIntroProps) {
+export function SignatureIntro() {
   const [showPreloader, setShowPreloader] = useState(true);
   const [phase, setPhase] = useState<"play" | "fade" | "unmount">("play");
-  const [loadingPct, setLoadingPct] = useState("00");
-  const [statusText, setStatusText] = useState("Setting up the canvas");
-  const [statusSwap, setStatusSwap] = useState(false);
-  const fillRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const fadeFired = useRef(false);
 
   useEffect(() => {
     const forcePlay = window.location.search.includes("loader=1");
     if (hasPlayed && !forcePlay) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowPreloader(false);
-       
       setPhase("unmount");
-      delete document.documentElement.dataset.loader;
-      window.dispatchEvent(new Event("introComplete"));
-      if (onComplete) onComplete();
+      window.dispatchEvent(new Event("shutterOpen"));
       return;
     }
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce && !forcePlay) {
-       
       setShowPreloader(false);
-       
       setPhase("unmount");
       hasPlayed = true;
-      delete document.documentElement.dataset.loader;
-      window.dispatchEvent(new Event("introComplete"));
-      if (onComplete) onComplete();
+      window.dispatchEvent(new Event("shutterOpen"));
       return;
     }
 
-    const DUR = 4600;
-    const DELAY = 900;
-    let t0 = 0;
-    let raf = 0;
-    let curMsgIndex = 0;
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    function ease(x: number) {
-      return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
-    }
-
-    function tick(now: number) {
-      if (!t0) t0 = now;
-      const p = Math.min(Math.max((now - t0 - DELAY) / DUR, 0), 1);
-      const e = ease(p);
-      const n = Math.round(e * 100);
-
-      if (fillRef.current) {
-        fillRef.current.style.transform = `scaleX(${e})`;
-      }
-      setLoadingPct(String(n).padStart(2, "0"));
-
-      let nextIndex = curMsgIndex;
-      for (let i = msgs.length - 1; i >= 0; i--) {
-        if (n >= msgs[i][0]) {
-          nextIndex = i;
-          break;
-        }
-      }
-
-      if (nextIndex !== curMsgIndex) {
-        setStatusSwap(true);
-        setTimeout(() => {
-          setStatusText(msgs[nextIndex][1]);
-          setStatusSwap(false);
-        }, 220);
-        curMsgIndex = nextIndex;
-      }
-
-      if (p < 1) {
-        raf = requestAnimationFrame(tick);
-      } else {
-        timeoutId = setTimeout(() => {
-          setPhase("fade");
-        }, 400); // 1) Loader reaches 100%, wait 400ms
-      }
-    }
-
-    raf = requestAnimationFrame(tick);
+    // After 1500ms, the intro finishes and we trigger the shutter
+    const timeoutId = setTimeout(() => {
+      setPhase("fade");
+      window.dispatchEvent(new Event("shutterOpen")); // Tell GlobeHero to reveal
+    }, 1500);
 
     return () => {
-      cancelAnimationFrame(raf);
       clearTimeout(timeoutId);
     };
-  }, [onComplete]);
+  }, []);
 
-  // 3) On opacity transitionend
   const handleTransitionEnd = (e: React.TransitionEvent) => {
-    if (phase !== "fade" || e.propertyName !== "opacity") return;
+    if (phase !== "fade" || e.propertyName !== "transform") return;
     if (fadeFired.current) return;
     fadeFired.current = true;
     
     setPhase("unmount");
     setShowPreloader(false);
     hasPlayed = true;
-    
-    requestAnimationFrame(() => {
-      delete document.documentElement.dataset.loader;
-    });
-
-    window.dispatchEvent(new Event("introComplete"));
-    if (onComplete) onComplete();
   };
 
   if (phase === "unmount" || !showPreloader) {
@@ -131,12 +53,11 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent text-white overflow-hidden font-serif">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent pointer-events-none overflow-hidden">
       <div 
-        ref={contentRef}
         onTransitionEnd={handleTransitionEnd}
-        className={`relative z-10 flex flex-col items-center w-[min(92vw,520px)] text-center transition-all duration-500 ${
-          phase === "fade" ? "opacity-0 -translate-y-2" : "opacity-100 translate-y-0"
+        className={`relative z-10 flex flex-col items-center w-[min(92vw,520px)] text-center transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+          phase === "fade" ? "-translate-y-[150vh]" : "translate-y-0"
         }`}
       >
         {/* Signature */}
@@ -145,37 +66,16 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
           className="sig w-[clamp(200px,34vw,340px)] h-auto block drop-shadow-[0_0_18px_rgba(109,59,255,0.35)]"
           alt=""
           src="/websk-signature.png"
+          style={{ opacity: 0 }}
           onError={(e) => {
             e.currentTarget.style.display = 'none';
           }}
         />
 
         {/* Tagline */}
-        <div className="tag mt-[clamp(18px,3vh,30px)] min-h-[4.4em] text-[clamp(16px,2.1vw,21px)] leading-relaxed tracking-[0.01em]">
-          <span className="block opacity-0 translate-y-2 text-[#9ea2c0]">Web experiences</span>
-          <span className="block opacity-0 translate-y-2 text-[#9ea2c0]">shaped by code, not templates.</span>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="bar mt-[clamp(18px,3vh,30px)] w-[min(220px,50vw)] h-[1px] bg-[#22254a] relative overflow-hidden opacity-0">
-          <div
-            ref={fillRef}
-            className="absolute inset-0 origin-left scale-x-0 bg-[linear-gradient(90deg,transparent,#c9c6ff_70%,#fff)]"
-          />
-        </div>
-
-        {/* Meta */}
-        <div className="meta mt-[14px] font-mono text-[10px] tracking-[0.28em] uppercase text-[#6a6e90] opacity-0">
-          Loading {loadingPct}%
-        </div>
-
-        {/* Status */}
-        <div
-          className={`status mt-[18px] font-mono text-[9.5px] tracking-[0.3em] uppercase text-[#6a6e90] opacity-0 h-[1.2em] transition-opacity duration-200 ${
-            statusSwap ? "!opacity-25" : ""
-          }`}
-        >
-          {statusText}
+        <div className="tag mt-[clamp(18px,3vh,30px)] min-h-[4.4em] text-[clamp(16px,2.1vw,21px)] leading-relaxed tracking-[0.01em] font-serif text-white">
+          <span className="block translate-y-2 text-[#9ea2c0]" style={{ opacity: 0 }}>Web experiences</span>
+          <span className="block translate-y-2 text-[#9ea2c0]" style={{ opacity: 0 }}>shaped by code, not templates.</span>
         </div>
       </div>
 
@@ -186,18 +86,23 @@ export function SignatureIntro({ onComplete }: SignatureIntroProps) {
           -webkit-mask-size: 260% 100%; mask-size: 260% 100%;
           -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
           -webkit-mask-position: 100% 0; mask-position: 100% 0;
-          animation: write 1.9s cubic-bezier(.45,.05,.3,1) .15s forwards;
+          animation: write 1.2s cubic-bezier(.45,.05,.3,1) 0.1s forwards;
         }
-        @keyframes write { to { -webkit-mask-position: 0 0; mask-position: 0 0; } }
+        @keyframes write { 
+          0% { opacity: 0; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+          1% { opacity: 1; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+          100% { opacity: 1; -webkit-mask-position: 0 0; mask-position: 0 0; } 
+        }
 
-        .tag span:nth-child(1) { animation: up .9s ease 1.6s forwards; }
-        .tag span:nth-child(2) { animation: up .9s ease 2.3s forwards; }
-        @keyframes up { to { opacity: 1; transform: none; } }
-
-        .bar { animation: fade .6s ease .9s forwards; }
-        .meta { animation: fade .6s ease 1s forwards; }
-        .status { animation: fade .6s ease 1s forwards; }
-        @keyframes fade { to { opacity: 1; } }
+        .tag span {
+          display: inline-block;
+        }
+        .tag span:nth-child(1) { animation: up 0.6s ease 0.6s forwards; }
+        .tag span:nth-child(2) { animation: up 0.6s ease 0.9s forwards; }
+        @keyframes up { 
+          0% { opacity: 0; transform: translateY(8px); }
+          100% { opacity: 1; transform: none; } 
+        }
       `}} />
     </div>
   );

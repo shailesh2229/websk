@@ -50,21 +50,9 @@ export default function RootLayout({
       lang="en"
       className={`${marcellus.variable} ${jetbrainsMono.variable} ${ibmPlexMono.variable} ${nunitoSans.variable} dark antialiased`}
       suppressHydrationWarning
-      data-loader="playing"
     >
       <head>
         <link rel="preload" as="image" href="/websk-signature-nav.png" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches && !window.location.search.includes('loader=1')) {
-                  delete document.documentElement.dataset.loader;
-                }
-              } catch (e) {}
-            `,
-          }}
-        />
       </head>
       <body className="bg-black text-white min-h-[100dvh] flex flex-col font-serif relative">
         <SpaceBackground />

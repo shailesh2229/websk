@@ -159,21 +159,6 @@
   --nav-h: 84px;
 }
 
-html[data-loader="playing"] {
-  overflow: hidden;
-}
-
-#site-content, #navbar, #page-shell {
-  transition: opacity 0.8s ease;
-}
-
-html[data-loader="playing"] #site-content,
-html[data-loader="playing"] #navbar,
-html[data-loader="playing"] #page-shell {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
