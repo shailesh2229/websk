@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ["latin"], weight: ["400"] });
 
 const links = [
   { href: "/#work", label: "Work" },
-  { href: "/#about", label: "About" },
   { href: "/#services", label: "Services" },
   { href: "/#contact", label: "Contact" },
 ];
@@ -20,6 +19,7 @@ export function Navbar() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,6 +60,10 @@ export function Navbar() {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  if (pathname === "/contact") {
+    return null;
+  }
 
   return (
     <>
@@ -138,4 +142,3 @@ export function Navbar() {
     </>
   );
 }
-

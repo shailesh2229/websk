@@ -9,7 +9,8 @@ const inter = Inter_Tight({
 });
 
 import { Navbar } from "@/components/layout/Navbar";
-
+import { SmoothScroll } from "@/components/layout/SmoothScroll";
+import { MenuOverlay } from "@/components/layout/MenuOverlay";
 export const metadata: Metadata = {
   title: "Websk",
   description: "Personal portfolio of Shailesh Chaudhary",
@@ -36,11 +37,14 @@ export default function RootLayout({
       <head>
         <link rel="preload" as="image" href="/websk-signature-nav.png" />
       </head>
-      <body className="bg-[#F4F3EF] text-[#111] min-h-[100dvh] flex flex-col font-sans relative transition-colors duration-500">
-        <Navbar />
-        <div id="page-shell" className="relative z-10">
-          {children}
-        </div>
+      <body className="bg-[#ffffff] text-[#1c1d20] min-h-[100dvh] flex flex-col font-sans relative">
+        <SmoothScroll>
+          <Navbar />
+          <MenuOverlay />
+          <div id="page-shell" className="relative z-10 w-full min-h-screen bg-[#ffffff]">
+            {children}
+          </div>
+        </SmoothScroll>
       </body>
     </html>
   );
