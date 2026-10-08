@@ -1,58 +1,113 @@
 "use client";
 
-import Image from "next/image";
-import { Globe, ArrowDownRight } from "lucide-react";
+import { WireframeGlobe } from "./WireframeGlobe";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], weight: ["400"] });
 
 export function EditorialHero() {
   return (
-    <section className="relative w-full h-[100dvh] bg-[#8E9193] overflow-hidden">
+    <section className={`relative w-full h-[100dvh] bg-[#8E9494] overflow-hidden ${inter.className}`}>
+      <style>{`
+        @keyframes heroMarquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .hero-marquee {
+          animation: heroMarquee 50s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-marquee {
+            animation-play-state: paused;
+          }
+        }
+      `}</style>
+
+      {/* Soft lighter radial glow behind the portrait */}
+      <div 
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{ background: "radial-gradient(ellipse 30% 55% at 50% 52%, rgba(168,172,172,.55), transparent 70%)" }}
+      />
       
-      {/* Middle Elements (Pill & Role text) */}
-      
-      {/* Left: Location Pill + Globe Badge */}
-      <div className="hero-pill absolute left-0 top-[120px] md:top-[44%] z-20 flex items-center">
-        <div className="bg-[#1f1f1f] text-white text-[14px] leading-[1.3] pl-4 md:pl-8 pr-5 py-3 md:py-4 rounded-r-full flex items-center shadow-lg">
-          <div>
-            Located<br />in<br />Ahmedabad
-          </div>
-          <div className="ml-4 bg-[#a9abad] w-[52px] h-[52px] rounded-full flex items-center justify-center text-[#111] shrink-0">
-            <Globe className="w-6 h-6 animate-[spin_10s_linear_infinite]" strokeWidth={1.5} />
-          </div>
+      {/* Location Pill */}
+      <div 
+        className="hero-pill absolute left-0 z-20 flex items-center bg-[#17181a] top-[40%] md:top-[44%]"
+        style={{ 
+          height: "clamp(60px, 7vw, 120px)",
+          borderRadius: "0 999px 999px 0",
+          paddingLeft: "3vw",
+          paddingRight: "clamp(6px, 0.7vw, 12px)",
+          gap: "2.3vw",
+          color: "#ffffff"
+        }}
+      >
+        <div 
+          className="font-normal"
+          style={{ 
+            fontSize: "clamp(10px, 1.2vw, 20px)", 
+            lineHeight: 1.18,
+            color: "#ffffff"
+          }}
+        >
+          Located<br />in<br />Ahmedabad
+        </div>
+        <div 
+          className="bg-[#979a9a] rounded-full flex items-center justify-center shrink-0"
+          style={{ 
+            width: "clamp(44px, 5.3vw, 92px)",
+            height: "clamp(44px, 5.3vw, 92px)",
+          }}
+        >
+          <WireframeGlobe />
         </div>
       </div>
 
-      {/* Right: Role Text */}
-      <div className="hero-role absolute right-6 top-[80px] md:left-[71%] md:top-[36%] z-20 flex flex-col items-end md:items-start text-white">
-        <ArrowDownRight className="w-6 h-6 md:w-8 md:h-8 mb-2" strokeWidth={1.5} />
-        <div className="font-light text-[clamp(20px,2.1vw,30px)] leading-[1.1] text-right md:text-left">
-          Freelance Designer<br />& Developer
+      {/* Role Text */}
+      <div 
+        className="hero-role absolute z-20 flex flex-col items-end md:items-start right-6 top-[16%] md:right-auto md:left-[71.5%] md:top-[35%]"
+        style={{ color: "#ffffff" }}
+      >
+        <div className="mb-2 text-sm md:text-base" style={{ color: "#ffffff" }}>↘</div>
+        <div 
+          className="font-normal text-right md:text-left text-[18px] md:text-[clamp(16px,1.95vw,34px)]"
+          style={{ lineHeight: 1.12, color: "#ffffff" }}
+        >
+          Freelance<br />Designer & Developer
         </div>
       </div>
 
       {/* Portrait Photo */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[90vw] md:w-[45vw] max-w-[600px] h-[75vh] md:h-[85vh] z-10 pointer-events-none">
-        <Image
+      <div 
+        className="absolute left-1/2 bottom-0 z-[2] pointer-events-none h-[70%] md:h-[94%]"
+        style={{ transform: "translateX(-50%)" }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/shailesh.png"
           alt="Shailesh Chaudhary"
-          fill
-          priority
-          className="object-contain object-bottom"
+          className="h-full w-auto object-bottom pointer-events-none"
         />
       </div>
 
-      {/* Giant Bottom Text */}
-      <div className="absolute bottom-6 md:bottom-8 left-0 right-0 z-30 w-full px-4 md:px-0 pointer-events-none">
-        <h1 className="text-white font-normal tracking-[-0.045em] leading-[0.9] text-[19vw] md:text-[11.2vw] flex flex-col md:flex-row items-center justify-center">
-          <div className="overflow-hidden">
-            <div className="hero-word">Shailesh</div>
-          </div>
-          <div className="overflow-hidden hidden md:flex items-center justify-center mx-[2vw] h-full">
-            <div className="hero-dash bg-white w-[7.2vw] h-[0.55vw] rounded-full" />
-          </div>
-          <div className="overflow-hidden">
-            <div className="hero-word">Chaudhary</div>
-          </div>
-        </h1>
+      {/* Name Marquee */}
+      <div 
+        className="absolute left-0 right-0 z-[3] pointer-events-none overflow-hidden"
+        style={{ bottom: "3%" }}
+      >
+        <div 
+          className="hero-marquee inline-flex whitespace-nowrap font-normal will-change-transform"
+          style={{ 
+            letterSpacing: "-0.035em",
+            lineHeight: 0.95,
+            color: "#ffffff"
+          }}
+        >
+          {[...Array(4)].map((_, i) => (
+            <span key={i} className="pr-[0.3em] text-[14vh] md:text-[19vh]" style={{ color: "#ffffff" }}>
+              Shailesh Chaudhary —
+            </span>
+          ))}
+        </div>
       </div>
 
     </section>
