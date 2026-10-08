@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import HoverFooter from "@/components/ui/hover-footer";
 import { ProcessSlides } from "@/components/ProcessSlides";
+import { InteractiveCard } from "@/components/ui/interactive-card";
 
 export function WorkSection() {
   return (
@@ -81,11 +82,7 @@ export function WorkSection() {
               { num: "05", title: "SEO Ready", desc: "Technical foundations that help your site get found and rank better." },
               { num: "06", title: "Business Focused", desc: "Every decision tied to clarity, trust, and real conversion goals." },
             ].map((feature, idx) => (
-              <div key={idx} className="flex flex-col gap-3 bg-[#0a0a0a] p-8 rounded-2xl border border-[#1f1f1f]">
-                <span className="text-sm font-mono text-muted-foreground tabular-nums mb-2 block">{feature.num}</span>
-                <h3 className="text-xl font-bold font-sans tracking-tight text-white">{feature.title}</h3>
-                <p className="text-muted-foreground font-sans leading-relaxed">{feature.desc}</p>
-              </div>
+              <InteractiveCard key={idx} feature={feature} />
             ))}
           </div>
         </div>

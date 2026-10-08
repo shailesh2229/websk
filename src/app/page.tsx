@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { GlobeHero } from "@/components/GlobeHero";
+import { EditorialHero } from "@/components/hero/EditorialHero";
+import { Intro } from "@/components/Intro";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { WorkSection } from "@/components/sections/WorkSection";
@@ -22,7 +23,8 @@ export default function Home() {
 
   return (
     <>
-      <GlobeHero />
+      <Intro />
+      <EditorialHero />
       <main>
         <section id="about" className="scroll-mt-[96px]">
           <AboutSection />

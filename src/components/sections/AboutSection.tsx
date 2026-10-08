@@ -34,7 +34,7 @@ export function AboutSection() {
 
             {/* Mono label pill */}
             <div className="inline-flex items-center px-4 py-2 rounded-full border border-white/20 text-[11px] font-mono tracking-[0.2em] uppercase w-fit">
-              // SYSTEM PROFILE
+              // DIGITAL BUILDER
             </div>
 
             {/* Heading */}
@@ -44,10 +44,7 @@ export function AboutSection() {
 
             {/* Body */}
             <p className="text-[#a1a1a1] font-sans text-[clamp(15px,1.15vw,18px)] leading-[1.75] max-w-[560px]">
-              A second-year Computer Science student who builds like he&apos;s already four years in.
-              I use AI as a force multiplier — not a shortcut — to design, build, and ship
-              production-grade full-stack products, learning by doing rather than waiting for a
-              syllabus to catch up.
+              I build modern websites and digital experiences that are fast, responsive, and built around real business needs. From clean interfaces to full-stack functionality, I turn ideas into products that are ready to ship.
             </p>
 
             {/* Skill chips */}
@@ -122,12 +119,13 @@ export function AboutSection() {
             <div 
               className="absolute inset-0 w-full h-full"
               style={{
-                backgroundImage: `url(/about/featured.jpg), linear-gradient(135deg, #1f1f2e, #0a0a14), linear-gradient(to right, #111, #000)`,
+                backgroundImage: `url(/about/featured_new.jpg), linear-gradient(135deg, #1f1f2e, #0a0a14), linear-gradient(to right, #111, #000)`,
                 backgroundSize: 'cover, cover, cover',
                 backgroundPosition: 'center, center, center',
                 backgroundRepeat: 'no-repeat, no-repeat, no-repeat'
               }}
             />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
             <div className="absolute top-8 left-8">
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[11px] font-mono tracking-[0.2em] uppercase text-white">
                 DIGITAL CRAFT
@@ -135,25 +133,14 @@ export function AboutSection() {
             </div>
           </div>
 
-          {/* Card 3: Polaroids */}
+          {/* Card 3: Brand showcase image */}
           <div className="bg-[#0a0a0a] border border-[#1f1f1f] rounded-[36px] p-[32px] md:p-[44px] flex flex-col items-center justify-between min-h-[620px] relative overflow-hidden">
             <p className="text-center text-[#888] text-[17px] leading-relaxed max-w-[280px] relative z-10 font-sans tracking-tight">
               Stories and moments from brands we&apos;ve helped grow with clearer design and stronger digital presence.
             </p>
             
-            <div className="relative w-full flex-1 flex items-end justify-center pb-12 mt-12">
-              {/* Left Polaroid */}
-              <div className="absolute w-[160px] md:w-[180px] aspect-[3/4] bg-white p-2 pb-8 rounded-sm shadow-xl -rotate-8 -translate-x-12 md:-translate-x-16 translate-y-4">
-                <div className="w-full h-full bg-[#111] overflow-hidden" style={{ backgroundImage: 'url(/about/moment-1.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              </div>
-              {/* Right Polaroid */}
-              <div className="absolute w-[160px] md:w-[180px] aspect-[3/4] bg-white p-2 pb-8 rounded-sm shadow-xl rotate-8 translate-x-12 md:translate-x-16 translate-y-4">
-                <div className="w-full h-full bg-[#111] overflow-hidden" style={{ backgroundImage: 'url(/about/moment-3.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              </div>
-              {/* Center Polaroid (on top) */}
-              <div className="absolute w-[170px] md:w-[190px] aspect-[3/4] bg-white p-2 pb-8 rounded-sm shadow-2xl rotate-0 z-10">
-                <div className="w-full h-full bg-[#111] overflow-hidden" style={{ backgroundImage: 'url(/about/moment-2.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              </div>
+            <div className="relative w-full flex-1 flex mt-10 rounded-[20px] overflow-hidden border border-white/5 shadow-2xl">
+              <div className="w-full h-full absolute inset-0 bg-[#111]" style={{ backgroundImage: 'url(/about/brand_showcase.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
             </div>
           </div>
         </div>
