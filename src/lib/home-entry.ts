@@ -2,6 +2,10 @@
 let _fromAbout = false;
 
 export const homeEntry = {
-  get fromAbout(): boolean { return _fromAbout; },
-  setFromAbout(v: boolean) { _fromAbout = v; },
+  get fromAbout(): boolean {
+    return _fromAbout;
+  },
+  setFromAbout(v: boolean) {
+    _fromAbout = v;
+  },
 };

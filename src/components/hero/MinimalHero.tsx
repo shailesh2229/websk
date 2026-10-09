@@ -9,12 +9,17 @@ interface MinimalHeroProps {
   bottomText?: string;
 }
 
-export function MinimalHero({ title, subtitle, topText = "INITIATING SEQUENCE", bottomText = "SYSTEM.READY" }: MinimalHeroProps) {
+export function MinimalHero({
+  title,
+  subtitle,
+  topText = "INITIATING SEQUENCE",
+  bottomText = "SYSTEM.READY",
+}: MinimalHeroProps) {
   return (
     <section className="relative w-full h-[60vh] min-h-[500px] bg-[#030712] overflow-hidden flex items-center justify-center border-b border-white/5">
       {/* Faint Grid Lines */}
       <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-      
+
       {/* Corner Square Brackets */}
       <div className="absolute inset-8 z-10 pointer-events-none">
         <div className="absolute top-0 left-0 w-8 h-8 border-t border-l border-white/20"></div>

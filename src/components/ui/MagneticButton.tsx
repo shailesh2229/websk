@@ -1,43 +1,65 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useEffect } from "react";
+import gsap from "gsap";
 
-export function MagneticButton({ 
-  children, 
+export function MagneticButton({
+  children,
   className = "",
-  onClick
-}: { 
+  onClick,
+}: {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { clientX, clientY } = e;
-    const { height, width, left, top } = ref.current!.getBoundingClientRect();
-    const middleX = clientX - (left + width / 2);
-    const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * 0.2, y: middleY * 0.2 });
-  };
+  useEffect(() => {
+    if (window.matchMedia("(hover: none) and (pointer: coarse)").matches)
+      return;
+    if (!ref.current) return;
 
-  const reset = () => {
-    setPosition({ x: 0, y: 0 });
-  };
+    const el = ref.current;
+
+    const xTo = gsap.quickTo(el, "x", {
+      duration: 1,
+      ease: "elastic.out(1, 0.3)",
+    });
+    const yTo = gsap.quickTo(el, "y", {
+      duration: 1,
+      ease: "elastic.out(1, 0.3)",
+    });
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const { clientX, clientY } = e;
+      const { height, width, left, top } = el.getBoundingClientRect();
+      const centerX = left + width / 2;
+      const centerY = top + height / 2;
+      xTo((clientX - centerX) * 0.35);
+      yTo((clientY - centerY) * 0.35);
+    };
+
+    const handleMouseLeave = () => {
+      xTo(0);
+      yTo(0);
+    };
+
+    el.addEventListener("mousemove", handleMouseMove);
+    el.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      el.removeEventListener("mousemove", handleMouseMove);
+      el.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      onMouseMove={handleMouse}
-      onMouseLeave={reset}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
       className={`relative inline-flex items-center justify-center cursor-pointer ${className}`}
       onClick={onClick}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

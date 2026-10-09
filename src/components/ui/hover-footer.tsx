@@ -2,19 +2,56 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import {
-  Mail,
-  ArrowUpRight,
-} from "lucide-react";
+import { Mail, ArrowUpRight } from "lucide-react";
 
 const Linkedin = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+    <rect x="2" y="9" width="4" height="12"></rect>
+    <circle cx="4" cy="4" r="2"></circle>
+  </svg>
 );
 const Github = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+  </svg>
 );
 const Instagram = ({ size }: { size: number }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+  </svg>
 );
 import { profile } from "@/data/profile";
 import { useRouter } from "next/navigation";
@@ -172,7 +209,10 @@ function HoverFooter() {
   const router = useRouter();
 
   // Handle footer link navigation — anchors all live on the home page now.
-  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+  const handleNavigation = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    path: string,
+  ) => {
     e.preventDefault();
     // Map old route paths to their home-page anchor equivalents.
     const ANCHOR_MAP: Record<string, string> = {
@@ -220,7 +260,10 @@ function HoverFooter() {
 
   return (
     <div className="dark bg-[#01030f] w-full relative pt-16 pb-8">
-      <footer className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden mx-4 md:mx-8 xl:mx-auto max-w-[1440px]" style={{ fontFamily: 'var(--font-nunito-sans)' }}>
+      <footer
+        className="bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden mx-4 md:mx-8 xl:mx-auto max-w-[1440px]"
+        style={{ fontFamily: "var(--font-nunito-sans)" }}
+      >
         <div className="max-w-7xl mx-auto p-8 md:p-14 lg:pb-0 z-40 relative pointer-events-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12">
             {/* Brand section */}
@@ -232,7 +275,8 @@ function HoverFooter() {
                 <span className="text-white text-3xl font-bold">Websk</span>
               </div>
               <p className="text-sm leading-relaxed text-gray-300">
-                Custom websites, designed and coded from scratch. Fast, modern, and built for your business.
+                Custom websites, designed and coded from scratch. Fast, modern,
+                and built for your business.
               </p>
             </div>
 
@@ -275,7 +319,10 @@ function HoverFooter() {
                 </li>
                 <li>
                   <div className="flex items-center space-x-3 mb-2">
-                    <ArrowUpRight size={18} className="text-[#3ca2fa] shrink-0" />
+                    <ArrowUpRight
+                      size={18}
+                      className="text-[#3ca2fa] shrink-0"
+                    />
                     <a
                       href="/#contact"
                       className="text-gray-300 hover:text-[#3ca2fa] transition-colors relative text-base"
@@ -284,7 +331,9 @@ function HoverFooter() {
                       <span className="absolute top-0 -right-4 w-2 h-2 rounded-full bg-[#3ca2fa] animate-pulse"></span>
                     </a>
                   </div>
-                  <p className="text-sm text-gray-500 pl-8">Currently available for new opportunities.</p>
+                  <p className="text-sm text-gray-500 pl-8">
+                    Currently available for new opportunities.
+                  </p>
                 </li>
               </ul>
             </div>
@@ -296,13 +345,31 @@ function HoverFooter() {
           <div className="flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0 pointer-events-auto mb-8 lg:mb-0">
             {/* Social icons */}
             <div className="flex space-x-6 text-gray-400">
-              <a href={profile.socials.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-[#3ca2fa] transition-colors">
+              <a
+                href={profile.socials.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="hover:text-[#3ca2fa] transition-colors"
+              >
                 <Linkedin size={20} />
               </a>
-              <a href={profile.socials.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="hover:text-[#3ca2fa] transition-colors">
+              <a
+                href={profile.socials.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                className="hover:text-[#3ca2fa] transition-colors"
+              >
                 <Github size={20} />
               </a>
-              <a href={profile.socials.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-[#3ca2fa] transition-colors">
+              <a
+                href={profile.socials.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="hover:text-[#3ca2fa] transition-colors"
+              >
                 <Instagram size={20} />
               </a>
             </div>

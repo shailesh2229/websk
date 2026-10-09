@@ -1,15 +1,24 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
-import { motion, useSpring, useTransform, useMotionTemplate } from "framer-motion";
+import {
+  motion,
+  useSpring,
+  useTransform,
+  useMotionTemplate,
+} from "framer-motion";
 
-export function InteractiveCard({ feature }: { feature: { num: string; title: string; desc: string } }) {
+export function InteractiveCard({
+  feature,
+}: {
+  feature: { num: string; title: string; desc: string };
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
-  
+
   const mouseX = useSpring(0, { stiffness: 300, damping: 20 });
   const mouseY = useSpring(0, { stiffness: 300, damping: 20 });
-  
+
   const rotateX = useTransform(mouseY, [-0.5, 0.5], ["5deg", "-5deg"]);
   const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-5deg", "5deg"]);
 
@@ -20,11 +29,11 @@ export function InteractiveCard({ feature }: { feature: { num: string; title: st
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    
+
     // Normalized for rotation
     const nx = (e.clientX - rect.left) / rect.width - 0.5;
     const ny = (e.clientY - rect.top) / rect.height - 0.5;
-    
+
     mouseX.set(nx);
     mouseY.set(ny);
 
@@ -73,14 +82,20 @@ export function InteractiveCard({ feature }: { feature: { num: string; title: st
           background,
         }}
       />
-      
-      <motion.div 
+
+      <motion.div
         style={{ translateZ: isHoverable && hovered ? 25 : 0 }}
         className="relative z-10 flex flex-col gap-3 transition-transform duration-300 ease-out"
       >
-        <span className="text-sm font-mono text-muted-foreground tabular-nums mb-2 block">{feature.num}</span>
-        <h3 className="text-xl font-bold font-sans tracking-tight text-foreground">{feature.title}</h3>
-        <p className="text-muted-foreground font-sans leading-relaxed">{feature.desc}</p>
+        <span className="text-sm font-mono text-muted-foreground tabular-nums mb-2 block">
+          {feature.num}
+        </span>
+        <h3 className="text-xl font-bold font-sans tracking-tight text-foreground">
+          {feature.title}
+        </h3>
+        <p className="text-muted-foreground font-sans leading-relaxed">
+          {feature.desc}
+        </p>
       </motion.div>
     </motion.div>
   );

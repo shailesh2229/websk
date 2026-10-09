@@ -1,76 +1,185 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useSpring } from "framer-motion";
+import gsap from "gsap";
 import Link from "next/link";
-import Image from "next/image";
+import { RoundedButton } from "../ui/RoundedButton";
 
 const projects = [
   {
     slug: "shivkrupa",
     title: "Shivkrupa Enterprise",
-    discipline: "Web Design, Development",
+    discipline: "Design & Development",
     year: "2026",
-    image: "/work/shivkrupa.jpg" // TODO: Add actual image or placeholder
-  }
+    color: "#e1e4e7",
+    image: "/work/shivkrupa.jpg", // TODO placeholder
+  },
+  {
+    slug: "project-2",
+    title: "Second Project",
+    discipline: "Design & Development",
+    year: "2025",
+    color: "#d0d4d9",
+    image: "/work/project2.jpg",
+  },
+  {
+    slug: "project-3",
+    title: "Third Project",
+    discipline: "Design & Development",
+    year: "2025",
+    color: "#c0c4c9",
+    image: "/work/project3.jpg",
+  },
+  {
+    slug: "project-4",
+    title: "Fourth Project",
+    discipline: "Design & Development",
+    year: "2024",
+    color: "#b0b4b9",
+    image: "/work/project4.jpg",
+  },
 ];
 
 export function RecentWork() {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  
-  // Floating cursor setup
-  const cursorX = useSpring(0, { stiffness: 150, damping: 25, mass: 0.5 });
-  const cursorY = useSpring(0, { stiffness: 150, damping: 25, mass: 0.5 });
-  const containerRef = useRef<HTMLDivElement>(null);
+
+  const containerRef = useRef<HTMLElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Touch devices skip custom cursor
+    if (window.matchMedia("(hover: none) and (pointer: coarse)").matches)
+      return;
+    if (!modalRef.current || !bubbleRef.current || !containerRef.current)
+      return;
+
+    const modal = modalRef.current;
+    const bubble = bubbleRef.current;
+    const container = containerRef.current;
+
+    const xModalTo = gsap.quickTo(modal, "left", {
+      duration: 0.8,
+      ease: "power3",
+    });
+    const yModalTo = gsap.quickTo(modal, "top", {
+      duration: 0.8,
+      ease: "power3",
+    });
+
+    const xBubbleTo = gsap.quickTo(bubble, "left", {
+      duration: 0.5,
+      ease: "power3",
+    });
+    const yBubbleTo = gsap.quickTo(bubble, "top", {
+      duration: 0.5,
+      ease: "power3",
+    });
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      // Center the floating image on cursor
-      cursorX.set(e.clientX - rect.left - 192); // 385/2 approx
-      cursorY.set(e.clientY - rect.top - 192);
+      xModalTo(e.clientX);
+      yModalTo(e.clientY);
+      xBubbleTo(e.clientX);
+      yBubbleTo(e.clientY);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [cursorX, cursorY]);
+    container.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      container.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  // Enter / Leave List
+  const handleMouseEnterList = () => {
+    if (window.matchMedia("(hover: none) and (pointer: coarse)").matches)
+      return;
+    gsap.to(modalRef.current, { scale: 1, duration: 0.4, ease: "custom" });
+    gsap.to(bubbleRef.current, { scale: 1, duration: 0.4, ease: "custom" });
+    if (modalRef.current)
+      modalRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.76,0,0.24,1)";
+    if (bubbleRef.current)
+      bubbleRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.76,0,0.24,1)";
+  };
+
+  const handleMouseLeaveList = () => {
+    if (window.matchMedia("(hover: none) and (pointer: coarse)").matches)
+      return;
+    setHoveredIdx(null);
+    if (modalRef.current)
+      modalRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.32,0,0.67,0)";
+    if (bubbleRef.current)
+      bubbleRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.32,0,0.67,0)";
+    gsap.to(modalRef.current, { scale: 0, duration: 0.4 });
+    gsap.to(bubbleRef.current, { scale: 0, duration: 0.4 });
+  };
+
+  // Slider change
+  useEffect(() => {
+    if (hoveredIdx !== null && sliderRef.current) {
+      gsap.to(sliderRef.current, {
+        y: `${hoveredIdx * -100}%`,
+        duration: 0.5,
+        ease: "power3.out",
+      });
+    }
+  }, [hoveredIdx]);
 
   return (
-    <section className="w-full bg-[#ffffff] pt-12 pb-24 relative" ref={containerRef}>
-      <div className="max-w-[1440px] mx-auto px-[4vw]">
-        
+    <section
+      className="w-full bg-[#ffffff] pt-[0.5vw] pb-[8vw] relative"
+      ref={containerRef}
+      onMouseEnter={handleMouseEnterList}
+      onMouseLeave={handleMouseLeaveList}
+    >
+      <div
+        className="w-full relative"
+        style={{ paddingLeft: "8vw", paddingRight: "8vw" }}
+      >
         {/* Label */}
-        <div className="text-[12px] tracking-widest text-[#999] mb-8">
+        <div
+          className="text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[3.1vw]"
+          style={{ paddingLeft: "8vw" }}
+        >
           RECENT WORK
         </div>
-        
+
         {/* Project List */}
-        <div className="border-t border-[#e1e4e7] flex flex-col group">
+        <div
+          className="border-t border-[#d5d5d5] flex flex-col group/list w-full"
+          style={{ paddingLeft: "8vw", paddingRight: "0" }}
+        >
           {projects.map((project, idx) => {
             const isHovered = hoveredIdx === idx;
-            const isOtherHovered = hoveredIdx !== null && hoveredIdx !== idx;
-            
+
             return (
               <Link
                 key={project.slug}
                 href={`/work/${project.slug}`}
                 onMouseEnter={() => setHoveredIdx(idx)}
-                onMouseLeave={() => setHoveredIdx(null)}
-                className="w-full border-b border-[#e1e4e7] py-8 md:py-12 flex flex-col md:flex-row items-start md:items-center justify-between transition-colors relative"
+                className={`w-full border-b border-[#d5d5d5] h-[13.8vw] flex flex-col md:flex-row items-start md:items-center justify-between transition-all duration-400 cursor-none ${
+                  isHovered ? "opacity-50" : "opacity-100"
+                }`}
               >
-                <motion.h3 
-                  className={`text-[clamp(42px,5vw,72px)] font-light m-0 leading-[1] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
-                    isOtherHovered ? "text-[#ccc]" : "text-[#1c1d20]"
-                  }`}
-                  animate={{ x: isHovered ? 20 : 0 }}
-                  transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
+                <h3
+                  className="text-[4.1vw] font-normal m-0 leading-[1] text-[#1c1d20] transition-transform duration-400 ease-out"
+                  style={{
+                    transform: isHovered ? "translateX(-1vw)" : "translateX(0)",
+                  }}
                 >
                   {project.title}
-                </motion.h3>
-                <div className={`text-[14px] md:text-[16px] font-normal transition-colors duration-500 mt-4 md:mt-0 ${
-                  isOtherHovered ? "text-[#ccc]" : "text-[#1c1d20]"
-                }`}>
+                </h3>
+                <div
+                  className="text-[1.2vw] font-normal text-[#1c1d20] mt-[1vw] md:mt-0 transition-transform duration-400 ease-out"
+                  style={{
+                    transform: isHovered ? "translateX(1vw)" : "translateX(0)",
+                  }}
+                >
                   {project.discipline}
                 </div>
               </Link>
@@ -79,55 +188,53 @@ export function RecentWork() {
         </div>
 
         {/* More Work Button */}
-        <div className="mt-16 flex justify-center md:justify-start">
-          <Link
+        <div
+          className="mt-[4vw] flex justify-center md:justify-start"
+          style={{ paddingLeft: "8vw" }}
+        >
+          <RoundedButton
             href="/work"
-            className="group relative inline-flex items-center justify-center px-8 py-4 border border-[#1c1d20] rounded-full overflow-hidden transition-colors hover:border-[#3A4BE0]"
+            className="px-[2vw] py-[1vw] border border-[#d0d0d0] text-[#1c1d20] hover:border-transparent rounded-full"
+            fillColor="#3A4BE0"
           >
-            <div className="absolute inset-0 bg-[#3A4BE0] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] rounded-full" />
-            <span className="relative z-10 text-[#1c1d20] group-hover:text-white font-normal text-[16px] flex items-center gap-1">
-              More work <sup className="text-[10px] top-[-0.5em]">{projects.length}</sup>
+            <span className="flex items-center gap-[0.2vw] text-[1.2vw]">
+              More work{" "}
+              <sup className="text-[0.65vw] top-[-0.5em] ml-[0.2em]">
+                {projects.length}
+              </sup>
             </span>
-          </Link>
+          </RoundedButton>
         </div>
       </div>
 
-      {/* Floating Image Preview */}
-      <motion.div
-        className="absolute top-0 left-0 pointer-events-none z-50 flex items-center justify-center"
-        style={{
-          x: cursorX,
-          y: cursorY,
-        }}
+      {/* Floating Modal (Fixed to viewport) */}
+      <div
+        ref={modalRef}
+        className="fixed top-0 left-0 w-[27.5vw] h-[27.5vw] bg-[#e9eaea] overflow-hidden pointer-events-none z-50 scale-0 origin-center hidden md:block"
+        style={{ transform: "translate(-50%, -50%) scale(0)" }}
       >
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{
-            scale: hoveredIdx !== null ? 1 : 0,
-            opacity: hoveredIdx !== null ? 1 : 0
-          }}
-          transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
-          className="relative w-[300px] h-[300px] md:w-[385px] md:h-[385px] bg-[#e1e4e7] overflow-hidden hidden md:block"
-        >
-          {hoveredIdx !== null && (
-            <>
-              {/* <Image 
-                src={projects[hoveredIdx].image}
-                alt="Project Preview"
-                fill
-                className="object-cover"
-              /> */}
-              {/* TODO placeholder text */}
-              <div className="absolute inset-0 flex items-center justify-center text-[#999] text-sm">
-                TODO: {projects[hoveredIdx].image}
+        <div ref={sliderRef} className="w-full h-full relative">
+          {projects.map((p, i) => (
+            <div
+              key={i}
+              className="w-full h-full flex items-center justify-center relative bg-[#e9eaea]"
+            >
+              <div className="w-[85%] aspect-[16/10] bg-[#d0d0d0] flex items-center justify-center text-[#999] text-[1vw]">
+                TODO: {p.image}
               </div>
-              <div className="absolute inset-0 m-auto w-[77px] h-[77px] bg-[#3A4BE0] rounded-full flex items-center justify-center text-white text-[14px]">
-                View
-              </div>
-            </>
-          )}
-        </motion.div>
-      </motion.div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* View Bubble */}
+      <div
+        ref={bubbleRef}
+        className="fixed top-0 left-0 w-[7vw] h-[7vw] bg-[#3A4BE0] rounded-full flex items-center justify-center text-[#ffffff] text-[1.2vw] pointer-events-none z-[51] scale-0 origin-center hidden md:flex"
+        style={{ transform: "translate(-50%, -50%) scale(0)" }}
+      >
+        View
+      </div>
     </section>
   );
 }

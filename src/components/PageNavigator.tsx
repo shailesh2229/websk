@@ -30,7 +30,8 @@ export function PageNavigator() {
   const root = () => document.documentElement;
   const sc = () => (document.scrollingElement || root()) as HTMLElement;
   const atTop = () => sc().scrollTop <= 1;
-  const atBottom = () => sc().scrollTop + window.innerHeight >= sc().scrollHeight - 2;
+  const atBottom = () =>
+    sc().scrollTop + window.innerHeight >= sc().scrollHeight - 2;
 
   useEffect(() => {
     setDebug(new URLSearchParams(location.search).get("debug") === "nav");
@@ -53,7 +54,9 @@ export function PageNavigator() {
     window.scrollTo(0, 0);
     el.dataset.nav = "in-start";
     void el.offsetHeight;
-    const raf = requestAnimationFrame(() => { el.dataset.nav = "in"; });
+    const raf = requestAnimationFrame(() => {
+      el.dataset.nav = "in";
+    });
 
     const started = performance.now();
     const done = setTimeout(() => {
@@ -64,7 +67,10 @@ export function PageNavigator() {
     const q = setInterval(() => {
       if (st.entering) return;
       const now = performance.now();
-      if (now - st.lastWheel > QUIET || now - started > IN_MS + MAX_LOCK_AFTER_IN) {
+      if (
+        now - st.lastWheel > QUIET ||
+        now - started > IN_MS + MAX_LOCK_AFTER_IN
+      ) {
         st.locked = false;
         st.edgeSince = { top: now, bottom: now };
         st.startedEdge = { top: false, bottom: false };
@@ -109,38 +115,55 @@ export function PageNavigator() {
       const fresh = now - st.lastWheel > GESTURE_GAP;
       st.lastWheel = now;
 
-      if (st.locked) { e.preventDefault(); return; }
+      if (st.locked) {
+        e.preventDefault();
+        return;
+      }
 
       const i = PAGES.indexOf(pathname);
       if (i <= 0) return; // Home (i===0) owned by GlobeHero; unknown routes (i===-1) never navigate
 
       if (fresh) {
-        st.startedEdge.top    = atTop()    && now - st.edgeSince.top    >= EDGE_REST;
-        st.startedEdge.bottom = atBottom() && now - st.edgeSince.bottom >= EDGE_REST;
+        st.startedEdge.top = atTop() && now - st.edgeSince.top >= EDGE_REST;
+        st.startedEdge.bottom =
+          atBottom() && now - st.edgeSince.bottom >= EDGE_REST;
       }
 
       const down = e.deltaY > 0;
 
       if (debug) {
         setHud({
-          page: pathname, y: Math.round(sc().scrollTop), h: sc().scrollHeight,
-          top: atTop(), bottom: atBottom(),
-          startedTop: st.startedEdge.top, startedBottom: st.startedEdge.bottom,
-          dy: Math.round(e.deltaY), fresh, locked: st.locked,
+          page: pathname,
+          y: Math.round(sc().scrollTop),
+          h: sc().scrollHeight,
+          top: atTop(),
+          bottom: atBottom(),
+          startedTop: st.startedEdge.top,
+          startedBottom: st.startedEdge.bottom,
+          dy: Math.round(e.deltaY),
+          fresh,
+          locked: st.locked,
         });
       }
 
       if (down && atBottom() && st.startedEdge.bottom && i < PAGES.length - 1) {
-        e.preventDefault(); go("down", PAGES[i + 1]);
+        e.preventDefault();
+        go("down", PAGES[i + 1]);
       } else if (!down && atTop() && st.startedEdge.top && i > 0) {
-        e.preventDefault(); go("up", PAGES[i - 1]);
+        e.preventDefault();
+        go("up", PAGES[i - 1]);
       }
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false, capture: true });
+    window.addEventListener("wheel", onWheel, {
+      passive: false,
+      capture: true,
+    });
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      window.removeEventListener("wheel", onWheel, { capture: true } as EventListenerOptions);
+      window.removeEventListener("wheel", onWheel, {
+        capture: true,
+      } as EventListenerOptions);
       window.removeEventListener("scroll", onScroll);
     };
   }, [pathname, router, debug]);
@@ -149,8 +172,16 @@ export function PageNavigator() {
   return (
     <pre
       style={{
-        position: "fixed", bottom: 8, left: 8, zIndex: 9999, margin: 0,
-        background: "#000c", color: "#0f0", padding: 8, fontSize: 11, pointerEvents: "none",
+        position: "fixed",
+        bottom: 8,
+        left: 8,
+        zIndex: 9999,
+        margin: 0,
+        background: "#000c",
+        color: "#0f0",
+        padding: 8,
+        fontSize: 11,
+        pointerEvents: "none",
       }}
     >
       {JSON.stringify(hud, null, 1)}

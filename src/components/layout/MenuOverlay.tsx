@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { MagneticButton } from "../ui/MagneticButton";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { RoundedButton } from "../ui/RoundedButton";
+import { usePathname, useRouter } from "next/navigation";
 
 const links = [
   { href: "/", label: "Home" },
@@ -22,13 +21,21 @@ const socials = [
 const curvePath = {
   initial: "M100 0 V1000 Q-100 500 100 0 Z",
   enter: "M100 0 V1000 Q100 500 100 0 Z",
-  exit: "M100 0 V1000 Q-100 500 100 0 Z"
+  exit: "M100 0 V1000 Q-100 500 100 0 Z",
+};
+
+const transitionCurvePath = {
+  initial: "M0 300 Q50 0 100 300 V300 H0 Z",
+  enter: "M0 0 Q50 0 100 0 V300 H0 Z",
 };
 
 export function MenuOverlay() {
   const [open, setOpen] = useState(false);
   const [showButton, setShowButton] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navTargetName, setNavTargetName] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -45,47 +52,61 @@ export function MenuOverlay() {
   }, [pathname]);
 
   useEffect(() => {
-    if (open) {
+    if (open || isNavigating) {
       document.body.style.overflow = "hidden";
-      const handleEsc = (e: KeyboardEvent) => {
-        if (e.key === "Escape") setOpen(false);
-      };
-      window.addEventListener("keydown", handleEsc);
-      return () => {
-        document.body.style.overflow = "";
-        window.removeEventListener("keydown", handleEsc);
-      };
     } else {
       document.body.style.overflow = "";
     }
-  }, [open]);
+  }, [open, isNavigating]);
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+    label: string,
+  ) => {
+    e.preventDefault();
+    if (pathname === href) {
+      setOpen(false);
+      return;
+    }
+    setNavTargetName(label);
+    setIsNavigating(true);
+    setOpen(false);
+
+    // Wait for overlay to animate up (about 800ms) then route
+    setTimeout(() => {
+      router.push(href);
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 500); // let the new page render, then hide overlay
+    }, 800);
+  };
 
   return (
     <>
       <AnimatePresence>
-        {showButton && (
+        {showButton && !isNavigating && (
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20 }}
-            className="fixed top-6 right-6 z-[2147483002]"
+            transition={{ duration: 0.3, ease: [0.76, 0, 0.24, 1] }}
+            className="fixed top-[2vw] right-[2.5vw] z-[2147483002]"
           >
-            <MagneticButton>
-              <button
-                onClick={() => setOpen(!open)}
-                className={`w-[76px] h-[76px] rounded-full flex flex-col items-center justify-center gap-1.5 transition-colors duration-300 ${
-                  open ? "bg-[#3A4BE0]" : "bg-[#1c1d20]"
-                }`}
-              >
-                <div 
-                  className={`w-6 h-[2px] bg-white transition-transform duration-300 ${open ? "rotate-45 translate-y-[4px]" : ""}`} 
-                />
-                <div 
-                  className={`w-6 h-[2px] bg-white transition-transform duration-300 ${open ? "-rotate-45 -translate-y-[4px]" : ""}`} 
-                />
-              </button>
-            </MagneticButton>
+            <RoundedButton
+              onClick={() => setOpen(!open)}
+              className={`w-[5.5vw] h-[5.5vw] flex flex-col items-center justify-center gap-1.5 transition-colors duration-300 ${
+                open ? "bg-[#3A4BE0]" : "bg-[#1c1d20]"
+              }`}
+              fillColor="#3A4BE0"
+            >
+              <div
+                className={`w-[1.2vw] h-[1px] bg-[#ffffff] transition-transform duration-300 absolute ${open ? "rotate-45" : "-translate-y-[2px]"}`}
+              />
+              <div
+                className={`w-[1.2vw] h-[1px] bg-[#ffffff] transition-transform duration-300 absolute ${open ? "-rotate-45" : "translate-y-[2px]"}`}
+              />
+            </RoundedButton>
           </motion.div>
         )}
       </AnimatePresence>
@@ -101,87 +122,117 @@ export function MenuOverlay() {
               transition={{ duration: 0.5 }}
               className="fixed inset-0 z-[2147483000]"
               style={{
-                background: "linear-gradient(to right, rgba(0,0,0,0.08), rgba(0,0,0,0.35))"
+                background:
+                  "linear-gradient(to right, rgba(0,0,0,0.08), rgba(0,0,0,0.35))",
               }}
               onClick={() => setOpen(false)}
             />
-            
+
             {/* Panel */}
             <motion.div
               initial={prefersReducedMotion ? { opacity: 0 } : { x: "100%" }}
               animate={prefersReducedMotion ? { opacity: 1 } : { x: "0%" }}
               exit={prefersReducedMotion ? { opacity: 0 } : { x: "100%" }}
               transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-              className="fixed top-0 right-0 bottom-0 w-full md:w-[38vw] md:min-w-[360px] bg-[#1c1d20] z-[2147483001] text-white flex flex-col pt-24 px-[4vw]"
+              className="fixed top-0 right-0 bottom-0 w-[36vw] bg-[#1c1d20] z-[2147483001] text-[#ffffff] flex flex-col justify-between"
+              style={{ padding: "6vw 4vw 2vw 4vw" }}
             >
               {/* SVG Curve */}
               {!prefersReducedMotion && (
-                <svg 
-                  className="absolute right-full top-0 w-[100px] h-full hidden md:block" 
-                  viewBox="0 0 100 1000" 
+                <svg
+                  className="absolute right-full top-0 w-[100px] h-full"
+                  viewBox="0 0 100 1000"
                   preserveAspectRatio="none"
                 >
-                  <motion.path 
+                  <motion.path
                     d={curvePath.initial}
                     initial="initial"
                     animate="enter"
                     exit="exit"
                     variants={{
                       initial: { d: curvePath.initial },
-                      enter: { d: curvePath.enter, transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } },
-                      exit: { d: curvePath.exit, transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }
+                      enter: {
+                        d: curvePath.enter,
+                        transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },
+                      },
+                      exit: {
+                        d: curvePath.exit,
+                        transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },
+                      },
                     }}
-                    fill="#1c1d20" 
+                    fill="#1c1d20"
                   />
                 </svg>
               )}
 
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: prefersReducedMotion ? 0 : 0.1 }}
-                className="text-[12px] tracking-widest text-[#999] mb-8 pb-4 border-b border-[#333]"
-              >
-                NAVIGATION
-              </motion.div>
-              
-              <nav className="flex flex-col gap-4">
-                {links.map((link, i) => {
-                  const isActive = pathname === link.href;
-                  return (
-                    <motion.div
-                      initial={{ x: 50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: 50, opacity: 0 }}
-                      transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: prefersReducedMotion ? 0 : 0.1 + i * 0.06 }}
-                      key={link.href}
-                    >
-                      <Link 
-                        href={link.href}
-                        className="text-[clamp(42px,5vw,64px)] font-light flex items-center group"
-                      >
-                        <span className={`inline-block w-[10px] h-[10px] rounded-full bg-white mr-4 transition-transform duration-300 ${isActive ? "scale-100" : "scale-0 group-hover:scale-100"}`} />
-                        <span className="transition-transform duration-300 group-hover:translate-x-4">
-                          {link.label}
-                        </span>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </nav>
-
-              <div className="mt-auto pb-12">
-                <motion.div 
+              <div>
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: prefersReducedMotion ? 0 : 0.4 }}
-                  className="text-[12px] tracking-widest text-[#999] mb-4"
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.76, 0, 0.24, 1],
+                    delay: 0.1,
+                  }}
+                  className="text-[0.65vw] tracking-[0.03em] text-[rgba(255,255,255,0.4)] uppercase mb-[4vw] pb-[2vw] border-b border-[rgba(255,255,255,0.15)]"
+                >
+                  NAVIGATION
+                </motion.div>
+
+                <nav className="flex flex-col" style={{ gap: "2vw" }}>
+                  {links.map((link, i) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <motion.div
+                        initial={{ y: 40, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 40, opacity: 0 }}
+                        transition={{
+                          duration: 0.8,
+                          ease: [0.76, 0, 0.24, 1],
+                          delay: 0.1 + i * 0.06,
+                        }}
+                        key={link.href}
+                        style={{
+                          height: "5.6vw",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <a
+                          href={link.href}
+                          onClick={(e) =>
+                            handleNavClick(e, link.href, link.label)
+                          }
+                          className="text-[3.6vw] font-normal flex items-center relative group text-[#ffffff] hover:opacity-70 transition-opacity"
+                        >
+                          <span
+                            className={`absolute left-[-1.5vw] top-1/2 -translate-y-1/2 w-[0.5vw] h-[0.5vw] rounded-full bg-[#ffffff] transition-transform duration-300 ${isActive ? "scale-100" : "scale-0 group-hover:scale-100"}`}
+                          />
+                          {link.label}
+                        </a>
+                      </motion.div>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{
+                    duration: 0.8,
+                    ease: [0.76, 0, 0.24, 1],
+                    delay: 0.4,
+                  }}
+                  className="text-[0.65vw] tracking-[0.03em] text-[rgba(255,255,255,0.4)] uppercase mb-[1vw]"
                 >
                   SOCIALS
                 </motion.div>
-                <div className="flex gap-6">
+                <div className="flex gap-[1.5vw]">
                   {socials.map((s, i) => (
                     <motion.a
                       key={s.label}
@@ -189,8 +240,12 @@ export function MenuOverlay() {
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: 20, opacity: 0 }}
-                      transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: prefersReducedMotion ? 0 : 0.4 + i * 0.06 }}
-                      className="text-[14px] font-normal hover:underline"
+                      transition={{
+                        duration: 0.8,
+                        ease: [0.76, 0, 0.24, 1],
+                        delay: 0.4 + i * 0.06,
+                      }}
+                      className="text-[0.9vw] font-normal text-[#ffffff] hover:opacity-70 transition-opacity"
                     >
                       {s.label}
                     </motion.a>
@@ -199,6 +254,37 @@ export function MenuOverlay() {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Page Transition Overlay */}
+      <AnimatePresence>
+        {isNavigating && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: "0%" }}
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+            className="fixed inset-0 z-[2147483003] bg-[#1c1d20] flex items-center justify-center text-[#ffffff]"
+          >
+            {/* Transition curve (optional nice-to-have) */}
+            <svg
+              className="absolute bottom-full left-0 w-full h-[300px]"
+              viewBox="0 0 100 300"
+              preserveAspectRatio="none"
+            >
+              <motion.path
+                d={transitionCurvePath.initial}
+                animate={{ d: transitionCurvePath.enter }}
+                transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+                fill="#1c1d20"
+              />
+            </svg>
+            <div className="text-[2.2vw] font-normal flex items-center gap-[1vw]">
+              <div className="w-[0.5vw] h-[0.5vw] rounded-full bg-[#ffffff]" />
+              {navTargetName}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

@@ -49,23 +49,23 @@
 }
 
 :root {
-  --background: #F4F3EF;
+  --background: #f4f3ef;
   --foreground: #111111;
-  --card: #FFFFFF;
+  --card: #ffffff;
   --card-foreground: #111111;
-  --popover: #FFFFFF;
+  --popover: #ffffff;
   --popover-foreground: #111111;
   --primary: #111111;
-  --primary-foreground: #FFFFFF;
-  --secondary: #EAE9E4;
+  --primary-foreground: #ffffff;
+  --secondary: #eae9e4;
   --secondary-foreground: #111111;
-  --muted: #EAE9E4;
-  --muted-foreground: #6B6B66;
-  --accent: #EAE9E4;
+  --muted: #eae9e4;
+  --muted-foreground: #6b6b66;
+  --accent: #eae9e4;
   --accent-foreground: #111111;
   --destructive: #ff4d4f;
-  --border: #E5E5DF;
-  --input: #E5E5DF;
+  --border: #e5e5df;
+  --input: #e5e5df;
   --ring: #111111;
   --radius: 0.5rem;
 }
@@ -96,16 +96,16 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-  
+
   /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }
 
@@ -115,11 +115,27 @@
   }
   body {
     @apply bg-transparent text-foreground;
+    font-family:
+      var(--font-inter), "Helvetica Neue", Arial, system-ui, sans-serif;
   }
   html {
     @apply font-sans;
     scrollbar-gutter: stable;
     scroll-behavior: auto;
+  }
+  button,
+  input,
+  textarea,
+  a,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span {
+    font-family: inherit;
   }
 }
 
@@ -128,13 +144,21 @@
 }
 
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes marquee-reverse {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .animate-marquee {
@@ -148,7 +172,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee, .animate-marquee-reverse {
+  .animate-marquee,
+  .animate-marquee-reverse {
     animation: none !important;
   }
 }

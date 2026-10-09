@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, useSpring, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import gsap from "gsap";
 import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
+import { RoundedButton } from "@/components/ui/RoundedButton";
 
 const projects = [
   {
@@ -14,8 +16,20 @@ const projects = [
     services: "Web Design, Development",
     year: "2026",
     category: "Development",
-    image: "/work/shivkrupa.jpg" // TODO placeholder
-  }
+    color: "#e1e4e7",
+    image: "/work/shivkrupa.jpg", // TODO placeholder
+  },
+  {
+    slug: "project-2",
+    title: "Second Project",
+    client: "Unknown",
+    location: "Remote",
+    services: "Creative Development",
+    year: "2025",
+    category: "Design",
+    color: "#d0d4d9",
+    image: "/work/project2.jpg",
+  },
 ];
 
 const categories = ["All", "Design", "Development"];
@@ -25,109 +39,241 @@ export default function WorkPage() {
   const [view, setView] = useState<"list" | "grid">("list");
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  // Floating cursor setup
-  const cursorX = useSpring(0, { stiffness: 150, damping: 25, mass: 0.5 });
-  const cursorY = useSpring(0, { stiffness: 150, damping: 25, mass: 0.5 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+
+  const filteredProjects = projects.filter(
+    (p) => activeCategory === "All" || p.category === activeCategory,
+  );
 
   useEffect(() => {
+    // Touch devices skip custom cursor
+    if (
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+      view !== "list"
+    )
+      return;
+    if (!modalRef.current || !bubbleRef.current || !containerRef.current)
+      return;
+
+    const modal = modalRef.current;
+    const bubble = bubbleRef.current;
+    const container = containerRef.current;
+
+    const xModalTo = gsap.quickTo(modal, "left", {
+      duration: 0.8,
+      ease: "power3",
+    });
+    const yModalTo = gsap.quickTo(modal, "top", {
+      duration: 0.8,
+      ease: "power3",
+    });
+
+    const xBubbleTo = gsap.quickTo(bubble, "left", {
+      duration: 0.5,
+      ease: "power3",
+    });
+    const yBubbleTo = gsap.quickTo(bubble, "top", {
+      duration: 0.5,
+      ease: "power3",
+    });
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current || view !== "list") return;
-      const rect = containerRef.current.getBoundingClientRect();
-      cursorX.set(e.clientX - rect.left - 192); // 385/2 approx
-      cursorY.set(e.clientY - rect.top - 192);
+      xModalTo(e.clientX);
+      yModalTo(e.clientY);
+      xBubbleTo(e.clientX);
+      yBubbleTo(e.clientY);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [cursorX, cursorY, view]);
+    container.addEventListener("mousemove", handleMouseMove);
+    return () => container.removeEventListener("mousemove", handleMouseMove);
+  }, [view]);
 
-  const filteredProjects = projects.filter(p => activeCategory === "All" || p.category === activeCategory);
+  // Enter / Leave List
+  const handleMouseEnterList = () => {
+    if (
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+      view !== "list"
+    )
+      return;
+    gsap.to(modalRef.current, { scale: 1, duration: 0.4, ease: "custom" });
+    gsap.to(bubbleRef.current, { scale: 1, duration: 0.4, ease: "custom" });
+    if (modalRef.current)
+      modalRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.76,0,0.24,1)";
+    if (bubbleRef.current)
+      bubbleRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.76,0,0.24,1)";
+  };
+
+  const handleMouseLeaveList = () => {
+    if (
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+      view !== "list"
+    )
+      return;
+    setHoveredIdx(null);
+    if (modalRef.current)
+      modalRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.32,0,0.67,0)";
+    if (bubbleRef.current)
+      bubbleRef.current.style.transition =
+        "transform 0.4s cubic-bezier(0.32,0,0.67,0)";
+    gsap.to(modalRef.current, { scale: 0, duration: 0.4 });
+    gsap.to(bubbleRef.current, { scale: 0, duration: 0.4 });
+  };
+
+  // Slider change
+  useEffect(() => {
+    if (hoveredIdx !== null && sliderRef.current && view === "list") {
+      gsap.to(sliderRef.current, {
+        y: `${hoveredIdx * -100}%`,
+        duration: 0.5,
+        ease: "power3.out",
+      });
+    }
+  }, [hoveredIdx, view]);
 
   return (
     <>
-      <main className="w-full bg-[#ffffff] pt-32 md:pt-48 pb-24 min-h-screen">
-        <div className="max-w-[1440px] mx-auto px-[4vw]">
-          
+      <main className="w-full bg-[#ffffff] pt-[17vw] min-h-screen">
+        <div className="w-full relative">
           {/* Header */}
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-            className="text-[clamp(48px,7vw,90px)] font-light leading-[1.1] text-[#1c1d20] mb-16 md:mb-24"
+            className="text-[6.2vw] font-normal leading-[1.05] text-[#1c1d20] mb-[4vw]"
+            style={{ paddingLeft: "16vw" }}
           >
-            Websites built<br />with care.
+            Websites built
+            <br />
+            with care.
           </motion.h1>
 
           {/* Controls: Filters & View Toggle */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-8 relative z-10">
-            <div className="flex flex-wrap gap-2 md:gap-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-[4vw] relative z-10 w-full">
+            <div
+              className="flex flex-wrap items-center"
+              style={{ paddingLeft: "16vw", gap: "0.7vw" }}
+            >
               {categories.map((cat) => {
                 const isActive = activeCategory === cat;
-                const count = cat === "All" ? projects.length : projects.filter(p => p.category === cat).length;
+                const count =
+                  cat === "All"
+                    ? projects.length
+                    : projects.filter((p) => p.category === cat).length;
                 return (
-                  <button
+                  <RoundedButton
                     key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className="relative px-6 py-3 rounded-full text-[14px] md:text-[16px] transition-colors"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setActiveCategory(cat);
+                    }}
+                    className={`h-[4.7vw] px-[2vw] rounded-full text-[1.2vw] transition-colors border ${
+                      isActive
+                        ? "bg-[#1c1d20] text-[#ffffff] border-[#1c1d20]"
+                        : "bg-transparent text-[#1c1d20] border-[#d0d0d0]"
+                    }`}
+                    fillColor="#3A4BE0"
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeFilterBlob"
-                        className="absolute inset-0 bg-[#3A4BE0] rounded-full"
-                        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                      />
-                    )}
-                    <span className={`relative z-10 flex items-center gap-1 ${isActive ? "text-white" : "text-[#1c1d20]"}`}>
-                      {cat} <sup className="text-[10px] top-[-0.5em]">{count}</sup>
-                    </span>
-                  </button>
+                    {cat}{" "}
+                    <sup className="text-[0.6em] top-[-0.5em] ml-[0.2em]">
+                      {count}
+                    </sup>
+                  </RoundedButton>
                 );
               })}
             </div>
 
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={() => setView("list")}
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${view === "list" ? "bg-[#e1e4e7]" : "hover:bg-[#f0f0f0]"}`}
+            <div
+              className="flex items-center gap-[0.7vw]"
+              style={{ paddingRight: "16vw" }}
+            >
+              <RoundedButton
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setView("list");
+                }}
+                className={`w-[4.7vw] h-[4.7vw] rounded-full flex items-center justify-center transition-colors border ${
+                  view === "list"
+                    ? "bg-[#1c1d20] text-[#ffffff] border-[#1c1d20]"
+                    : "bg-transparent border-[#d0d0d0] text-[#1c1d20]"
+                }`}
+                fillColor="#3A4BE0"
               >
                 {/* List Icon */}
-                <div className="flex flex-col gap-1 w-5">
-                  <div className="h-[2px] bg-[#1c1d20] w-full" />
-                  <div className="h-[2px] bg-[#1c1d20] w-full" />
-                  <div className="h-[2px] bg-[#1c1d20] w-full" />
+                <div className="flex flex-col gap-[3px] w-[35%]">
+                  <div
+                    className={`h-[2px] w-full ${view === "list" ? "bg-[#ffffff]" : "bg-current"}`}
+                  />
+                  <div
+                    className={`h-[2px] w-full ${view === "list" ? "bg-[#ffffff]" : "bg-current"}`}
+                  />
+                  <div
+                    className={`h-[2px] w-full ${view === "list" ? "bg-[#ffffff]" : "bg-current"}`}
+                  />
                 </div>
-              </button>
-              <button 
-                onClick={() => setView("grid")}
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${view === "grid" ? "bg-[#e1e4e7]" : "hover:bg-[#f0f0f0]"}`}
+              </RoundedButton>
+              <RoundedButton
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setView("grid");
+                }}
+                className={`w-[4.7vw] h-[4.7vw] rounded-full flex items-center justify-center transition-colors border ${
+                  view === "grid"
+                    ? "bg-[#1c1d20] text-[#ffffff] border-[#1c1d20]"
+                    : "bg-transparent border-[#d0d0d0] text-[#1c1d20]"
+                }`}
+                fillColor="#3A4BE0"
               >
                 {/* Grid Icon */}
-                <div className="flex flex-wrap gap-[3px] w-5 h-5">
-                  <div className="w-[8.5px] h-[8.5px] bg-[#1c1d20]" />
-                  <div className="w-[8.5px] h-[8.5px] bg-[#1c1d20]" />
-                  <div className="w-[8.5px] h-[8.5px] bg-[#1c1d20]" />
-                  <div className="w-[8.5px] h-[8.5px] bg-[#1c1d20]" />
+                <div className="flex flex-wrap gap-[3px] w-[40%] aspect-square">
+                  <div
+                    className={`w-[calc(50%-1.5px)] h-[calc(50%-1.5px)] ${view === "grid" ? "bg-[#ffffff]" : "bg-current"}`}
+                  />
+                  <div
+                    className={`w-[calc(50%-1.5px)] h-[calc(50%-1.5px)] ${view === "grid" ? "bg-[#ffffff]" : "bg-current"}`}
+                  />
+                  <div
+                    className={`w-[calc(50%-1.5px)] h-[calc(50%-1.5px)] ${view === "grid" ? "bg-[#ffffff]" : "bg-current"}`}
+                  />
+                  <div
+                    className={`w-[calc(50%-1.5px)] h-[calc(50%-1.5px)] ${view === "grid" ? "bg-[#ffffff]" : "bg-current"}`}
+                  />
                 </div>
-              </button>
+              </RoundedButton>
             </div>
           </div>
 
           {/* List View */}
           {view === "list" && (
-            <div className="w-full relative" ref={containerRef}>
-              <div className="hidden md:grid grid-cols-12 text-[12px] tracking-widest text-[#999] pb-4 border-b border-[#e1e4e7]">
-                <div className="col-span-4">CLIENT</div>
-                <div className="col-span-3">LOCATION</div>
-                <div className="col-span-4">SERVICES</div>
-                <div className="col-span-1 text-right">YEAR</div>
+            <div
+              className="w-full relative pb-[12vw]"
+              ref={containerRef}
+              onMouseEnter={handleMouseEnterList}
+              onMouseLeave={handleMouseLeaveList}
+            >
+              <div className="w-full relative text-[0.65vw] tracking-widest text-[#999] uppercase pb-[1vw]">
+                <div className="absolute top-0 left-[16vw]">CLIENT</div>
+                <div className="absolute top-0 left-[45vw]">LOCATION</div>
+                <div className="absolute top-0 left-[61.7vw]">SERVICES</div>
+                <div className="absolute top-0 right-[16vw]">YEAR</div>
               </div>
+              <div
+                className="h-[1px] bg-[#d5d5d5] w-full mt-[1.5vw] mb-0 absolute"
+                style={{ left: "8vw", width: "84vw" }}
+              />
 
-              <div className="flex flex-col group">
+              <div className="flex flex-col group/list mt-[1.5vw] relative w-full">
                 <AnimatePresence>
                   {filteredProjects.map((project, idx) => {
                     const isHovered = hoveredIdx === idx;
-                    const isOtherHovered = hoveredIdx !== null && hoveredIdx !== idx;
                     return (
                       <motion.div
                         key={project.slug}
@@ -135,27 +281,61 @@ export default function WorkPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.4 }}
+                        className="w-full"
                       >
                         <Link
                           href={`/work/${project.slug}`}
                           onMouseEnter={() => setHoveredIdx(idx)}
-                          onMouseLeave={() => setHoveredIdx(null)}
-                          className="w-full border-b border-[#e1e4e7] py-6 md:py-8 flex flex-col md:grid md:grid-cols-12 items-start md:items-center relative z-10 transition-colors"
+                          className={`w-full h-[7.2vw] flex items-center relative z-10 transition-all duration-400 cursor-none border-b border-[#d5d5d5] ${
+                            isHovered ? "opacity-50" : "opacity-100"
+                          }`}
+                          style={{
+                            margin: "0 auto",
+                            width: "84vw",
+                            marginLeft: "8vw",
+                          }}
                         >
-                          <motion.div 
-                            className={`col-span-4 text-[clamp(24px,3vw,32px)] font-light leading-[1.2] transition-colors duration-500 mb-2 md:mb-0 ${isOtherHovered ? "text-[#ccc]" : "text-[#1c1d20]"}`}
-                            animate={{ x: isHovered ? 20 : 0 }}
-                            transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
+                          <div
+                            className="absolute text-[2.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                            style={{
+                              left: "8vw",
+                              transform: isHovered
+                                ? "translateX(-1vw)"
+                                : "translateX(0)",
+                            }}
                           >
                             {project.title}
-                          </motion.div>
-                          <div className={`col-span-3 text-[14px] md:text-[16px] font-normal transition-colors duration-500 mb-1 md:mb-0 ${isOtherHovered ? "text-[#ccc]" : "text-[#1c1d20]"}`}>
+                          </div>
+                          <div
+                            className="absolute text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                            style={{
+                              left: "37vw",
+                              transform: isHovered
+                                ? "translateX(1vw)"
+                                : "translateX(0)",
+                            }}
+                          >
                             {project.location}
                           </div>
-                          <div className={`col-span-4 text-[14px] md:text-[16px] font-normal transition-colors duration-500 mb-1 md:mb-0 ${isOtherHovered ? "text-[#ccc]" : "text-[#1c1d20]"}`}>
+                          <div
+                            className="absolute text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                            style={{
+                              left: "53.7vw",
+                              transform: isHovered
+                                ? "translateX(1vw)"
+                                : "translateX(0)",
+                            }}
+                          >
                             {project.services}
                           </div>
-                          <div className={`col-span-1 text-left md:text-right text-[14px] md:text-[16px] font-normal transition-colors duration-500 ${isOtherHovered ? "text-[#ccc]" : "text-[#1c1d20]"}`}>
+                          <div
+                            className="absolute right-[8vw] text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                            style={{
+                              transform: isHovered
+                                ? "translateX(1vw)"
+                                : "translateX(0)",
+                            }}
+                          >
                             {project.year}
                           </div>
                         </Link>
@@ -165,41 +345,40 @@ export default function WorkPage() {
                 </AnimatePresence>
               </div>
 
-              {/* Floating Image Preview */}
-              <motion.div
-                className="absolute top-0 left-0 pointer-events-none z-50 flex items-center justify-center hidden md:flex"
-                style={{
-                  x: cursorX,
-                  y: cursorY,
-                }}
+              {/* Floating Modal (Fixed to viewport) */}
+              <div
+                ref={modalRef}
+                className="fixed top-0 left-0 w-[27.5vw] h-[27.5vw] bg-[#e9eaea] overflow-hidden pointer-events-none z-50 scale-0 origin-center hidden md:block"
+                style={{ transform: "translate(-50%, -50%) scale(0)" }}
               >
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{
-                    scale: hoveredIdx !== null ? 1 : 0,
-                    opacity: hoveredIdx !== null ? 1 : 0
-                  }}
-                  transition={{ duration: 0.4, ease: [0.76, 0, 0.24, 1] }}
-                  className="relative w-[385px] h-[385px] bg-[#e1e4e7] overflow-hidden"
-                >
-                  {hoveredIdx !== null && (
-                    <>
-                      <div className="absolute inset-0 flex items-center justify-center text-[#999] text-sm">
-                        TODO: {filteredProjects[hoveredIdx].image}
+                <div ref={sliderRef} className="w-full h-full relative">
+                  {filteredProjects.map((p, i) => (
+                    <div
+                      key={i}
+                      className="w-full h-full flex items-center justify-center relative bg-[#e9eaea]"
+                    >
+                      <div className="w-[85%] aspect-[16/10] bg-[#d0d0d0] flex items-center justify-center text-[#999] text-[1vw]">
+                        TODO: {p.image}
                       </div>
-                      <div className="absolute inset-0 m-auto w-[77px] h-[77px] bg-[#3A4BE0] rounded-full flex items-center justify-center text-white text-[14px]">
-                        View
-                      </div>
-                    </>
-                  )}
-                </motion.div>
-              </motion.div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* View Bubble */}
+              <div
+                ref={bubbleRef}
+                className="fixed top-0 left-0 w-[7vw] h-[7vw] bg-[#3A4BE0] rounded-full flex items-center justify-center text-[#ffffff] text-[1.2vw] pointer-events-none z-[51] scale-0 origin-center hidden md:flex"
+                style={{ transform: "translate(-50%, -50%) scale(0)" }}
+              >
+                View
+              </div>
             </div>
           )}
 
           {/* Grid View */}
           {view === "grid" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="w-[84vw] mx-auto grid grid-cols-1 md:grid-cols-2 gap-[4vw] pb-[12vw]">
               <AnimatePresence>
                 {filteredProjects.map((project) => (
                   <motion.div
@@ -209,17 +388,24 @@ export default function WorkPage() {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <Link href={`/work/${project.slug}`} className="group block">
-                      <div className="relative w-full aspect-[4/3] bg-[#e1e4e7] mb-6 overflow-hidden">
-                        <div className="absolute inset-0 flex items-center justify-center text-[#999] text-sm transition-transform duration-700 group-hover:scale-105">
+                    <Link
+                      href={`/work/${project.slug}`}
+                      className="group block"
+                    >
+                      <div className="relative w-full aspect-[4/3] bg-[#e1e4e7] mb-[2vw] overflow-hidden">
+                        <div className="absolute inset-0 flex items-center justify-center text-[#999] text-[1vw] transition-transform duration-700 group-hover:scale-105">
                           TODO: {project.image}
                         </div>
                       </div>
                       <div className="flex items-start justify-between">
-                        <h3 className="text-[24px] font-light text-[#1c1d20] leading-[1.2]">{project.title}</h3>
-                        <span className="text-[16px] text-[#1c1d20]">{project.year}</span>
+                        <h3 className="text-[2.2vw] font-normal text-[#1c1d20] leading-[1.2]">
+                          {project.title}
+                        </h3>
+                        <span className="text-[1.2vw] text-[#1c1d20]">
+                          {project.year}
+                        </span>
                       </div>
-                      <div className="text-[14px] text-[#999] mt-2 border-b border-[#e1e4e7] pb-6">
+                      <div className="text-[1.2vw] text-[#999] mt-[0.5vw] border-b border-[#e1e4e7] pb-[2vw]">
                         {project.services}
                       </div>
                     </Link>

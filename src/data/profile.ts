@@ -1,7 +1,9 @@
 export const profile = {
   name: "Shailesh Chaudhary",
-  tagline: "Building dynamic, functional, and visually stunning web experiences.",
-  about: "I am a passionate web developer dedicated to creating minimalistic, beautiful, and highly responsive applications. With expertise in Next.js, React, and modern CSS frameworks, I bring designs to life and help businesses establish a strong digital presence.",
+  tagline:
+    "Building dynamic, functional, and visually stunning web experiences.",
+  about:
+    "I am a passionate web developer dedicated to creating minimalistic, beautiful, and highly responsive applications. With expertise in Next.js, React, and modern CSS frameworks, I bring designs to life and help businesses establish a strong digital presence.",
   email: "websk2026@gmail.com",
   socials: {
     linkedin: "https://www.linkedin.com/in/shailesh-chaudhary-0a215a378",

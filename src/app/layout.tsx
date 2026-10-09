@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Inter_Tight } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter_Tight({
+const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500"],
 });
 
 import { Navbar } from "@/components/layout/Navbar";
@@ -15,10 +15,7 @@ export const metadata: Metadata = {
   title: "Websk",
   description: "Personal portfolio of Shailesh Chaudhary",
   icons: {
-    icon: [
-      { url: "/favicon.png" },
-      { url: "/favicon-32.png", sizes: "32x32" }
-    ],
+    icon: [{ url: "/favicon.png" }, { url: "/favicon-32.png", sizes: "32x32" }],
     apple: "/apple-touch-icon.png",
   },
 };
@@ -41,7 +38,10 @@ export default function RootLayout({
         <SmoothScroll>
           <Navbar />
           <MenuOverlay />
-          <div id="page-shell" className="relative z-10 w-full min-h-screen bg-[#ffffff]">
+          <div
+            id="page-shell"
+            className="relative z-10 w-full min-h-screen bg-[#ffffff]"
+          >
             {children}
           </div>
         </SmoothScroll>
@@ -49,4 +49,3 @@ export default function RootLayout({
     </html>
   );
 }
-

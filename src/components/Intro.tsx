@@ -27,7 +27,7 @@ export function Intro() {
 
     // Lock body scroll
     document.body.style.overflow = "hidden";
-    
+
     // Initial hero states
     gsap.set("#navbar", { opacity: 0, y: -14 });
     gsap.set(".hero-word", { yPercent: 115 });
@@ -40,12 +40,12 @@ export function Intro() {
       onComplete: () => {
         document.body.style.overflow = "";
         setIsDone(true);
-      }
+      },
     });
 
     // Path logic
     const st = { y: 115, c: 15, mode: "enter" };
-    
+
     const updatePath = () => {
       if (!pathRef.current) return;
       let d = "";
@@ -58,19 +58,24 @@ export function Intro() {
     };
 
     // 1. Enter: Tween st.y 115 -> 0
-    tl.to(st, {
-      y: 0,
-      duration: 0.5,
-      ease: "power3.inOut",
-      onUpdate: updatePath,
-    }, 0.05);
+    tl.to(
+      st,
+      {
+        y: 0,
+        duration: 0.5,
+        ease: "power3.inOut",
+        onUpdate: updatePath,
+      },
+      0.05,
+    );
 
     // 2. Call: switch mode, reset y, ensure path covers everything
     tl.call(() => {
       st.mode = "exit";
       st.y = 115;
       updatePath(); // Instantly update so screen remains dark
-      if (containerRef.current) containerRef.current.style.background = "transparent";
+      if (containerRef.current)
+        containerRef.current.style.background = "transparent";
     });
 
     // 3. Signature wipe: --p 0 -> 114
@@ -81,10 +86,11 @@ export function Intro() {
     });
 
     // 4. Tagline lines stagger
-    tl.fromTo([line1Ref.current, line2Ref.current], 
+    tl.fromTo(
+      [line1Ref.current, line2Ref.current],
       { opacity: 0, y: 10 },
       { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", stagger: 0.16 },
-      "-=0.35"
+      "-=0.35",
     );
 
     // 5. Hold, then fade out signature + tagline
@@ -93,32 +99,48 @@ export function Intro() {
       y: -10,
       duration: 0.22,
       ease: "power2.in",
-      delay: 0.3
+      delay: 0.3,
     });
 
     // 6. Exit: st.y 115 -> 0, page-shell y 60 -> 0
     const exitTime = tl.duration();
-    
-    tl.to(st, {
-      y: 0,
-      duration: 0.7,
-      ease: "power3.inOut",
-      onUpdate: updatePath,
-    }, exitTime);
-    
-    tl.to("#page-shell", {
-      y: 0,
-      duration: 0.7,
-      ease: "power3.inOut",
-    }, exitTime);
+
+    tl.to(
+      st,
+      {
+        y: 0,
+        duration: 0.7,
+        ease: "power3.inOut",
+        onUpdate: updatePath,
+      },
+      exitTime,
+    );
+
+    tl.to(
+      "#page-shell",
+      {
+        y: 0,
+        duration: 0.7,
+        ease: "power3.inOut",
+      },
+      exitTime,
+    );
 
     // 7. Hero entrance overlapping end of exit
     const heroTime = exitTime + 0.3; // overlapping end of step 6
-    
+
     tl.to("#navbar", { opacity: 1, y: 0, duration: 0.5 }, heroTime);
-    tl.to(".hero-word", { yPercent: 0, duration: 0.8, ease: "power4.out", stagger: 0.06 }, heroTime);
+    tl.to(
+      ".hero-word",
+      { yPercent: 0, duration: 0.8, ease: "power4.out", stagger: 0.06 },
+      heroTime,
+    );
     tl.to(".hero-dash", { scaleX: 1, duration: 0.5 }, heroTime + 0.2);
-    tl.to(".hero-pill", { xPercent: 0, duration: 0.7, ease: "power3.out" }, heroTime + 0.1);
+    tl.to(
+      ".hero-pill",
+      { xPercent: 0, duration: 0.7, ease: "power3.out" },
+      heroTime + 0.1,
+    );
     tl.to(".hero-role", { opacity: 1, y: 0, duration: 0.6 }, heroTime + 0.3);
 
     return () => {
@@ -130,46 +152,50 @@ export function Intro() {
   if (isDone) return null;
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`fixed inset-0 z-[100] flex items-center justify-center pointer-events-none bg-[#141414] ${sourceSerif.variable}`}
     >
-      <svg 
-        viewBox="0 0 100 100" 
-        preserveAspectRatio="none" 
+      <svg
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full z-10"
       >
-        <path 
-          ref={pathRef} 
-          fill="#141414" 
-          d="M0,0 L100,0 L100,100 L0,100 Z" 
-        />
+        <path ref={pathRef} fill="#141414" d="M0,0 L100,0 L100,100 L0,100 Z" />
       </svg>
 
       <div className="relative z-20 flex flex-col items-center justify-center gap-6">
-        <div 
+        <div
           ref={sigRef}
-          style={{ 
-            "--p": 0,
-            WebkitMaskImage: "linear-gradient(90deg, #000 calc(var(--p) * 1% - 14%), transparent calc(var(--p) * 1%))",
-            maskImage: "linear-gradient(90deg, #000 calc(var(--p) * 1% - 14%), transparent calc(var(--p) * 1%))",
-          } as React.CSSProperties}
+          style={
+            {
+              "--p": 0,
+              WebkitMaskImage:
+                "linear-gradient(90deg, #000 calc(var(--p) * 1% - 14%), transparent calc(var(--p) * 1%))",
+              maskImage:
+                "linear-gradient(90deg, #000 calc(var(--p) * 1% - 14%), transparent calc(var(--p) * 1%))",
+            } as React.CSSProperties
+          }
           className="w-[clamp(260px,40vw,620px)]"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
-            src="/websk-signature-nav.png" 
-            alt="Websk" 
+          <img
+            src="/websk-signature-nav.png"
+            alt="Websk"
             className="w-full h-auto"
           />
         </div>
-        
-        <div 
+
+        <div
           className="text-[#9d9dba] text-[clamp(17px,1.7vw,24px)] leading-[1.5] text-center flex flex-col items-center"
           style={{ fontFamily: "var(--font-source-serif), Georgia, serif" }}
         >
-          <div ref={line1Ref} className="opacity-0">Web experiences</div>
-          <div ref={line2Ref} className="opacity-0">shaped by code, not templates.</div>
+          <div ref={line1Ref} className="opacity-0">
+            Web experiences
+          </div>
+          <div ref={line2Ref} className="opacity-0">
+            shaped by code, not templates.
+          </div>
         </div>
       </div>
     </div>

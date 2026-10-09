@@ -14,7 +14,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     if (pathname === "/" && !sessionStorage.getItem("introPlayed")) {
       return;
     }
-    
+
     // Instead of doing both entrance and exit in template, we do an "entrance sweep".
     // When the template mounts, the overlay starts covering the screen, then sweeps up.
     setShowTransition(true);
@@ -24,7 +24,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer);
   }, [pathname]);
 
-  const pageName = pathname === "/" ? "Home" : pathname.replace("/", "").charAt(0).toUpperCase() + pathname.slice(2);
+  const pageName =
+    pathname === "/"
+      ? "Home"
+      : pathname.replace("/", "").charAt(0).toUpperCase() + pathname.slice(2);
 
   return (
     <>
@@ -37,7 +40,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
             exit={{ y: "-100vh" }} // Sweep up
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
           >
-            <motion.div 
+            <motion.div
               initial={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}

@@ -49,7 +49,10 @@ const SLIDES = [
 
 export function ProcessSlides() {
   return (
-    <section className="w-full py-24 md:py-32 bg-transparent" aria-label="How we work">
+    <section
+      className="w-full py-24 md:py-32 bg-transparent"
+      aria-label="How we work"
+    >
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-20 text-center">
           <span className="text-xs uppercase tracking-widest text-muted-foreground mb-4 block font-medium">
@@ -75,7 +78,10 @@ export function ProcessSlides() {
                   </p>
                   <ul className="space-y-4">
                     {s.bullets.map((b, k) => (
-                      <li key={k} className="text-foreground text-base md:text-lg pl-8 relative before:content-['—'] before:absolute before:left-0 before:text-muted-foreground font-light">
+                      <li
+                        key={k}
+                        className="text-foreground text-base md:text-lg pl-8 relative before:content-['—'] before:absolute before:left-0 before:text-muted-foreground font-light"
+                      >
                         {b}
                       </li>
                     ))}

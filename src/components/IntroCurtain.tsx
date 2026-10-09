@@ -46,15 +46,29 @@ export function IntroCurtain() {
     const role = document.querySelector<HTMLElement>(".hero-role");
     const shell = document.getElementById("page-shell");
 
-    if (navbar) { navbar.style.opacity = "0"; navbar.style.transform = "translateY(-14px)"; }
+    if (navbar) {
+      navbar.style.opacity = "0";
+      navbar.style.transform = "translateY(-14px)";
+    }
     words.forEach((w) => (w.style.transform = "translateY(115%)"));
-    if (dash) { dash.style.transform = "scaleX(0)"; dash.style.transformOrigin = "left"; }
-    if (pill) { pill.style.transform = "translateX(-110%)"; }
-    if (role) { role.style.opacity = "0"; role.style.transform = "translateY(24px)"; }
-    if (shell) { shell.style.transform = "translateY(60px)"; }
+    if (dash) {
+      dash.style.transform = "scaleX(0)";
+      dash.style.transformOrigin = "left";
+    }
+    if (pill) {
+      pill.style.transform = "translateX(-110%)";
+    }
+    if (role) {
+      role.style.opacity = "0";
+      role.style.transform = "translateY(24px)";
+    }
+    if (shell) {
+      shell.style.transform = "translateY(60px)";
+    }
 
     const N = 28;
-    const inOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const inOut = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     const clamp = (v: number) => Math.max(0, Math.min(1, v));
     const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
     const out3 = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -143,12 +157,25 @@ export function IntroCurtain() {
         raf = requestAnimationFrame(frame);
       } else {
         document.body.style.overflow = "";
-        if (navbar) { navbar.style.opacity = ""; navbar.style.transform = ""; }
+        if (navbar) {
+          navbar.style.opacity = "";
+          navbar.style.transform = "";
+        }
         words.forEach((w) => (w.style.transform = ""));
-        if (dash) { dash.style.transform = ""; dash.style.transformOrigin = ""; }
-        if (pill) { pill.style.transform = ""; }
-        if (role) { role.style.opacity = ""; role.style.transform = ""; }
-        if (shell) { shell.style.transform = ""; }
+        if (dash) {
+          dash.style.transform = "";
+          dash.style.transformOrigin = "";
+        }
+        if (pill) {
+          pill.style.transform = "";
+        }
+        if (role) {
+          role.style.opacity = "";
+          role.style.transform = "";
+        }
+        if (shell) {
+          shell.style.transform = "";
+        }
         setIsDone(true);
       }
     }
@@ -199,7 +226,13 @@ export function IntroCurtain() {
         willChange: "clip-path",
       }}
     >
-      <div style={{ width: "min(64vw, 440px)", padding: "0 20px", textAlign: "center" }}>
+      <div
+        style={{
+          width: "min(64vw, 440px)",
+          padding: "0 20px",
+          textAlign: "center",
+        }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           ref={sigRef}
@@ -222,15 +255,29 @@ export function IntroCurtain() {
             lineHeight: 1.55,
           }}
         >
-          <span ref={t1Ref} style={{ display: "block", opacity: 0, transform: "translateY(8px)" }}>
+          <span
+            ref={t1Ref}
+            style={{
+              display: "block",
+              opacity: 0,
+              transform: "translateY(8px)",
+            }}
+          >
             Web experiences
           </span>
-          <span ref={t2Ref} style={{ display: "block", opacity: 0, transform: "translateY(8px)" }}>
+          <span
+            ref={t2Ref}
+            style={{
+              display: "block",
+              opacity: 0,
+              transform: "translateY(8px)",
+            }}
+          >
             shaped by code, not templates.
           </span>
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

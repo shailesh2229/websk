@@ -1,92 +1,169 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { MagneticButton } from "../ui/MagneticButton";
-import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
+import { RoundedButton } from "../ui/RoundedButton";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowDownLeft } from "lucide-react";
 import Image from "next/image";
 
 export function Footer() {
   const [time, setTime] = useState("");
+  const containerRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end end"],
+  });
+
+  const curveHeight = useTransform(scrollYProgress, [0, 1], ["15vw", "0vw"]);
+  const yParallax = useTransform(scrollYProgress, [0, 1], ["-300px", "0px"]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       const d = new Date();
-      setTime(d.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true }) + " IST");
+      setTime(
+        d.toLocaleTimeString("en-US", {
+          timeZone: "Asia/Kolkata",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }) + " IST",
+      );
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <footer className="relative w-full bg-[#1c1d20] text-white pt-24 pb-8 overflow-hidden z-0">
+    <footer
+      ref={containerRef}
+      className="relative w-full bg-[#1c1d20] text-white pt-[20vw] pb-[2vw] z-0 overflow-hidden"
+    >
       {/* Curved top edge to transition from white section to dark footer */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-[100px] w-full bg-[#ffffff]"
+      <motion.div
+        className="absolute top-0 left-0 right-0 w-full bg-[#ffffff] pointer-events-none"
         style={{
-          borderBottomLeftRadius: "50% 100%",
-          borderBottomRightRadius: "50% 100%",
+          height: curveHeight,
+          borderBottomLeftRadius: "50% 50%",
+          borderBottomRightRadius: "50% 50%",
         }}
       />
 
-      <div className="max-w-[1440px] mx-auto px-[4vw] mt-12 md:mt-24">
+      <motion.div className="w-full relative" style={{ y: yParallax }}>
         {/* Heading Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-12 mb-20">
-          <div className="w-[80px] h-[80px] md:w-[120px] md:h-[120px] rounded-full bg-[#333] overflow-hidden relative shrink-0">
-            {/* TODO: Add real avatar here */}
-            {/* <Image src="/avatar.jpg" alt="Avatar" fill className="object-cover" /> */}
-          </div>
-          <h2 className="text-[clamp(48px,7vw,90px)] font-light leading-[1.1] tracking-tight">
-            Let&apos;s work<br />together
+        <div className="w-full flex" style={{ paddingLeft: "16vw" }}>
+          <h2 className="text-[6.2vw] font-normal leading-[1.1] tracking-[-0.02em] text-[#ffffff] flex flex-wrap items-center">
+            <div className="w-[5.2vw] h-[5.2vw] rounded-full bg-[#8b9193] mr-[2vw] shrink-0 inline-block overflow-hidden relative align-middle">
+              <Image src="/shailesh-avatar.png" alt="Shailesh" fill className="object-cover object-center" sizes="120px" quality={100} />
+            </div>
+            <span className="inline-block align-middle">Let's work</span>
+            <div className="w-full" />
+            <span className="inline-block align-middle">together</span>
           </h2>
         </div>
 
-        {/* Divider and Get in Touch Button */}
-        <div className="relative border-t border-[#333] pt-6 mb-20 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-          <div className="text-[24px]">↙</div>
-          
-          <div className="absolute top-0 right-0 -translate-y-1/2">
-            <MagneticButton>
-              <Link 
-                href="/contact"
-                className="w-[120px] h-[120px] md:w-[160px] md:h-[160px] bg-[#3A4BE0] rounded-full flex items-center justify-center text-white text-[16px] md:text-[18px] transition-transform hover:scale-105"
-              >
-                Get in touch
-              </Link>
-            </MagneticButton>
+        {/* Divider and Get in Touch Button & Arrow */}
+        <div className="relative w-full mt-[8vw]">
+          <div
+            className="absolute top-0 h-[1px] bg-[rgba(255,255,255,0.2)]"
+            style={{ left: "16vw", right: "16vw" }}
+          />
+
+          <ArrowDownLeft
+            className="absolute text-white stroke-[1]"
+            style={{
+              width: "1.3vw",
+              height: "1.3vw",
+              right: "17vw",
+              bottom: "100%",
+              marginBottom: "1vw",
+            }}
+          />
+
+          {/* Button on the line */}
+          <div
+            className="absolute top-0 -translate-y-1/2 z-10"
+            style={{ left: "72.3vw", transform: "translate(-50%, -50%)" }}
+          >
+            <RoundedButton
+              href="/contact"
+              className="w-[12vw] h-[12vw] bg-[#3A4BE0] text-[#ffffff] font-normal text-[1.2vw]"
+              fillColor="#2B38C4"
+            >
+              Get in touch
+            </RoundedButton>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto mt-12 md:mt-0">
-            <a href="mailto:websk2026@gmail.com" className="border border-[#333] rounded-full px-6 py-4 text-[14px] md:text-[16px] hover:bg-white hover:text-[#1c1d20] transition-colors text-center">
+          {/* Pills Below */}
+          <div
+            className="w-full flex items-center pt-[4vw]"
+            style={{ paddingLeft: "16vw", gap: "0.6vw" }}
+          >
+            <RoundedButton
+              href="mailto:websk2026@gmail.com"
+              className="h-[4.7vw] px-[2vw] border border-[rgba(255,255,255,0.2)] rounded-full text-[1.2vw] text-[#ffffff]"
+              fillColor="#3A4BE0"
+            >
               websk2026@gmail.com
-            </a>
-            <a href="#" className="border border-[#333] rounded-full px-6 py-4 text-[14px] md:text-[16px] hover:bg-white hover:text-[#1c1d20] transition-colors text-center">
-              +91 (000) 000-0000 {/* TODO: Phone */}
-            </a>
+            </RoundedButton>
+            <RoundedButton
+              href="#"
+              className="h-[4.7vw] px-[2vw] border border-[rgba(255,255,255,0.2)] rounded-full text-[1.2vw] text-[#ffffff]"
+              fillColor="#3A4BE0"
+            >
+              +91 (000) 000-0000
+            </RoundedButton>
           </div>
         </div>
 
         {/* Bottom Meta Row */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 text-[14px] text-[#999] pt-8">
-          <div className="flex items-center gap-8 w-full md:w-auto justify-between md:justify-start">
+        <div
+          className="w-full flex items-end justify-between mt-[12vw]"
+          style={{ paddingLeft: "2.8vw", paddingRight: "3vw" }}
+        >
+          <div className="flex items-start" style={{ gap: "2vw" }}>
             <div className="flex flex-col">
-              <span className="text-[10px] tracking-widest mb-1">VERSION</span>
-              <span>2026 © Edition</span>
+              <span className="text-[0.65vw] tracking-[0.03em] uppercase text-[rgba(255,255,255,0.5)] mb-[1vw]">
+                VERSION
+              </span>
+              <span className="text-[1vw] text-[#ffffff]">2026 © Edition</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] tracking-widest mb-1">LOCAL TIME</span>
-              <span>{time || "Loading..."}</span>
+              <span className="text-[0.65vw] tracking-[0.03em] uppercase text-[rgba(255,255,255,0.5)] mb-[1vw]">
+                LOCAL TIME
+              </span>
+              <span className="text-[1vw] text-[#ffffff]">
+                {time || "Loading..."}
+              </span>
             </div>
           </div>
 
-          <div className="flex flex-col w-full md:w-auto">
-            <span className="text-[10px] tracking-widest mb-1 hidden md:block">SOCIALS</span>
-            <div className="flex items-center gap-6 justify-between md:justify-start">
-              <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
-              <a href="#" className="hover:text-white transition-colors">GitHub</a>
-              <a href="#" className="hover:text-white transition-colors">Instagram</a>
+          <div className="flex flex-col items-start">
+            <span className="text-[0.65vw] tracking-[0.03em] uppercase text-[rgba(255,255,255,0.5)] mb-[1vw]">
+              SOCIALS
+            </span>
+            <div className="flex items-center" style={{ gap: "2vw" }}>
+              <a
+                href="#"
+                className="text-[1vw] text-[#ffffff] hover:opacity-70 transition-opacity"
+              >
+                LinkedIn
+              </a>
+              <a
+                href="#"
+                className="text-[1vw] text-[#ffffff] hover:opacity-70 transition-opacity"
+              >
+                GitHub
+              </a>
+              <a
+                href="#"
+                className="text-[1vw] text-[#ffffff] hover:opacity-70 transition-opacity"
+              >
+                Instagram
+              </a>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </footer>
   );
 }

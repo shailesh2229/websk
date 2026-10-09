@@ -3,7 +3,11 @@
 import { use } from "react";
 import { Footer } from "@/components/layout/Footer";
 
-export default function WorkDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function WorkDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const resolvedParams = use(params);
 
   return (

@@ -2,16 +2,13 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"], weight: ["400"] });
-
-const links = [
-  { href: "/#work", label: "Work" },
-  { href: "/#services", label: "Services" },
-  { href: "/#contact", label: "Contact" },
+const mainLinks = [
+  { href: "/work", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Navbar() {
@@ -20,99 +17,111 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const isLightTheme = pathname === "/work" || pathname === "/about";
+  const isContact = pathname === "/contact";
+
+  const textColor = isLightTheme ? "#1c1d20" : "#ffffff";
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    
-    // We want the hero text to be white at the top, 
-    // and only switch when we scroll down past the hero (or just a bit).
-    // Let's switch at window.innerHeight - 80
     const handleScrollHero = () => {
-      setScrolled(window.scrollY > window.innerHeight - 80);
+      setScrolled(window.scrollY > window.innerHeight - 100);
     };
 
     window.addEventListener("scroll", handleScrollHero);
-    
-    // Check initial
-    handleScrollHero();
-    
+    handleScrollHero(); // init
     return () => window.removeEventListener("scroll", handleScrollHero);
   }, [pathname]);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
     e.preventDefault();
     setMobileMenuOpen(false);
-    
-    const id = href === "/" ? null : href.replace("/", "").replace("#", "");
-
-    if (pathname !== "/") {
-      router.push(id ? `/#${id}` : "/");
-      return;
-    }
-
-    if (!id) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    router.push(href);
   };
-
-  if (pathname === "/contact") {
-    return null;
-  }
 
   return (
     <>
-      <header 
-        id="navbar" 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${inter.className} ${
-          scrolled 
-            ? "bg-[rgba(244,243,239,0.8)] backdrop-blur-md border-b border-black/10 py-2" 
-            : "bg-transparent border-b border-transparent"
-        }`}
-        style={!scrolled ? { paddingTop: "2.4vh", paddingLeft: "3vw", paddingRight: "3vw" } : { paddingLeft: "3vw", paddingRight: "3vw" }}
+      <header
+        id="navbar"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent border-none py-2`}
+        style={
+          !scrolled
+            ? { paddingTop: "2.4vh", paddingLeft: "3vw", paddingRight: "3vw" }
+            : { paddingLeft: "3vw", paddingRight: "3vw" }
+        }
       >
         <div className="w-full flex items-center justify-between">
-          <a href="/" onClick={(e) => handleNavClick(e, "/")} className="flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/websk-signature-nav.png"
-              alt="Websk"
-              className={`w-auto object-contain transition-all duration-300 ${
-                scrolled ? "invert opacity-90" : "drop-shadow-sm"
-              }`}
-              style={{ height: "clamp(26px, 3vw, 52px)" }}
-            />
-          </a>
+          {/* Logo / Left side */}
+          {isContact ? (
+            <div className="text-[#ffffff] text-[1.25vw] tracking-tight ml-[1vw]">
+              © Websk
+            </div>
+          ) : (
+            <a
+              href="/"
+              onClick={(e) => handleNavClick(e, "/")}
+              className="flex items-center"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/websk-signature-nav.png"
+                alt="Websk"
+                className="w-auto object-contain transition-all duration-300"
+                style={{
+                  height: "clamp(26px, 3vw, 52px)",
+                  filter:
+                    isLightTheme && !scrolled
+                      ? "invert(1)"
+                      : scrolled
+                        ? "invert(1) opacity(0.9)"
+                        : "drop-shadow(0 1px 2px rgba(0,0,0,0.1))",
+                }}
+              />
+            </a>
+          )}
 
+          {/* Nav links / Right side */}
           <div className="flex items-center">
-            <nav className="hidden md:flex" style={{ gap: "2.2vw" }}>
-              {links.map((link) => {
+            <nav
+              className={`hidden md:flex transition-opacity duration-300 ${scrolled ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+              style={{ gap: "1.8vw" }}
+            >
+              {mainLinks.map((link) => {
+                const isActive = pathname === link.href;
                 return (
                   <a
                     key={link.href}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className={`transition-all duration-300 hover:opacity-60 font-normal ${
-                      scrolled ? "text-[#111]" : "text-[#ffffff]"
-                    }`}
-                    style={{ fontSize: "clamp(11px, 0.85vw, 14px)", color: scrolled ? "#111" : "#ffffff" }}
+                    className="relative transition-opacity duration-300 hover:opacity-60 font-normal"
+                    style={{ fontSize: "1.1vw", color: textColor }}
                   >
                     {link.label}
+                    {isActive && (
+                      <span
+                        className="absolute left-1/2 -bottom-[0.5vw] -translate-x-1/2 rounded-full"
+                        style={{
+                          width: "0.35vw",
+                          height: "0.35vw",
+                          backgroundColor: textColor,
+                        }}
+                      />
+                    )}
                   </a>
                 );
               })}
             </nav>
 
             {/* Mobile Nav Toggle */}
-            <div className="md:hidden ml-4">
-              <button 
+            <div
+              className={`md:hidden ml-4 transition-opacity duration-300 ${scrolled ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+            >
+              <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`p-2 transition-colors ${scrolled ? "text-[#111]" : "text-[#ffffff]"}`}
+                className="p-2 transition-colors"
+                style={{ color: textColor }}
                 aria-label="Toggle menu"
               >
                 <Menu className="h-6 w-6" />
@@ -124,9 +133,11 @@ export function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className={`fixed inset-0 z-40 bg-[#F4F3EF] flex flex-col pt-24 px-6 md:hidden ${inter.className}`}>
+        <div
+          className={`fixed inset-0 z-40 bg-[#F4F3EF] flex flex-col pt-24 px-6 md:hidden`}
+        >
           <nav className="flex flex-col gap-6">
-            {links.map((link) => (
+            {mainLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
