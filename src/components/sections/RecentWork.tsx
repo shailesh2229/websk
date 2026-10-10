@@ -132,26 +132,24 @@ export function RecentWork() {
 
   return (
     <section
-      className="w-full bg-[#ffffff] pt-[0.5vw] pb-[8vw] relative"
+      className="w-full bg-[#ffffff] pt-[2vw] md:pt-[0.5vw] pb-[20vw] md:pb-[8vw] relative"
       ref={containerRef}
       onMouseEnter={handleMouseEnterList}
       onMouseLeave={handleMouseLeaveList}
     >
       <div
-        className="w-full relative"
-        style={{ paddingLeft: "8vw", paddingRight: "8vw" }}
+        className="w-full relative px-[5vw] md:px-[8vw] md:pr-[8vw]"
       >
         {/* Label */}
         <div
-          className="text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[3.1vw]"
-          style={{ paddingLeft: "8vw" }}
+          className="text-[4vw] md:text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[6vw] md:mb-[3.1vw] pl-0 md:pl-[8vw]"
         >
           RECENT WORK
         </div>
 
-        {/* Project List */}
+        {/* Desktop Project List */}
         <div
-          className="border-t border-[#d5d5d5] flex flex-col group/list w-full"
+          className="hidden md:flex border-t border-[#d5d5d5] flex-col group/list w-full"
           style={{ paddingLeft: "8vw", paddingRight: "0" }}
         >
           {projects.map((project, idx) => {
@@ -187,19 +185,45 @@ export function RecentWork() {
           })}
         </div>
 
+        {/* Mobile Project Cards */}
+        <div className="flex md:hidden flex-col w-full">
+          {projects.map((project) => (
+            <Link
+              key={project.slug}
+              href={`/work/${project.slug}`}
+              className="flex flex-col w-full mb-[18vw]"
+            >
+              <div className="w-full aspect-[1/0.92] bg-[#ececec] flex items-center justify-center mb-[3vw]">
+                {/* Project Image Placeholder */}
+                <div className="w-[85%] h-[85%] bg-[#d0d0d0] flex items-center justify-center text-[#999] text-[3vw]">
+                  TODO: {project.image}
+                </div>
+              </div>
+              <h3 className="text-[7.8vw] font-normal text-[#1c1d20] leading-[1.1] mb-[3vw]">
+                {project.title}
+              </h3>
+              <div className="w-full h-[1px] bg-[#d5d5d5] mb-[3vw]" />
+              <div className="w-full flex justify-between items-center text-[3.9vw] font-normal text-[#1c1d20]">
+                <span>{project.discipline}</span>
+                <span>{project.year}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+
         {/* More Work Button */}
         <div
           className="mt-[4vw] flex justify-center md:justify-start"
-          style={{ paddingLeft: "8vw" }}
+          style={{ paddingLeft: "0", paddingRight: "0" }} // We use inline class for padding on desktop below
         >
           <RoundedButton
             href="/work"
-            className="px-[2vw] py-[1vw] border border-[#d0d0d0] text-[#1c1d20] hover:border-transparent rounded-full"
+            className="w-[38vw] h-[12vw] md:w-auto md:h-auto md:px-[2vw] md:py-[1vw] border border-[#d0d0d0] text-[#1c1d20] hover:border-transparent rounded-full md:ml-[8vw]"
             fillColor="#3A4BE0"
           >
-            <span className="flex items-center gap-[0.2vw] text-[1.2vw]">
+            <span className="flex items-center gap-[0.2vw] text-[4vw] md:text-[1.2vw]">
               More work{" "}
-              <sup className="text-[0.65vw] top-[-0.5em] ml-[0.2em]">
+              <sup className="text-[2.5vw] md:text-[0.65vw] top-[-0.5em] ml-[0.2em]">
                 {projects.length}
               </sup>
             </span>

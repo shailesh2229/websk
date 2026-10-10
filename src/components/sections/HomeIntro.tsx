@@ -36,13 +36,15 @@ export function HomeIntro() {
   return (
     <section 
       ref={containerRef} 
-      className="w-full bg-[#ffffff] pt-[12vw] pb-0 relative"
+      className="w-full bg-[#ffffff] pt-[20vw] md:pt-[12vw] pb-0 relative"
     >
-      <div className="w-full flex relative" style={{ paddingLeft: "16vw", paddingRight: "8vw" }}>
+      <div 
+        className="w-full flex flex-col md:flex-row relative px-[5vw] md:px-[8vw] md:pl-[16vw]"
+      >
         
         {/* Left: Big Statement */}
-        <div className="w-[50vw]">
-          <h2 className="text-[2.8vw] font-normal leading-[1.3] text-[#1c1d20]">
+        <div className="w-full md:w-[50vw] mb-[8vw] md:mb-0">
+          <h2 className="text-[6vw] md:text-[2.8vw] font-normal leading-[1.4] md:leading-[1.3] text-[#1c1d20]">
             <span className="block overflow-hidden">
               <motion.span 
                 custom={0} 
@@ -80,8 +82,9 @@ export function HomeIntro() {
         </div>
 
         {/* Right: Paragraph + Button */}
-        <div className="w-[26vw] flex flex-col items-start gap-[4vw]">
-          <p className="text-[1.2vw] font-normal leading-[1.5] text-[#1c1d20] w-[21vw]">
+        <div className="w-full md:w-[26vw] flex flex-row md:flex-col items-end md:items-start justify-between md:justify-normal md:gap-[4vw]">
+          
+          <p className="text-[4vw] md:text-[1.2vw] font-normal leading-[1.6] md:leading-[1.5] text-[#1c1d20] max-w-[56vw] md:max-w-none md:w-[21vw]">
             <span className="block overflow-hidden">
               <motion.span 
                 custom={0} 
@@ -121,11 +124,11 @@ export function HomeIntro() {
             initial={{ opacity: prefersReducedMotion ? 1 : 0, scale: prefersReducedMotion ? 1 : 0.8 }}
             animate={isInView ? { opacity: 1, scale: 1 } : { opacity: prefersReducedMotion ? 1 : 0, scale: prefersReducedMotion ? 1 : 0.8 }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.25 }}
-            className="mt-[4vw] self-end relative right-[4vw]"
+            className="md:mt-[4vw] self-end relative md:right-[4vw] -mt-[4vw] right-[5vw] md:mr-0 -mr-[5vw]"
           >
             <RoundedButton
               href="/about"
-              className="w-[12vw] h-[12vw] bg-[#1c1d20] text-[#ffffff] font-normal text-[1.2vw]"
+              className="w-[34vw] h-[34vw] md:w-[12vw] md:h-[12vw] bg-[#1c1d20] text-[#ffffff] font-normal text-[4vw] md:text-[1.2vw]"
               fillColor="#3A4BE0"
             >
               About me

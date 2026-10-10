@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], weight: ["400"] });
 export function EditorialHero() {
   return (
     <section
-      className={`relative w-full h-[100svh] min-h-[640px] bg-[#8d9294] overflow-hidden ${inter.className}`}
+      className={`relative w-full h-[100svh] min-h-[500px] md:min-h-[640px] bg-[#8d9294] overflow-hidden ${inter.className}`}
     >
       <style>{`
         @keyframes heroMarquee {
@@ -26,7 +26,7 @@ export function EditorialHero() {
         }
         .hero-photo-img {
           object-fit: cover !important;
-          object-position: 52% 0% !important;
+          object-position: 50% 12% !important;
         }
         @media (min-width: 768px) {
           .hero-photo-img {
@@ -45,7 +45,7 @@ export function EditorialHero() {
       />
 
       {/* Portrait Photo Wrapper (Full-bleed via Next Image) */}
-      <div className="absolute left-0 right-0 bottom-0 w-full h-[72%] md:h-full z-[1] pointer-events-none">
+      <div className="absolute left-0 right-0 bottom-0 w-full h-[100svh] z-[1] pointer-events-none">
         <div className="absolute top-0 left-0 right-0 h-[80px] bg-gradient-to-b from-[#8d9294] to-transparent z-[2] block md:hidden" />
         <Image
           src="/shailesh-hero.png"
@@ -58,9 +58,9 @@ export function EditorialHero() {
         />
       </div>
 
-      {/* Location Pill */}
+      {/* Desktop Location Pill (hidden on mobile) */}
       <div
-        className="hero-pill absolute left-0 z-20 flex items-center bg-[#17181a] top-[55%] md:top-[44%] scale-[0.85] md:scale-100 origin-left"
+        className="hero-pill hidden md:flex absolute left-0 z-20 items-center bg-[#17181a] top-[44%] origin-left"
         style={{
           height: "clamp(60px, 7vw, 120px)",
           borderRadius: "0 999px 999px 0",
@@ -97,26 +97,31 @@ export function EditorialHero() {
 
       {/* Role Text */}
       <div
-        className="hero-role absolute z-20 flex flex-col items-start left-6 top-[16%] md:left-[71.5%] md:top-[35%]"
+        className="hero-role absolute z-20 flex flex-col items-start left-[5vw] bottom-[5vw] md:bottom-auto md:left-[71.5%] md:top-[35%]"
         style={{ color: "#ffffff" }}
       >
-        <div className="mb-2 text-sm md:text-base" style={{ color: "#ffffff" }}>
+        <div className="mb-[2vw] md:mb-2 text-[4vw] md:text-base" style={{ color: "#ffffff" }}>
           ↘
         </div>
         <div
-          className="font-normal text-left text-[clamp(18px,5vw,22px)] md:text-[clamp(16px,1.95vw,34px)]"
-          style={{ lineHeight: 1.12, color: "#ffffff" }}
+          className="font-normal text-left text-[6vw] md:text-[clamp(16px,1.95vw,34px)] leading-[1.2] md:leading-[1.12]"
+          style={{ color: "#ffffff" }}
         >
           Freelance
-          <br />
+          <br className="hidden md:block" />
+          <span className="md:hidden"> / </span>
           Designer & Developer
         </div>
       </div>
 
+      {/* Mobile Rotating Globe (bottom-right) */}
+      <div className="md:hidden absolute right-[5vw] bottom-[5vw] w-[10vw] h-[10vw] z-20">
+        <WireframeGlobe />
+      </div>
+
       {/* Name Marquee */}
       <div
-        className="absolute left-0 right-0 z-[3] pointer-events-none overflow-hidden"
-        style={{ bottom: "3%" }}
+        className="absolute left-0 right-0 z-[3] pointer-events-none overflow-hidden bottom-[20%] md:bottom-[3%]"
       >
         <div
           className="hero-marquee inline-flex whitespace-nowrap font-normal will-change-transform"
@@ -129,7 +134,7 @@ export function EditorialHero() {
           {[...Array(4)].map((_, i) => (
             <span
               key={i}
-              className="pr-[0.3em] text-[clamp(64px,20vw,120px)] md:text-[19vh]"
+              className="pr-[0.3em] text-[30vw] md:text-[19vh]"
               style={{ color: "#ffffff" }}
             >
               Shailesh Chaudhary —

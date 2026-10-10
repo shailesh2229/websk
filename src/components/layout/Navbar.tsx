@@ -119,37 +119,18 @@ export function Navbar() {
               className={`md:hidden ml-4 transition-opacity duration-300 ${scrolled ? "opacity-0 pointer-events-none" : "opacity-100"}`}
             >
               <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 transition-colors"
+                onClick={() => window.dispatchEvent(new CustomEvent("open-menu"))}
+                className="flex items-center gap-[1.5vw]"
                 style={{ color: textColor }}
-                aria-label="Toggle menu"
+                aria-label="Open menu"
               >
-                <Menu className="h-6 w-6" />
+                <span className="w-[1vw] h-[1vw] rounded-full bg-current block" />
+                <span className="text-[4vw] font-normal tracking-tight">Menu</span>
               </button>
             </div>
           </div>
         </div>
       </header>
-
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div
-          className={`fixed inset-0 z-40 bg-[#F4F3EF] flex flex-col pt-24 px-6 md:hidden`}
-        >
-          <nav className="flex flex-col gap-6">
-            {mainLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className="text-3xl text-[#111] font-normal"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-        </div>
-      )}
     </>
   );
 }

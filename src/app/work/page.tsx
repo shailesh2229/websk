@@ -138,15 +138,14 @@ export default function WorkPage() {
 
   return (
     <>
-      <main className="w-full bg-[#ffffff] pt-[17vw] min-h-screen">
+      <main className="w-full bg-[#ffffff] pt-[28vw] md:pt-[17vw] min-h-screen">
         <div className="w-full relative">
           {/* Header */}
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-            className="text-[6.2vw] font-normal leading-[1.05] text-[#1c1d20] mb-[4vw]"
-            style={{ paddingLeft: "16vw" }}
+            className="text-[9vw] md:text-[6.2vw] font-normal leading-[1.1] md:leading-[1.05] text-[#1c1d20] mb-[8vw] md:mb-[4vw] px-[5vw] md:px-[16vw]"
           >
             Websites built
             <br />
@@ -154,10 +153,10 @@ export default function WorkPage() {
           </motion.h1>
 
           {/* Controls: Filters & View Toggle */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-[4vw] relative z-10 w-full">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-[8vw] md:mb-[4vw] relative z-10 w-full">
             <div
-              className="flex flex-wrap items-center"
-              style={{ paddingLeft: "16vw", gap: "0.7vw" }}
+              className="flex flex-nowrap items-center w-full md:w-auto overflow-x-auto no-scrollbar pl-[5vw] pr-[5vw] md:pr-0 md:pl-[16vw]"
+              style={{ gap: "2vw" }}
             >
               {categories.map((cat) => {
                 const isActive = activeCategory === cat;
@@ -173,7 +172,7 @@ export default function WorkPage() {
                       e.preventDefault();
                       setActiveCategory(cat);
                     }}
-                    className={`h-[4.7vw] px-[2vw] rounded-full text-[1.2vw] transition-colors border ${
+                    className={`shrink-0 h-[11vw] md:h-[4.7vw] px-[5vw] md:px-[2vw] rounded-full text-[4vw] md:text-[1.2vw] transition-colors border ${
                       isActive
                         ? "bg-[#1c1d20] text-[#ffffff] border-[#1c1d20]"
                         : "bg-transparent text-[#1c1d20] border-[#d0d0d0]"
@@ -181,7 +180,7 @@ export default function WorkPage() {
                     fillColor="#3A4BE0"
                   >
                     {cat}{" "}
-                    <sup className="text-[0.6em] top-[-0.5em] ml-[0.2em]">
+                    <sup className="text-[2.5vw] md:text-[0.6em] top-[-0.5em] ml-[0.2em]">
                       {count}
                     </sup>
                   </RoundedButton>
@@ -189,8 +188,9 @@ export default function WorkPage() {
               })}
             </div>
 
+            {/* Hidden on mobile, shown on desktop */}
             <div
-              className="flex items-center gap-[0.7vw]"
+              className="hidden md:flex items-center gap-[0.7vw]"
               style={{ paddingRight: "16vw" }}
             >
               <RoundedButton
@@ -251,169 +251,207 @@ export default function WorkPage() {
             </div>
           </div>
 
-          {/* List View */}
-          {view === "list" && (
-            <div
-              className="w-full relative pb-[12vw]"
-              ref={containerRef}
-              onMouseEnter={handleMouseEnterList}
-              onMouseLeave={handleMouseLeaveList}
-            >
-              <div className="w-full relative text-[0.65vw] tracking-widest text-[#999] uppercase pb-[1vw]">
-                <div className="absolute top-0 left-[16vw]">CLIENT</div>
-                <div className="absolute top-0 left-[45vw]">LOCATION</div>
-                <div className="absolute top-0 left-[61.7vw]">SERVICES</div>
-                <div className="absolute top-0 right-[16vw]">YEAR</div>
-              </div>
-              <div
-                className="h-[1px] bg-[#d5d5d5] w-full mt-[1.5vw] mb-0 absolute"
-                style={{ left: "8vw", width: "84vw" }}
-              />
-
-              <div className="flex flex-col group/list mt-[1.5vw] relative w-full">
-                <AnimatePresence>
-                  {filteredProjects.map((project, idx) => {
-                    const isHovered = hoveredIdx === idx;
-                    return (
-                      <motion.div
-                        key={project.slug}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.4 }}
-                        className="w-full"
-                      >
-                        <Link
-                          href={`/work/${project.slug}`}
-                          onMouseEnter={() => setHoveredIdx(idx)}
-                          className={`w-full h-[7.2vw] flex items-center relative z-10 transition-all duration-400 cursor-none border-b border-[#d5d5d5] ${
-                            isHovered ? "opacity-50" : "opacity-100"
-                          }`}
-                          style={{
-                            margin: "0 auto",
-                            width: "84vw",
-                            marginLeft: "8vw",
-                          }}
-                        >
-                          <div
-                            className="absolute text-[2.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
-                            style={{
-                              left: "8vw",
-                              transform: isHovered
-                                ? "translateX(-1vw)"
-                                : "translateX(0)",
-                            }}
-                          >
-                            {project.title}
-                          </div>
-                          <div
-                            className="absolute text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
-                            style={{
-                              left: "37vw",
-                              transform: isHovered
-                                ? "translateX(1vw)"
-                                : "translateX(0)",
-                            }}
-                          >
-                            {project.location}
-                          </div>
-                          <div
-                            className="absolute text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
-                            style={{
-                              left: "53.7vw",
-                              transform: isHovered
-                                ? "translateX(1vw)"
-                                : "translateX(0)",
-                            }}
-                          >
-                            {project.services}
-                          </div>
-                          <div
-                            className="absolute right-[8vw] text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
-                            style={{
-                              transform: isHovered
-                                ? "translateX(1vw)"
-                                : "translateX(0)",
-                            }}
-                          >
-                            {project.year}
-                          </div>
-                        </Link>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              </div>
-
-              {/* Floating Modal (Fixed to viewport) */}
-              <div
-                ref={modalRef}
-                className="fixed top-0 left-0 w-[27.5vw] h-[27.5vw] bg-[#e9eaea] overflow-hidden pointer-events-none z-50 scale-0 origin-center hidden md:block"
-                style={{ transform: "translate(-50%, -50%) scale(0)" }}
-              >
-                <div ref={sliderRef} className="w-full h-full relative">
-                  {filteredProjects.map((p, i) => (
-                    <div
-                      key={i}
-                      className="w-full h-full flex items-center justify-center relative bg-[#e9eaea]"
-                    >
-                      <div className="w-[85%] aspect-[16/10] bg-[#d0d0d0] flex items-center justify-center text-[#999] text-[1vw]">
-                        TODO: {p.image}
+          {/* Mobile Project Cards */}
+          <div className="flex md:hidden flex-col w-full px-[5vw]">
+            <AnimatePresence>
+              {filteredProjects.map((project) => (
+                <motion.div
+                  key={project.slug}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.4 }}
+                  className="w-full"
+                >
+                  <Link
+                    href={`/work/${project.slug}`}
+                    className="flex flex-col w-full mb-[18vw]"
+                  >
+                    <div className="w-full aspect-[1/0.92] bg-[#ececec] flex items-center justify-center mb-[3vw]">
+                      {/* Project Image Placeholder */}
+                      <div className="w-[85%] h-[85%] bg-[#d0d0d0] flex items-center justify-center text-[#999] text-[3vw]">
+                        TODO: {project.image}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
+                    <h3 className="text-[7.8vw] font-normal text-[#1c1d20] leading-[1.1] mb-[3vw]">
+                      {project.title}
+                    </h3>
+                    <div className="w-full h-[1px] bg-[#d5d5d5] mb-[3vw]" />
+                    <div className="w-full flex justify-between items-center text-[3.9vw] font-normal text-[#1c1d20]">
+                      <span>{project.services}</span>
+                      <span>{project.year}</span>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
 
-              {/* View Bubble */}
+          {/* Desktop List View */}
+          <div className="hidden md:block w-full">
+            {view === "list" && (
               <div
-                ref={bubbleRef}
-                className="fixed top-0 left-0 w-[7vw] h-[7vw] bg-[#3A4BE0] rounded-full flex items-center justify-center text-[#ffffff] text-[1.2vw] pointer-events-none z-[51] scale-0 origin-center hidden md:flex"
-                style={{ transform: "translate(-50%, -50%) scale(0)" }}
+                className="w-full relative pb-[12vw]"
+                ref={containerRef}
+                onMouseEnter={handleMouseEnterList}
+                onMouseLeave={handleMouseLeaveList}
               >
-                View
-              </div>
-            </div>
-          )}
+                <div className="w-full relative text-[0.65vw] tracking-widest text-[#999] uppercase pb-[1vw]">
+                  <div className="absolute top-0 left-[16vw]">CLIENT</div>
+                  <div className="absolute top-0 left-[45vw]">LOCATION</div>
+                  <div className="absolute top-0 left-[61.7vw]">SERVICES</div>
+                  <div className="absolute top-0 right-[16vw]">YEAR</div>
+                </div>
+                <div
+                  className="h-[1px] bg-[#d5d5d5] w-full mt-[1.5vw] mb-0 absolute"
+                  style={{ left: "8vw", width: "84vw" }}
+                />
 
-          {/* Grid View */}
-          {view === "grid" && (
-            <div className="w-[84vw] mx-auto grid grid-cols-1 md:grid-cols-2 gap-[4vw] pb-[12vw]">
-              <AnimatePresence>
-                {filteredProjects.map((project) => (
-                  <motion.div
-                    key={project.slug}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <Link
-                      href={`/work/${project.slug}`}
-                      className="group block"
-                    >
-                      <div className="relative w-full aspect-[4/3] bg-[#e1e4e7] mb-[2vw] overflow-hidden">
-                        <div className="absolute inset-0 flex items-center justify-center text-[#999] text-[1vw] transition-transform duration-700 group-hover:scale-105">
-                          TODO: {project.image}
+                <div className="flex flex-col group/list mt-[1.5vw] relative w-full">
+                  <AnimatePresence>
+                    {filteredProjects.map((project, idx) => {
+                      const isHovered = hoveredIdx === idx;
+                      return (
+                        <motion.div
+                          key={project.slug}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.4 }}
+                          className="w-full"
+                        >
+                          <Link
+                            href={`/work/${project.slug}`}
+                            onMouseEnter={() => setHoveredIdx(idx)}
+                            className={`w-full h-[7.2vw] flex items-center relative z-10 transition-all duration-400 cursor-none border-b border-[#d5d5d5] ${
+                              isHovered ? "opacity-50" : "opacity-100"
+                            }`}
+                            style={{
+                              margin: "0 auto",
+                              width: "84vw",
+                              marginLeft: "8vw",
+                            }}
+                          >
+                            <div
+                              className="absolute text-[2.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                              style={{
+                                left: "8vw",
+                                transform: isHovered
+                                  ? "translateX(-1vw)"
+                                  : "translateX(0)",
+                              }}
+                            >
+                              {project.title}
+                            </div>
+                            <div
+                              className="absolute text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                              style={{
+                                left: "37vw",
+                                transform: isHovered
+                                  ? "translateX(1vw)"
+                                  : "translateX(0)",
+                              }}
+                            >
+                              {project.location}
+                            </div>
+                            <div
+                              className="absolute text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                              style={{
+                                left: "53.7vw",
+                                transform: isHovered
+                                  ? "translateX(1vw)"
+                                  : "translateX(0)",
+                              }}
+                            >
+                              {project.services}
+                            </div>
+                            <div
+                              className="absolute right-[8vw] text-[1.2vw] font-normal text-[#1c1d20] transition-transform duration-400 ease-out"
+                              style={{
+                                transform: isHovered
+                                  ? "translateX(1vw)"
+                                  : "translateX(0)",
+                              }}
+                            >
+                              {project.year}
+                            </div>
+                          </Link>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+
+                {/* Floating Modal (Fixed to viewport) */}
+                <div
+                  ref={modalRef}
+                  className="fixed top-0 left-0 w-[27.5vw] h-[27.5vw] bg-[#e9eaea] overflow-hidden pointer-events-none z-50 scale-0 origin-center hidden md:block"
+                  style={{ transform: "translate(-50%, -50%) scale(0)" }}
+                >
+                  <div ref={sliderRef} className="w-full h-full relative">
+                    {filteredProjects.map((p, i) => (
+                      <div
+                        key={i}
+                        className="w-full h-full flex items-center justify-center relative bg-[#e9eaea]"
+                      >
+                        <div className="w-[85%] aspect-[16/10] bg-[#d0d0d0] flex items-center justify-center text-[#999] text-[1vw]">
+                          TODO: {p.image}
                         </div>
                       </div>
-                      <div className="flex items-start justify-between">
-                        <h3 className="text-[2.2vw] font-normal text-[#1c1d20] leading-[1.2]">
-                          {project.title}
-                        </h3>
-                        <span className="text-[1.2vw] text-[#1c1d20]">
-                          {project.year}
-                        </span>
-                      </div>
-                      <div className="text-[1.2vw] text-[#999] mt-[0.5vw] border-b border-[#e1e4e7] pb-[2vw]">
-                        {project.services}
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
+                    ))}
+                  </div>
+                </div>
+
+                {/* View Bubble */}
+                <div
+                  ref={bubbleRef}
+                  className="fixed top-0 left-0 w-[7vw] h-[7vw] bg-[#3A4BE0] rounded-full flex items-center justify-center text-[#ffffff] text-[1.2vw] pointer-events-none z-[51] scale-0 origin-center hidden md:flex"
+                  style={{ transform: "translate(-50%, -50%) scale(0)" }}
+                >
+                  View
+                </div>
+              </div>
+            )}
+
+            {/* Desktop Grid View */}
+            {view === "grid" && (
+              <div className="w-[84vw] mx-auto grid grid-cols-1 md:grid-cols-2 gap-[4vw] pb-[12vw]">
+                <AnimatePresence>
+                  {filteredProjects.map((project) => (
+                    <motion.div
+                      key={project.slug}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Link
+                        href={`/work/${project.slug}`}
+                        className="group block"
+                      >
+                        <div className="relative w-full aspect-[4/3] bg-[#e1e4e7] mb-[2vw] overflow-hidden">
+                          <div className="absolute inset-0 flex items-center justify-center text-[#999] text-[1vw] transition-transform duration-700 group-hover:scale-105">
+                            TODO: {project.image}
+                          </div>
+                        </div>
+                        <div className="flex items-start justify-between">
+                          <h3 className="text-[2.2vw] font-normal text-[#1c1d20] leading-[1.2]">
+                            {project.title}
+                          </h3>
+                          <span className="text-[1.2vw] text-[#1c1d20]">
+                            {project.year}
+                          </span>
+                        </div>
+                        <div className="text-[1.2vw] text-[#999] mt-[0.5vw] border-b border-[#e1e4e7] pb-[2vw]">
+                          {project.services}
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
         </div>
       </main>
       <Footer />

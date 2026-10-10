@@ -48,6 +48,12 @@ export function MenuOverlay() {
   }, []);
 
   useEffect(() => {
+    const handleOpenMenu = () => setOpen(true);
+    window.addEventListener("open-menu", handleOpenMenu);
+    return () => window.removeEventListener("open-menu", handleOpenMenu);
+  }, []);
+
+  useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
@@ -91,20 +97,20 @@ export function MenuOverlay() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.76, 0, 0.24, 1] }}
-            className="fixed top-[2vw] right-[2.5vw] z-[2147483002]"
+            className="fixed top-[4vw] right-[4vw] md:top-[2vw] md:right-[2.5vw] z-[2147483002]"
           >
             <RoundedButton
               onClick={() => setOpen(!open)}
-              className={`w-[5.5vw] h-[5.5vw] flex flex-col items-center justify-center gap-1.5 transition-colors duration-300 ${
+              className={`w-[14.5vw] h-[14.5vw] md:w-[5.5vw] md:h-[5.5vw] flex flex-col items-center justify-center gap-[1.5vw] md:gap-[0.35vw] transition-colors duration-300 ${
                 open ? "bg-[#3A4BE0]" : "bg-[#1c1d20]"
               }`}
               fillColor="#3A4BE0"
             >
               <div
-                className={`w-[1.2vw] h-[1px] bg-[#ffffff] transition-transform duration-300 absolute ${open ? "rotate-45" : "-translate-y-[2px]"}`}
+                className={`w-[4vw] md:w-[1.2vw] h-[1.5px] md:h-[1px] bg-[#ffffff] transition-transform duration-300 absolute ${open ? "rotate-45" : "-translate-y-[2.5vw] md:-translate-y-[2px]"}`}
               />
               <div
-                className={`w-[1.2vw] h-[1px] bg-[#ffffff] transition-transform duration-300 absolute ${open ? "-rotate-45" : "translate-y-[2px]"}`}
+                className={`w-[4vw] md:w-[1.2vw] h-[1.5px] md:h-[1px] bg-[#ffffff] transition-transform duration-300 absolute ${open ? "-rotate-45" : "translate-y-[2.5vw] md:translate-y-[2px]"}`}
               />
             </RoundedButton>
           </motion.div>
@@ -130,17 +136,16 @@ export function MenuOverlay() {
 
             {/* Panel */}
             <motion.div
-              initial={prefersReducedMotion ? { opacity: 0 } : { x: "100%" }}
-              animate={prefersReducedMotion ? { opacity: 1 } : { x: "0%" }}
-              exit={prefersReducedMotion ? { opacity: 0 } : { x: "100%" }}
+              initial={prefersReducedMotion ? { opacity: 0 } : { y: "100%", x: "0%" }}
+              animate={prefersReducedMotion ? { opacity: 1 } : { y: "0%", x: "0%" }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { y: "100%", x: "0%" }}
               transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-              className="fixed top-0 right-0 bottom-0 w-[36vw] bg-[#1c1d20] z-[2147483001] text-[#ffffff] flex flex-col justify-between"
-              style={{ padding: "6vw 4vw 2vw 4vw" }}
+              className="fixed inset-0 md:inset-auto md:top-0 md:right-0 md:bottom-0 w-full md:w-[36vw] bg-[#1c1d20] z-[2147483001] text-[#ffffff] flex flex-col justify-between pt-[24vw] pb-[5vw] px-[5vw] md:p-[6vw_4vw_2vw_4vw]"
             >
-              {/* SVG Curve */}
+              {/* SVG Curve (Desktop only) */}
               {!prefersReducedMotion && (
                 <svg
-                  className="absolute right-full top-0 w-[100px] h-full"
+                  className="hidden md:block absolute right-full top-0 w-[100px] h-full"
                   viewBox="0 0 100 1000"
                   preserveAspectRatio="none"
                 >
@@ -165,7 +170,7 @@ export function MenuOverlay() {
                 </svg>
               )}
 
-              <div>
+              <div className="w-full">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -175,12 +180,12 @@ export function MenuOverlay() {
                     ease: [0.76, 0, 0.24, 1],
                     delay: 0.1,
                   }}
-                  className="text-[0.65vw] tracking-[0.03em] text-[rgba(255,255,255,0.4)] uppercase mb-[4vw] pb-[2vw] border-b border-[rgba(255,255,255,0.15)]"
+                  className="text-[2.5vw] md:text-[0.65vw] tracking-[0.03em] text-[rgba(255,255,255,0.4)] uppercase mb-[6vw] md:mb-[4vw] pb-[4vw] md:pb-[2vw] border-b border-[rgba(255,255,255,0.15)] w-[110%] -ml-[5%]"
                 >
-                  NAVIGATION
+                  <span className="ml-[5%]">NAVIGATION</span>
                 </motion.div>
 
-                <nav className="flex flex-col" style={{ gap: "2vw" }}>
+                <nav className="flex flex-col gap-[6vw] md:gap-[2vw]">
                   {links.map((link, i) => {
                     const isActive = pathname === link.href;
                     return (
@@ -194,23 +199,23 @@ export function MenuOverlay() {
                           delay: 0.1 + i * 0.06,
                         }}
                         key={link.href}
-                        style={{
-                          height: "5.6vw",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
+                        className="h-[15vw] md:h-[5.6vw] flex items-center"
                       >
                         <a
                           href={link.href}
                           onClick={(e) =>
                             handleNavClick(e, link.href, link.label)
                           }
-                          className="text-[3.6vw] font-normal flex items-center relative group text-[#ffffff] hover:opacity-70 transition-opacity"
+                          className="w-full text-[11vw] md:text-[3.6vw] font-light md:font-normal flex justify-between items-center relative group text-[#ffffff] hover:opacity-70 transition-opacity"
                         >
                           <span
-                            className={`absolute left-[-1.5vw] top-1/2 -translate-y-1/2 w-[0.5vw] h-[0.5vw] rounded-full bg-[#ffffff] transition-transform duration-300 ${isActive ? "scale-100" : "scale-0 group-hover:scale-100"}`}
+                            className="hidden md:block absolute left-[-1.5vw] top-1/2 -translate-y-1/2 w-[0.5vw] h-[0.5vw] rounded-full bg-[#ffffff] transition-transform duration-300"
+                            style={{ transform: isActive ? "scale(1)" : "scale(0)" }}
                           />
                           {link.label}
+                          {isActive && (
+                            <span className="md:hidden w-[2.7vw] h-[2.7vw] rounded-full bg-[#ffffff] mr-[10vw]" />
+                          )}
                         </a>
                       </motion.div>
                     );
@@ -218,7 +223,8 @@ export function MenuOverlay() {
                 </nav>
               </div>
 
-              <div>
+              <div className="w-full">
+                <div className="w-[110%] -ml-[5%] h-[1px] bg-[rgba(255,255,255,0.15)] mb-[4vw] md:hidden" />
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -228,11 +234,11 @@ export function MenuOverlay() {
                     ease: [0.76, 0, 0.24, 1],
                     delay: 0.4,
                   }}
-                  className="text-[0.65vw] tracking-[0.03em] text-[rgba(255,255,255,0.4)] uppercase mb-[1vw]"
+                  className="text-[2.5vw] md:text-[0.65vw] tracking-[0.03em] text-[rgba(255,255,255,0.4)] uppercase mb-[4vw] md:mb-[1vw]"
                 >
                   SOCIALS
                 </motion.div>
-                <div className="flex gap-[1.5vw]">
+                <div className="flex gap-[5vw] md:gap-[1.5vw]">
                   {socials.map((s, i) => (
                     <motion.a
                       key={s.label}
@@ -245,7 +251,7 @@ export function MenuOverlay() {
                         ease: [0.76, 0, 0.24, 1],
                         delay: 0.4 + i * 0.06,
                       }}
-                      className="text-[0.9vw] font-normal text-[#ffffff] hover:opacity-70 transition-opacity"
+                      className="text-[4vw] md:text-[0.9vw] font-normal text-[#ffffff] hover:opacity-70 transition-opacity"
                     >
                       {s.label}
                     </motion.a>
@@ -280,8 +286,8 @@ export function MenuOverlay() {
                 fill="#1c1d20"
               />
             </svg>
-            <div className="text-[2.2vw] font-normal flex items-center gap-[1vw]">
-              <div className="w-[0.5vw] h-[0.5vw] rounded-full bg-[#ffffff]" />
+            <div className="text-[9vw] md:text-[2.2vw] text-[#ffffff] font-normal flex items-center gap-[2.5vw] md:gap-[1vw]">
+              <div className="w-[1.5vw] h-[1.5vw] md:w-[0.5vw] md:h-[0.5vw] rounded-full bg-[#ffffff]" />
               {navTargetName}
             </div>
           </motion.div>

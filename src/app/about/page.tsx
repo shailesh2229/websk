@@ -1,9 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Footer } from "@/components/layout/Footer";
 import { RoundedButton } from "@/components/ui/RoundedButton";
-import { Globe, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { useRef } from "react";
+import { InteractiveGlobeButton } from "@/components/about/InteractiveGlobeButton";
 
 const services = [
   {
@@ -74,56 +77,65 @@ const tools = [
 ];
 
 export default function AboutPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+  const prefersReducedMotion = useReducedMotion();
+  const yPortrait = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? ["0%", "0%"] : ["-8%", "8%"]
+  );
+
   return (
-    <>
-      <main className="w-full bg-[#ffffff] pt-[17vw] min-h-screen">
+    <div ref={containerRef}>
+      <main className="w-full bg-[#ffffff] pt-[28vw] md:pt-[17vw]">
         {/* Intro */}
-        <div className="w-full relative mb-[8vw]">
+        <div className="w-full relative mb-[8vw] md:mb-[12vw] px-[5vw] md:px-0">
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-            className="text-[6vw] font-normal leading-[1.1] text-[#1c1d20]"
-            style={{ paddingLeft: "16vw", width: "90vw" }}
+            className="text-[9.3vw] md:text-[6vw] font-normal leading-[1.2] md:leading-[1.1] text-[#1c1d20] md:pl-[16vw] md:w-[90vw]"
           >
             I'm a freelance designer and developer blending creativity
-            <br />
+            <br className="hidden md:block" />
+            <span className="md:hidden"> </span>
             with code.
           </motion.h1>
         </div>
 
         {/* Divider and globe button */}
-        <div className="relative w-full mb-[12vw] mt-[4vw]">
+        <div className="relative w-full mb-[12vw]">
           <div
-            className="h-[1px] bg-[#d5d5d5] absolute top-0"
-            style={{ left: "16vw", width: "68vw" }}
+            className="h-[1px] bg-[#d5d5d5] absolute top-0 left-[5vw] right-[5vw] md:left-[16vw] md:w-[68vw] md:right-auto"
           />
-          <div
-            className="absolute top-0 -translate-y-1/2 z-10"
-            style={{ left: "72vw", transform: "translate(-50%, -50%)" }}
-          >
-            <RoundedButton
-              href="#"
-              className="w-[12vw] h-[12vw] bg-[#3A4BE0] text-white flex items-center justify-center text-[1.2vw]"
-              fillColor="#2B38C4"
-            >
-              <Globe className="w-[3vw] h-[3vw] stroke-[1]" />
-            </RoundedButton>
+          <div className="md:hidden absolute top-0 -translate-y-1/2 right-[7vw]">
+            <InteractiveGlobeButton />
+          </div>
+          <div className="hidden md:block">
+            <InteractiveGlobeButton />
           </div>
         </div>
 
         {/* Portrait & Text */}
-        <div className="w-full relative flex mb-[16vw]">
+        <div className="w-full relative flex flex-col md:flex-row mb-[20vw] md:mb-[12vw] px-[5vw] md:px-0">
+          
+          {/* Arrow */}
           <ArrowRight
-            className="absolute text-[#1c1d20] stroke-[1]"
+            className="hidden md:block absolute text-[#1c1d20] stroke-[1]"
             style={{ width: "1.5vw", height: "1.5vw", left: "5vw", top: "0" }}
           />
 
           <div
-            className="flex flex-col"
-            style={{ paddingLeft: "16vw", width: "37vw" }}
+            className="flex flex-col md:pl-[16vw] md:w-[37vw] w-full"
           >
-            <p className="text-[1.2vw] font-normal leading-[1.5] text-[#1c1d20] w-[21vw] mb-[4vw]">
+            <ArrowRight
+              className="md:hidden text-[#1c1d20] stroke-[1] w-[4vw] h-[4vw] mb-[3vw]"
+            />
+            <p className="text-[4vw] md:text-[1.2vw] font-normal leading-[1.6] md:leading-[1.5] text-[#1c1d20] w-full md:w-[21vw] mb-[8vw] md:mb-[4vw]">
               Hi, I'm Shailesh.
               <br />
               <br />I specialize in designing and building custom websites that
@@ -131,54 +143,65 @@ export default function AboutPage() {
               on creating unique digital experiences rather than relying on
               generic templates.
             </p>
-            <div className="flex flex-wrap gap-[1vw] mb-[4vw] w-[21vw]">
-              <span className="px-[1.5vw] py-[0.8vw] border border-[#1c1d20] rounded-full text-[0.9vw]">
+            <div className="h-[1px] bg-[#d5d5d5] w-full mb-[8vw] md:hidden" />
+            <div className="flex flex-wrap gap-[2vw] md:gap-[1vw] mb-[6vw] md:mb-[4vw] w-full md:w-[21vw]">
+              <span className="px-[4vw] md:px-[1.5vw] py-[2vw] md:py-[0.8vw] border border-[#1c1d20] rounded-full text-[3vw] md:text-[0.9vw]">
                 Full-Stack
               </span>
-              <span className="px-[1.5vw] py-[0.8vw] border border-[#1c1d20] rounded-full text-[0.9vw]">
+              <span className="px-[4vw] md:px-[1.5vw] py-[2vw] md:py-[0.8vw] border border-[#1c1d20] rounded-full text-[3vw] md:text-[0.9vw]">
                 AI-Accelerated Dev
               </span>
-              <span className="px-[1.5vw] py-[0.8vw] border border-[#1c1d20] rounded-full text-[0.9vw]">
+              <span className="px-[4vw] md:px-[1.5vw] py-[2vw] md:py-[0.8vw] border border-[#1c1d20] rounded-full text-[3vw] md:text-[0.9vw]">
                 Fast Shipping
               </span>
             </div>
-            <span className="text-[0.65vw] tracking-[0.03em] uppercase text-[#999]">
+            <span className="text-[2.5vw] md:text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[8vw] md:mb-0">
               Always exploring
             </span>
           </div>
 
-          <div className="w-[55vw]" style={{ paddingRight: "8vw" }}>
-            <div className="w-[54vw] aspect-[4/5] bg-[#e1e4e7] relative overflow-hidden">
-              <div className="absolute inset-0 flex items-center justify-center text-[#999] text-[1vw]">
-                TODO: /public/about/portrait.jpg
-              </div>
+          <div className="w-full md:w-[55vw] md:pr-[8vw]">
+            <div className="w-full md:w-[54vw] aspect-[4/5] bg-[#e1e4e7] relative overflow-hidden">
+              <motion.div 
+                className="absolute inset-0 w-full"
+                style={{ y: yPortrait, height: "115%", top: "-7.5%" }}
+              >
+                <Image
+                  src="/shailesh-avatar.png"
+                  alt="Shailesh Portrait"
+                  fill
+                  sizes="(max-width: 768px) 90vw, 55vw"
+                  quality={100}
+                  className="object-cover"
+                  style={{ objectPosition: "40% 30%" }}
+                />
+              </motion.div>
             </div>
           </div>
         </div>
 
         {/* Services Panel */}
-        <div id="services" className="w-full bg-[#e1e4e7] py-[10vw]">
+        <div id="services" className="w-full bg-[#e1e4e7] py-[16vw] md:py-[10vw]">
           <div
-            className="w-full relative"
-            style={{ paddingLeft: "16vw", paddingRight: "8vw" }}
+            className="w-full relative px-[5vw] md:pl-[16vw] md:pr-[8vw]"
           >
-            <h2 className="text-[0.65vw] tracking-[0.03em] uppercase text-[#1c1d20] mb-[6vw]">
+            <h2 className="text-[3.5vw] md:text-[0.65vw] tracking-[0.03em] uppercase text-[#1c1d20] mb-[10vw] md:mb-[6vw]">
               I CAN HELP YOU WITH
             </h2>
 
-            <div className="flex gap-[3vw]">
+            <div className="flex flex-col md:flex-row gap-[10vw] md:gap-[3vw]">
               {services.map((s) => (
                 <div
                   key={s.id}
-                  className="flex flex-col flex-1 border-t border-[#1c1d20] pt-[1.5vw]"
+                  className="flex flex-col md:flex-1 border-t border-[#1c1d20] pt-[4vw] md:pt-[1.5vw]"
                 >
-                  <span className="text-[0.9vw] text-[#1c1d20] mb-[3vw]">
+                  <span className="text-[2.5vw] md:text-[0.9vw] text-[#1c1d20] mb-[4vw] md:mb-[3vw]">
                     {s.id}
                   </span>
-                  <h3 className="text-[2.2vw] font-normal text-[#1c1d20] leading-[1.1] mb-[3vw]">
+                  <h3 className="text-[6vw] md:text-[2.2vw] font-normal text-[#1c1d20] leading-[1.1] mb-[4vw] md:mb-[3vw]">
                     {s.title}
                   </h3>
-                  <p className="text-[1.2vw] text-[#333] font-normal leading-[1.5] pr-[1vw]">
+                  <p className="text-[4vw] md:text-[1.2vw] text-[#333] font-normal leading-[1.6] md:leading-[1.5] md:pr-[1vw]">
                     {s.desc}
                   </p>
                 </div>
@@ -188,30 +211,29 @@ export default function AboutPage() {
         </div>
 
         {/* Process */}
-        <div className="w-full bg-[#ffffff] py-[10vw]">
+        <div className="w-full bg-[#ffffff] py-[16vw] md:py-[10vw]">
           <div
-            className="w-full relative flex"
-            style={{ paddingLeft: "16vw", paddingRight: "8vw" }}
+            className="w-full relative flex flex-col md:flex-row px-[5vw] md:pl-[16vw] md:pr-[8vw]"
           >
-            <div className="w-[30%]">
-              <h2 className="text-[3vw] font-normal leading-[1.2] text-[#1c1d20] sticky top-[10vw]">
+            <div className="w-full md:w-[30%] mb-[8vw] md:mb-0">
+              <h2 className="text-[8vw] md:text-[3vw] font-normal leading-[1.2] text-[#1c1d20] md:sticky md:top-[10vw]">
                 My Process
               </h2>
             </div>
-            <div className="w-[70%] flex flex-col pl-[2vw]">
+            <div className="w-full md:w-[70%] flex flex-col md:pl-[2vw]">
               {process.map((p) => (
                 <div
                   key={p.id}
-                  className="border-t border-[#e1e4e7] py-[4vw] flex gap-[4vw]"
+                  className="border-t border-[#e1e4e7] py-[8vw] md:py-[4vw] flex gap-[4vw]"
                 >
-                  <span className="text-[0.9vw] text-[#999] w-[10%] pt-[0.5vw]">
+                  <span className="text-[3vw] md:text-[0.9vw] text-[#999] w-[10%] pt-[1vw] md:pt-[0.5vw]">
                     {p.id}
                   </span>
                   <div className="flex flex-col w-[90%]">
-                    <h3 className="text-[2.2vw] font-normal text-[#1c1d20] mb-[1.5vw]">
+                    <h3 className="text-[6vw] md:text-[2.2vw] font-normal text-[#1c1d20] mb-[3vw] md:mb-[1.5vw]">
                       {p.title}
                     </h3>
-                    <p className="text-[1.2vw] text-[#666] font-normal leading-[1.5] w-[70%]">
+                    <p className="text-[4vw] md:text-[1.2vw] text-[#666] font-normal leading-[1.6] md:leading-[1.5] w-[90%] md:w-[70%]">
                       {p.desc}
                     </p>
                   </div>
@@ -222,71 +244,48 @@ export default function AboutPage() {
         </div>
 
         {/* Why Us & Tools */}
-        <div className="w-full bg-[#ffffff] pb-[10vw]">
+        <div className="w-full bg-[#ffffff]">
           <div
-            className="w-full relative flex border-t border-[#e1e4e7] pt-[6vw]"
-            style={{ paddingLeft: "16vw", paddingRight: "8vw" }}
+            className="w-full relative flex flex-col md:flex-row border-t border-[#e1e4e7] pt-[12vw] md:pt-[6vw] px-[5vw] md:pl-[16vw] md:pr-[8vw] pb-[16vw] md:pb-[10vw]"
           >
-            <div className="flex flex-col w-[50%]">
-              <h2 className="text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[4vw]">
+            <div className="flex flex-col w-full md:w-[50%] mb-[12vw] md:mb-0">
+              <h2 className="text-[3.5vw] md:text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[6vw] md:mb-[4vw]">
                 WHY US
               </h2>
-              <ul className="flex flex-col gap-[1.5vw]">
+              <ul className="flex flex-col gap-[4vw] md:gap-[1.5vw]">
                 {whyUs.map((item, i) => (
                   <li
                     key={i}
-                    className="text-[2.2vw] font-normal text-[#1c1d20] flex items-center gap-[1vw]"
+                    className="text-[6vw] md:text-[2.2vw] font-normal text-[#1c1d20] flex items-center gap-[3vw] md:gap-[1vw]"
                   >
-                    <span className="w-[0.5vw] h-[0.5vw] rounded-full bg-[#1c1d20]" />
+                    <span className="w-[1.5vw] h-[1.5vw] md:w-[0.5vw] md:h-[0.5vw] rounded-full bg-[#1c1d20]" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="flex flex-col w-[50%] pl-[2vw]">
-              <h2 className="text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[4vw]">
+            <div className="flex flex-col w-full md:w-[50%] md:pl-[2vw]">
+              <h2 className="text-[3.5vw] md:text-[0.65vw] tracking-[0.03em] uppercase text-[#999] mb-[6vw] md:mb-[4vw]">
                 TOOLS
               </h2>
-              <div className="flex flex-wrap gap-[0.8vw]">
+              <div className="flex flex-wrap gap-[2vw] md:gap-[0.8vw]">
                 {tools.map((tool, i) => (
-                  <span
+                  <RoundedButton
                     key={i}
-                    className="px-[1.5vw] py-[0.8vw] border border-[#e1e4e7] rounded-full text-[1.2vw] text-[#1c1d20]"
+                    type="button"
+                    className="px-[5vw] py-[2.5vw] md:px-[1.5vw] md:py-[0.8vw] border border-[#e1e4e7] rounded-full text-[4vw] md:text-[1.2vw] text-[#1c1d20] hover:border-transparent hover:text-white"
+                    fillColor="#3A4BE0"
                   >
                     {tool}
-                  </span>
+                  </RoundedButton>
                 ))}
               </div>
             </div>
           </div>
         </div>
-
-        {/* Rotating Badge Area */}
-        <div className="w-full h-[50vw] bg-[#e1e4e7] relative overflow-hidden flex items-center justify-center">
-          <div className="absolute inset-0 flex items-center justify-center text-[#999] text-[1vw]">
-            TODO: Add parallax photo /public/about/studio.jpg
-          </div>
-
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="w-[10vw] h-[10vw] rounded-full bg-white flex items-center justify-center z-10 p-[1vw]"
-          >
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              <path
-                id="curve"
-                d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0"
-                fill="transparent"
-              />
-              <text fontSize="12" letterSpacing="2.5" fill="#1c1d20">
-                <textPath href="#curve">WEBSK • AVAILABLE FOR WORK •</textPath>
-              </text>
-            </svg>
-          </motion.div>
-        </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
